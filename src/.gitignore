@@ -1,22 +1,5 @@
-#Visual Paradigm
-.vpprefdata/
-*.vpp~*
-*.vpp.working
-*.vpp.working-journal
-*.lock
-*.vpp.bak*
-tmp/*
-
-#Microsoft Word
-~$*
-*.asd
-*.wbk
-*.tmp
-
-#Android-Studio
 *.iml
 .gradle
-app/google-services.json
 /local.properties
 /.idea/caches
 /.idea/libraries
