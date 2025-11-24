@@ -6,3 +6,9 @@
 *.lock
 *.vpp.bak*
 tmp/*
+
+#Microsoft Word
+~$*
+*.asd
+*.wbk
+*.tmp
