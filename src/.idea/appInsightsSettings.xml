@@ -8,10 +8,10 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="PLACEHOLDER" />
-                  <option name="mobileSdkAppId" value="" />
-                  <option name="projectId" value="" />
-                  <option name="projectNumber" value="" />
+                  <option name="appId" value="com.ipca.socialstore" />
+                  <option name="mobileSdkAppId" value="1:595453439696:android:41df53c8bbc1a27686b8d5" />
+                  <option name="projectId" value="socialstore-f58be" />
+                  <option name="projectNumber" value="595453439696" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />
