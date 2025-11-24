@@ -1,0 +1,8 @@
+#Visual Paradigm
+.vpprefdata/
+*.vpp~*
+*.vpp.working
+*.vpp.working-journal
+*.lock
+*.vpp.bak*
+tmp/*
