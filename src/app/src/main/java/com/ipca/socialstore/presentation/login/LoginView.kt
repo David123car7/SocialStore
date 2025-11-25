@@ -1,5 +1,6 @@
 package com.ipca.socialstore.presentation.login
 
+import android.app.Activity
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -23,7 +24,7 @@ import com.ipca.socialstore.presentation.objects.NavigationViews
 import com.ipca.socialstore.ui.theme.SocialStoreTheme
 
 @Composable
-fun LoginView(modifier: Modifier, navController: NavController){
+fun LoginView(modifier: Modifier, navController: NavController, activity: Activity){
     val loginViewModel: LoginViewModel = hiltViewModel()
     val uiState by loginViewModel.uiState
 
@@ -32,7 +33,7 @@ fun LoginView(modifier: Modifier, navController: NavController){
         uiState = uiState,
         onEmailUpdate = {value -> loginViewModel.updateEmail(value)},
         onPasswordUpdate = {value -> loginViewModel.updatePassword(value)},
-        onLogin = {loginViewModel.login()},
+        onLogin = {loginViewModel.loginMicrosoft(activity = activity)},
         onClickRegister = {navController.navigate(NavigationViews.register)}
     )
 

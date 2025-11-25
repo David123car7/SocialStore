@@ -1,5 +1,6 @@
 package com.ipca.socialstore
 
+import android.app.Activity
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -29,12 +30,13 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             val navController = rememberNavController()
+            val acitivity = Activity()
             SocialStoreTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     NavHost(navController = navController, startDestination = NavigationViews.login){
                         composable (NavigationViews.login){
                             LoginView(modifier = Modifier.padding(innerPadding),
-                                navController = navController)
+                                navController = navController, activity = acitivity)
                         }
                         composable (NavigationViews.register){
                             RegisterView(modifier = Modifier.padding(innerPadding),
