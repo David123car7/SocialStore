@@ -11,37 +11,51 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.Navigation
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.ipca.socialstore.presentation.home.HomeView
+import com.ipca.socialstore.presentation.login.LoginView
+import com.ipca.socialstore.presentation.objects.NavigationViews
+import com.ipca.socialstore.presentation.register.RegisterView
 import com.ipca.socialstore.ui.theme.SocialStoreTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
+            val navController = rememberNavController()
             SocialStoreTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                    NavHost(navController = navController, startDestination = NavigationViews.login){
+                        composable (NavigationViews.login){
+                            LoginView(modifier = Modifier.padding(innerPadding),
+                                navController = navController)
+                        }
+                        composable (NavigationViews.register){
+                            RegisterView(modifier = Modifier.padding(innerPadding),
+                                navController = navController)
+                        }
+                        composable (NavigationViews.home){
+                            HomeView(modifier = Modifier.padding(innerPadding),
+                                navController = navController)
+                        }
+                    }
                 }
             }
         }
     }
 }
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
 
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
     SocialStoreTheme {
-        Greeting("Android")
+
     }
 }
