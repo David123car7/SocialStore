@@ -38,7 +38,6 @@ fun LoginView(modifier: Modifier, navController: NavController){
     )
 
     LaunchedEffect(uiState.isLoggedIn) {
-        loginViewModel.getUserStateSession()
         if(uiState.isLoggedIn){
             navController.navigate(NavigationViews.home)
         }

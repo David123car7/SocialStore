@@ -9,17 +9,9 @@ import javax.inject.Inject
 data class HomeState (
     var error : String? = null,
     var isLoading : Boolean = false,
-    var isLoggedIn: Boolean = false
 )
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(private val getUserSessionState: GetUserSessionState): ViewModel() {
     var uiState = mutableStateOf(HomeState())
-
-    fun getUserStateSession(){
-        val result = getUserSessionState()
-        result.onSuccess { value ->
-            uiState.value = uiState.value.copy(isLoading = false, error = null, isLoggedIn = value)
-        }
-    }
 }
