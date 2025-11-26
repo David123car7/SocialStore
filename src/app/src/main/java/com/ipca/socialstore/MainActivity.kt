@@ -30,13 +30,12 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             val navController = rememberNavController()
-            val acitivity = Activity()
             SocialStoreTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     NavHost(navController = navController, startDestination = NavigationViews.login){
                         composable (NavigationViews.login){
                             LoginView(modifier = Modifier.padding(innerPadding),
-                                navController = navController, activity = acitivity)
+                                navController = navController)
                         }
                         composable (NavigationViews.register){
                             RegisterView(modifier = Modifier.padding(innerPadding),

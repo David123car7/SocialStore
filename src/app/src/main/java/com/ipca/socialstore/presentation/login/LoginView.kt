@@ -24,7 +24,7 @@ import com.ipca.socialstore.presentation.objects.NavigationViews
 import com.ipca.socialstore.ui.theme.SocialStoreTheme
 
 @Composable
-fun LoginView(modifier: Modifier, navController: NavController, activity: Activity){
+fun LoginView(modifier: Modifier, navController: NavController){
     val loginViewModel: LoginViewModel = hiltViewModel()
     val uiState by loginViewModel.uiState
 
@@ -33,12 +33,13 @@ fun LoginView(modifier: Modifier, navController: NavController, activity: Activi
         uiState = uiState,
         onEmailUpdate = {value -> loginViewModel.updateEmail(value)},
         onPasswordUpdate = {value -> loginViewModel.updatePassword(value)},
-        onLogin = {loginViewModel.loginMicrosoft(activity = activity)},
+        onLogin = {loginViewModel.login()},
         onClickRegister = {navController.navigate(NavigationViews.register)}
     )
 
-    LaunchedEffect(uiState.isSucess) {
-        if(uiState.isSucess){
+    LaunchedEffect(uiState.isLoggedIn) {
+        loginViewModel.getUserStateSession()
+        if(uiState.isLoggedIn){
             navController.navigate(NavigationViews.home)
         }
     }

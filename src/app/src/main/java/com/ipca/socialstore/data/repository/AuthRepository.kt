@@ -9,8 +9,12 @@ import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 class AuthRepository @Inject constructor(private val auth: FirebaseAuth) {
-    fun getCurrentUserUID(): String? {
-        return auth.currentUser?.uid
+    fun getUserSessionState(): Result<Boolean> {
+        val uid = auth.currentUser?.uid
+        return if(uid == null)
+            Result.success(false)
+        else
+            Result.success(true)
     }
 
     suspend fun login(email: String, password: String): Result<Boolean> {
@@ -51,6 +55,16 @@ class AuthRepository @Inject constructor(private val auth: FirebaseAuth) {
             auth.createUserWithEmailAndPassword(email,password)
             Result.success(true)
         } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun logout(): Result<Boolean>{
+        return try{
+            auth.signOut()
+            Result.success(true)
+        }
+        catch (e: Exception){
             Result.failure(e)
         }
     }

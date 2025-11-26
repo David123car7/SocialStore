@@ -37,8 +37,8 @@ fun RegisterView(modifier: Modifier, navController: NavController){
         onRegister = {registerViewModel.register()},
     )
 
-    LaunchedEffect(uiState.isSucess) {
-        if(uiState.isSucess){
+    LaunchedEffect(uiState.isRegistered) {
+        if(uiState.isRegistered){
             navController.navigate(NavigationViews.login)
         }
     }

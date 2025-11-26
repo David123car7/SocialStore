@@ -13,7 +13,7 @@ data class RegisterState (
     var password : String = "",
     var error : String? = null,
     var isLoading : Boolean = false,
-    var isSucess : Boolean = false,
+    var isRegistered : Boolean = false,
 )
 
 @HiltViewModel
@@ -34,10 +34,10 @@ class RegisterViewModel @Inject constructor(private val registerUseCase: Registe
 
             val result = registerUseCase(uiState.value.email, uiState.value.password)
             result.onSuccess {
-                uiState.value = uiState.value.copy(isLoading = false, error = null, isSucess = true)
+                uiState.value = uiState.value.copy(isLoading = false, error = null, isRegistered = true)
             }
             result.onFailure { exception ->
-                uiState.value = uiState.value.copy(isLoading = false, error = exception.message, isSucess = false)
+                uiState.value = uiState.value.copy(isLoading = false, error = exception.message, isRegistered = false)
             }
         }
     }
