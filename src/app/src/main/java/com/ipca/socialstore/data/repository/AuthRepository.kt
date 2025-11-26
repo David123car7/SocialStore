@@ -59,7 +59,7 @@ class AuthRepository @Inject constructor(private val auth: FirebaseAuth) {
         }
     }
 
-    suspend fun logout(): Result<Boolean>{
+    fun logout(): Result<Boolean>{
         return try{
             auth.signOut()
             Result.success(true)
