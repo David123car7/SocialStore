@@ -1,21 +1,19 @@
 package com.ipca.socialstore.presentation.home
 
-import android.R
 import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.ViewModel
 import com.ipca.socialstore.domain.login.GetUserSessionState
-import com.ipca.socialstore.domain.login.LogoutUseCase
+import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
-data class HomeState(
-    val isLoading: Boolean? = null,
-    val error: String? = null,
-    val isLoggedIn: Boolean = false
+data class HomeState (
+    var error : String? = null,
+    var isLoading : Boolean = false,
+    var isLoggedIn: Boolean = false
 )
 
-class HomeViewModel @Inject constructor(
-    private val getUserSessionState: GetUserSessionState,
-    private val logoutUseCase: LogoutUseCase) {
-
+@HiltViewModel
+class HomeViewModel @Inject constructor(private val getUserSessionState: GetUserSessionState): ViewModel() {
     var uiState = mutableStateOf(HomeState())
 
     fun getUserStateSession(){
@@ -23,9 +21,5 @@ class HomeViewModel @Inject constructor(
         result.onSuccess { value ->
             uiState.value = uiState.value.copy(isLoading = false, error = null, isLoggedIn = value)
         }
-    }
-
-    fun logout(){
-        val result = logoutUseCase
     }
 }

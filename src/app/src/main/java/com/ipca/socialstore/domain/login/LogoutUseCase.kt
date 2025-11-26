@@ -5,7 +5,7 @@ import java.lang.Exception
 import javax.inject.Inject
 
 class LogoutUseCase @Inject constructor(private val authRepository: AuthRepository) {
-    suspend operator fun invoke(): Result<Boolean> {
+    operator fun invoke(): Result<Boolean> {
         return authRepository.logout()
     }
 }
