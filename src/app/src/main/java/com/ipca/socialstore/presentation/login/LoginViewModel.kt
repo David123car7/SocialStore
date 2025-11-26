@@ -5,7 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
-import com.ipca.socialstore.domain.login.GetUserSessionState
+import com.ipca.socialstore.data.resultwrappers.ResultWrapper
 import com.ipca.socialstore.domain.login.LoginMicrosoftUseCase
 import com.ipca.socialstore.domain.login.LoginUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -23,8 +23,7 @@ data class LoginState (
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     private val loginUseCase: LoginUseCase,
-    private val loginMicrosoftUseCase: LoginMicrosoftUseCase,
-    private val getUserSessionState: GetUserSessionState): ViewModel() {
+    private val loginMicrosoftUseCase: LoginMicrosoftUseCase): ViewModel() {
     var uiState = mutableStateOf(LoginState())
 
     fun updateEmail(email : String) {
@@ -40,11 +39,20 @@ class LoginViewModel @Inject constructor(
             uiState.value = uiState.value.copy(isLoading = true)
 
             val result = loginUseCase(uiState.value.email, uiState.value.password)
-            result.onSuccess {
-                uiState.value = uiState.value.copy(isLoading = false, error = null, isLoggedIn = true)
-            }
-            result.onFailure { exception ->
-                uiState.value = uiState.value.copy(isLoading = false, error = exception.message)
+            when(result){
+                is ResultWrapper.Success -> {
+                    uiState.value = uiState.value.copy(
+                        isLoading = false,
+                        isLoggedIn = true
+                    )
+                }
+                is ResultWrapper.Error -> {
+                    uiState.value = uiState.value.copy(
+                        isLoading = false,
+                        isLoggedIn = false,
+                        error = result.message
+                    )
+                }
             }
         }
     }

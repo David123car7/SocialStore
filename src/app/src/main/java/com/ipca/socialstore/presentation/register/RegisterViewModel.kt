@@ -3,6 +3,7 @@ package com.ipca.socialstore.presentation.register
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ipca.socialstore.data.resultwrappers.ResultWrapper
 import com.ipca.socialstore.domain.login.RegisterUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -30,14 +31,21 @@ class RegisterViewModel @Inject constructor(private val registerUseCase: Registe
 
     fun register(){
         viewModelScope.launch {
-            uiState.value = uiState.value.copy(isLoading = true)
-
             val result = registerUseCase(uiState.value.email, uiState.value.password)
-            result.onSuccess {
-                uiState.value = uiState.value.copy(isLoading = false, error = null, isRegistered = true)
-            }
-            result.onFailure { exception ->
-                uiState.value = uiState.value.copy(isLoading = false, error = exception.message, isRegistered = false)
+            when(result){
+                is ResultWrapper.Success -> {
+                    uiState.value = uiState.value.copy(
+                        isLoading = false,
+                        isRegistered = true
+                    )
+                }
+                is ResultWrapper.Error -> {
+                    uiState.value = uiState.value.copy(
+                        isLoading = false,
+                        isRegistered = false,
+                        error = result.message
+                    )
+                }
             }
         }
     }

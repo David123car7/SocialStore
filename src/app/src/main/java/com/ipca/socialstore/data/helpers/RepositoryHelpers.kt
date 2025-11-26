@@ -1,5 +1,6 @@
 package com.ipca.socialstore.data.helpers
 
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.Query
@@ -35,5 +36,17 @@ fun DocumentReference.snapshotFlow(): Flow<DocumentSnapshot> = callbackFlow {
     }
     awaitClose {
         listenerRegistration.remove()
+    }
+}
+
+fun FirebaseAuth.authStateFlow(): Flow<Boolean> = callbackFlow {
+    val authStateListener = FirebaseAuth.AuthStateListener { auth ->
+        trySend(auth.currentUser != null)
+    }
+
+    addAuthStateListener(authStateListener)
+
+    awaitClose {
+        removeAuthStateListener(authStateListener)
     }
 }

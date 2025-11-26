@@ -4,22 +4,21 @@ import android.util.Log
 import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.FirebaseFirestore
 import com.ipca.socialstore.Models.DonationModel
+import com.ipca.socialstore.data.resultwrappers.ResultWrapper
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 class DonationsRepository @Inject constructor(private val db : FirebaseFirestore) {
 
-    fun addDonation(donation : DonationModel) : ResultWrapper<Boolean>{
+    suspend fun addDonation(donation : DonationModel) : ResultWrapper<Boolean> {
         try {
             val donationsCollection = db.collection("Doações")
-            donationsCollection.document().set(donation)
+            donationsCollection.document().set(donation).await()
             return ResultWrapper.Success(true)
         }catch (e: Exception){
 
             Log.e("Erros", e.message ?: "Erro desconhecido")
             return ResultWrapper.Error(e.message?: "Erro ")
-
-
         }
     }
 }
