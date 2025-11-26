@@ -21,6 +21,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.ipca.socialstore.Models.DonationModel
+import com.ipca.socialstore.presentation.donations.DonationsViewModel
 import com.ipca.socialstore.ui.theme.SocialStoreTheme
 import dagger.hilt.android.lifecycle.HiltViewModel
 import org.w3c.dom.Text

@@ -2,7 +2,6 @@ package com.ipca.socialstore.presentation.home
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
-import com.ipca.socialstore.domain.login.GetUserSessionState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
@@ -12,6 +11,6 @@ data class HomeState (
 )
 
 @HiltViewModel
-class HomeViewModel @Inject constructor(private val getUserSessionState: GetUserSessionState): ViewModel() {
+class HomeViewModel @Inject constructor(): ViewModel() {
     var uiState = mutableStateOf(HomeState())
 }

@@ -3,8 +3,9 @@ package com.ipca.socialstore.presentation.main
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ipca.socialstore.data.helpers.ResultWrapper
-import com.ipca.socialstore.domain.login.GetUserSessionState
+import com.ipca.socialstore.data.resultwrappers.ResultFlowWrapper
+import com.ipca.socialstore.data.resultwrappers.ResultWrapper
+import com.ipca.socialstore.domain.login.GetUserSessionStateUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -16,7 +17,7 @@ data class SessionState(
 )
 
 @HiltViewModel
-class MainViewModel @Inject constructor(private val getUserSessionState: GetUserSessionState): ViewModel() {
+class MainViewModel @Inject constructor(private val getUserSessionState: GetUserSessionStateUseCase): ViewModel() {
     var sessionState = mutableStateOf(SessionState())
 
     init {
@@ -28,19 +29,19 @@ class MainViewModel @Inject constructor(private val getUserSessionState: GetUser
     suspend fun getUserStateSession(){
         getUserSessionState().collect { result ->
             when(result){
-                is ResultWrapper.Loading -> {
+                is ResultFlowWrapper.Loading -> {
                     sessionState.value = sessionState.value.copy(
                         isLoading = true
                     )
                 }
-                is ResultWrapper.Success -> {
+                is ResultFlowWrapper.Success -> {
                     sessionState.value = sessionState.value.copy(
                         isLoading = false,
                         error = null,
                         isLoggedIn = true
                     )
                 }
-                is ResultWrapper.Error -> {
+                is ResultFlowWrapper.Error -> {
                     sessionState.value = sessionState.value.copy(
                         isLoading = false,
                         error = result.message,

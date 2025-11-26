@@ -47,7 +47,7 @@ class MainActivity : ComponentActivity() {
 
             SocialStoreTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    NavHost(navController = navController, startDestination = startDestination){
+                    NavHost(navController = navController, startDestination = NavigationViews.login){
                         composable (NavigationViews.login){
                             LoginView(modifier = Modifier.padding(innerPadding),
                                 navController = navController)
