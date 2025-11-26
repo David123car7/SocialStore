@@ -39,29 +39,24 @@ class MainActivity : ComponentActivity() {
         setContent {
             val navController = rememberNavController()
             val mainState by mainViewModel.sessionState
+
+            val startDestination = if(mainState.isLoggedIn)
+                NavigationViews.home
+            else
+                NavigationViews.login
+
             SocialStoreTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    NavHost(navController = navController, startDestination = NavigationViews.login){
+                    NavHost(navController = navController, startDestination = startDestination){
                         composable (NavigationViews.login){
-                            if(!mainState.isLoggedIn){
-                                LoginView(modifier = Modifier.padding(innerPadding),
-                                    navController = navController)
-                            }
-                            else
-                                HomeView(modifier = Modifier.padding(innerPadding),
-                                    navController = navController)
+                            LoginView(modifier = Modifier.padding(innerPadding),
+                                navController = navController)
                         }
                         composable (NavigationViews.register){
-                            if(!mainState.isLoggedIn) {
-                                RegisterView(
-                                    modifier = Modifier.padding(innerPadding),
-                                    navController = navController
-                                )
-                            }
-                            else{
-                                HomeView(modifier = Modifier.padding(innerPadding),
-                                    navController = navController)
-                            }
+                            RegisterView(
+                                modifier = Modifier.padding(innerPadding),
+                                navController = navController
+                            )
                         }
                         composable (NavigationViews.home){
                             HomeView(modifier = Modifier.padding(innerPadding),
