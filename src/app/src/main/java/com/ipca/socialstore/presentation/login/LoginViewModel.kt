@@ -35,13 +35,6 @@ class LoginViewModel @Inject constructor(
         uiState.value = uiState.value.copy(password = password)
     }
 
-    fun getUserStateSession(){
-        val result = getUserSessionState()
-        result.onSuccess { value ->
-            uiState.value = uiState.value.copy(isLoading = false, error = null, isLoggedIn = value)
-        }
-    }
-
     fun login(){
         viewModelScope.launch {
             uiState.value = uiState.value.copy(isLoading = true)

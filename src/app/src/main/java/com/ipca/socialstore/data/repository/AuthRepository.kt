@@ -1,20 +1,37 @@
 package com.ipca.socialstore.data.repository
 
 import android.app.Activity
-import androidx.compose.runtime.MutableState
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.OAuthProvider
-import com.ipca.socialstore.presentation.login.LoginState
+import com.ipca.socialstore.data.helpers.ResultWrapper
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 class AuthRepository @Inject constructor(private val auth: FirebaseAuth) {
-    fun getUserSessionState(): Result<Boolean> {
-        val uid = auth.currentUser?.uid
-        return if(uid == null)
-            Result.success(false)
-        else
-            Result.success(true)
+    fun getUserSessionState(): Flow<ResultWrapper<Boolean>> = callbackFlow {
+        try{
+            trySend(ResultWrapper.Loading())
+
+            val authStateListener = FirebaseAuth.AuthStateListener { auth ->
+                val loggedIn = auth.currentUser != null
+                trySend(ResultWrapper.Success(loggedIn))
+            }
+
+            auth.addAuthStateListener(authStateListener)
+
+            awaitClose {
+                auth.removeAuthStateListener(authStateListener)
+            }
+        }
+        catch(e: Exception){
+            trySend(ResultWrapper.Error(e.message ?: "getUserSessionState Error"))
+        }
     }
 
     suspend fun login(email: String, password: String): Result<Boolean> {

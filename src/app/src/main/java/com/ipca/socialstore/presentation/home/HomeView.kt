@@ -19,13 +19,6 @@ fun HomeView(modifier: Modifier, navController: NavController) {
     val uiState by homeViewModel.uiState
 
     HomeViewContent(modifier = modifier)
-
-    LaunchedEffect(uiState.isLoggedIn) {
-        homeViewModel.getUserStateSession()
-        if(!uiState.isLoggedIn){
-            navController.navigate(NavigationViews.login)
-        }
-    }
 }
 
 @Composable
