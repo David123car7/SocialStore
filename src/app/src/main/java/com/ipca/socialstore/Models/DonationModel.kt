@@ -6,5 +6,5 @@ data class DonationModel (
     val campaign : String? = null,
     val donationData : Date? = null,
     val donatedItems : Map<String, String>? = emptyMap(),
-    val donatorName : String? = null
+    val donorName : String? = null
 )
