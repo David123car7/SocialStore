@@ -15,7 +15,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.ipca.socialstore.presentation.donations.DonationsView
 import com.ipca.socialstore.presentation.home.HomeView
 import com.ipca.socialstore.presentation.authentication.login.LoginView
 import com.ipca.socialstore.presentation.main.MainViewModel
@@ -57,10 +56,6 @@ class MainActivity : ComponentActivity() {
                         }
                         composable (NavigationViews.home){
                             HomeView(modifier = Modifier.padding(innerPadding),
-                                navController = navController)
-                        }
-                        composable ("AddDonation"){
-                            DonationsView(modifier = Modifier.padding(innerPadding),
                                 navController = navController)
                         }
                     }

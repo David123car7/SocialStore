@@ -9,17 +9,26 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.createSupabaseClient
+import io.github.jan.supabase.postgrest.Postgrest
 import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
-
-    @Provides
-    @Singleton
-    fun firestore() : FirebaseFirestore = Firebase.firestore
-
     @Provides
     @Singleton
     fun auth() : FirebaseAuth = Firebase.auth
+
+    @Provides
+    @Singleton
+    fun provideSupabaseClient(): SupabaseClient {
+        return createSupabaseClient(
+            supabaseUrl = "https://your-project-id.supabase.co",
+            supabaseKey = "your-anon-key"
+        ) {
+            install(Postgrest) // Enable Database
+        }
+    }
 }
