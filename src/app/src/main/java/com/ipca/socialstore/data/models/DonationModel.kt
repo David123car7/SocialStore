@@ -5,6 +5,6 @@ import java.util.Date
 data class DonationModel (
     val campaign : String? = null,
     val donationData : Date? = null,
-    val donatedItems : Map<String, String>? = emptyMap(),
+    val donatedItems : Map<ItemModel, Int>? = emptyMap(),
     val donorName : String? = null
 )

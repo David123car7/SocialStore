@@ -14,6 +14,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.ipca.socialstore.data.models.DonationModel
+import com.ipca.socialstore.presentation.donations.DonationsViewModel
 import com.ipca.socialstore.presentation.objects.NavigationViews
 import com.ipca.socialstore.ui.theme.SocialStoreTheme
 
@@ -22,13 +24,17 @@ fun HomeView(modifier: Modifier, navController: NavController) {
     val homeViewModel: HomeViewModel = hiltViewModel()
     val uiState by homeViewModel.uiState
 
+    val donationsView : DonationsViewModel = hiltViewModel()
+    val donationState by donationsView.uiState
+
     HomeViewContent(
         modifier = modifier,
-        onClickLogout = {homeViewModel.logout()})
+        onClickLogout = {homeViewModel.logout()},
+        onClickAddDonation = {navController.navigate("AddDonation")})
 }
 
 @Composable
-fun HomeViewContent(modifier: Modifier, onClickLogout:()->Unit){
+fun HomeViewContent(modifier: Modifier, onClickLogout:()->Unit, onClickAddDonation:()-> Unit){
     Box(modifier = modifier.fillMaxSize()){
         Column(modifier = modifier) {
             Text(modifier = Modifier.padding(8.dp), text = "Home Page")
@@ -36,6 +42,12 @@ fun HomeViewContent(modifier: Modifier, onClickLogout:()->Unit){
                 modifier = Modifier.padding(8.dp),
                 onClick = { onClickLogout() }) {
                 Text("Logout")
+            }
+            Button(
+                modifier = Modifier.padding(8.dp),
+                onClick = { onClickAddDonation() }) {
+                Text("AddDonation")
+
             }
         }
     }
@@ -45,6 +57,6 @@ fun HomeViewContent(modifier: Modifier, onClickLogout:()->Unit){
 @Composable
 fun HomePreview(){
     SocialStoreTheme() {
-        HomeViewContent(modifier = Modifier, onClickLogout = { Unit})
+        HomeViewContent(modifier = Modifier, onClickLogout = { Unit}, onClickAddDonation = { Unit})
     }
 }
