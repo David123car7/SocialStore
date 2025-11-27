@@ -39,6 +39,11 @@ fun RegisterView(modifier: Modifier, navController: NavController){
         onPasswordUpdate = {value -> registerViewModel.updatePassword(value)},
         onRegister = {registerViewModel.register()},
     )
+
+    LaunchedEffect(uiState.isRegistered) {
+        if(uiState.isRegistered)
+            navController.navigate(NavigationViews.login)
+    }
 }
 
 @Composable
