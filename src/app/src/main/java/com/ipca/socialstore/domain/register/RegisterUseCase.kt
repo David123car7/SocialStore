@@ -1,8 +1,7 @@
-package com.ipca.socialstore.domain.login
+package com.ipca.socialstore.domain.register
 
 import com.ipca.socialstore.data.repository.AuthRepository
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
-import java.lang.Exception
 import javax.inject.Inject
 
 class RegisterUseCase @Inject constructor(private val authRepository: AuthRepository) {

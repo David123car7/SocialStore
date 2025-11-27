@@ -1,4 +1,4 @@
-package com.ipca.socialstore.Models
+package com.ipca.socialstore.data.models
 
 import java.util.Date
 

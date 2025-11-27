@@ -3,7 +3,7 @@ package com.ipca.socialstore.presentation.donations
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ipca.socialstore.Models.DonationModel
+import com.ipca.socialstore.data.models.DonationModel
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
 import com.ipca.socialstore.domain.donations.AddDonationUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
