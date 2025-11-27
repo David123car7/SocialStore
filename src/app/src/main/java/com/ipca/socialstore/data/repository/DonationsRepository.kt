@@ -1,7 +1,6 @@
 package com.ipca.socialstore.data.repository
 
 import android.util.Log
-import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.FirebaseFirestore
 import com.ipca.socialstore.Models.DonationModel
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
