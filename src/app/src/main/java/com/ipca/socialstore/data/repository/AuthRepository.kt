@@ -53,15 +53,6 @@ class AuthRepository @Inject constructor(private val auth: FirebaseAuth) {
         }
     }
 
-    suspend fun verifyUserRegestry(email: String, password: String): ResultWrapper<Boolean>{
-        return try {
-
-            ResultWrapper.Success(true)
-        } catch (e: Exception) {
-            ResultWrapper.Error(e.message ?: "Register Error")
-        }
-    }
-
     suspend fun register(email: String, password: String): ResultWrapper<Boolean> {
         return try {
             val result = auth.createUserWithEmailAndPassword(email, password).await()
@@ -75,6 +66,16 @@ class AuthRepository @Inject constructor(private val auth: FirebaseAuth) {
         } catch (e: Exception) {
             // 5. Catch errors (e.g. Email already used)
             ResultWrapper.Error(e.message ?: "Register Error")
+        }
+    }
+
+    suspend fun resetPassword(email : String) : ResultWrapper<Boolean>{
+        return try{
+            auth.sendPasswordResetEmail(email).await()
+            ResultWrapper.Success(true)
+        }
+        catch (e: Exception){
+            ResultWrapper.Error(e.message ?: "Reset password Errror")
         }
     }
 
