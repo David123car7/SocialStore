@@ -19,7 +19,7 @@ class AuthRepository @Inject constructor(private val auth: FirebaseAuth) {
                 ResultFlowWrapper.Loading(false) as ResultFlowWrapper<Boolean>
                 if(isLoggedIn){
                     val validSession = auth.reloadUserSession()
-                    if(!validSession)
+                    if(validSession)
                         ResultFlowWrapper.Success(true) as ResultFlowWrapper<Boolean>
                     else{
                         logout()
@@ -34,7 +34,7 @@ class AuthRepository @Inject constructor(private val auth: FirebaseAuth) {
             }
             .catch { exception ->
                 logout()
-                emit(ResultFlowWrapper.Error(exception.message ?: ""))
+                emit(ResultFlowWrapper.Error(exception.message ?: "GetUserSessionState Error"))
             }
     }
 
@@ -43,7 +43,7 @@ class AuthRepository @Inject constructor(private val auth: FirebaseAuth) {
             auth.signInWithEmailAndPassword(email, password).await()
             ResultWrapper.Success(true)
         } catch (e: Exception) {
-            ResultWrapper.Error(e.message ?: "")
+            ResultWrapper.Error(e.message ?: "Login Error")
         }
     }
 
@@ -52,17 +52,17 @@ class AuthRepository @Inject constructor(private val auth: FirebaseAuth) {
             auth.createUserWithEmailAndPassword(email,password).await()
             ResultWrapper.Success(true)
         } catch (e: Exception) {
-            ResultWrapper.Error(e.message ?: "")
+            ResultWrapper.Error(e.message ?: "Register Error")
         }
     }
 
-    fun logout(): Result<Boolean>{
+    fun logout(): ResultWrapper<Boolean>{
         return try{
             auth.signOut()
-            Result.success(true)
+            ResultWrapper.Success(true)
         }
         catch (e: Exception){
-            Result.failure(e)
+            ResultWrapper.Error(e.message ?: "Logout error")
         }
     }
 }

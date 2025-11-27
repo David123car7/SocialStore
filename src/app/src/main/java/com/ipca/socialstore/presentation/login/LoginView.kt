@@ -1,6 +1,5 @@
 package com.ipca.socialstore.presentation.login
 
-import android.app.Activity
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,7 +11,6 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,12 +34,6 @@ fun LoginView(modifier: Modifier, navController: NavController){
         onLogin = {loginViewModel.login()},
         onClickRegister = {navController.navigate(NavigationViews.register)}
     )
-
-    LaunchedEffect(uiState.isLoggedIn) {
-        if(uiState.isLoggedIn){
-            navController.navigate(NavigationViews.home)
-        }
-    }
 }
 
 @Composable
