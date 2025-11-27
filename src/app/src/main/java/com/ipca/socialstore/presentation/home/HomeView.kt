@@ -7,25 +7,18 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import com.ipca.socialstore.data.models.DonationModel
-import com.ipca.socialstore.presentation.donations.DonationsViewModel
-import com.ipca.socialstore.presentation.objects.NavigationViews
 import com.ipca.socialstore.ui.theme.SocialStoreTheme
 
 @Composable
 fun HomeView(modifier: Modifier, navController: NavController) {
     val homeViewModel: HomeViewModel = hiltViewModel()
     val uiState by homeViewModel.uiState
-
-    val donationsView : DonationsViewModel = hiltViewModel()
-    val donationState by donationsView.uiState
 
     HomeViewContent(
         modifier = modifier,
