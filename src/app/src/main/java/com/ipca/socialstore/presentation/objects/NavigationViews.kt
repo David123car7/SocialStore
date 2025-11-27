@@ -4,4 +4,5 @@ object NavigationViews {
     val login: String = "login"
     val register: String = "register"
     val home: String = "home"
+    val resetPassword: String = "resetPassword"
 }

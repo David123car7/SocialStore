@@ -1,25 +1,27 @@
-package com.ipca.socialstore.presentation.register
+package com.ipca.socialstore.presentation.authentication.login
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
-import com.ipca.socialstore.domain.register.RegisterUseCase
+import com.ipca.socialstore.domain.login.LoginUseCase
+import com.ipca.socialstore.domain.login.ResetPasswordUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-data class RegisterState (
+data class LoginState (
     var email : String = "",
     var password : String = "",
     var error : String? = null,
     var isLoading : Boolean = false,
-    var isRegistered : Boolean = false,
+    var isLoggedIn: Boolean = false
 )
 
 @HiltViewModel
-class RegisterViewModel @Inject constructor(private val registerUseCase: RegisterUseCase): ViewModel() {
-    var uiState = mutableStateOf(RegisterState())
+class LoginViewModel @Inject constructor(
+    private val loginUseCase: LoginUseCase): ViewModel() {
+    var uiState = mutableStateOf(LoginState())
 
     fun updateEmail(email : String) {
         uiState.value = uiState.value.copy(email = email)
@@ -29,20 +31,22 @@ class RegisterViewModel @Inject constructor(private val registerUseCase: Registe
         uiState.value = uiState.value.copy(password = password)
     }
 
-    fun register(){
+    fun login(){
         viewModelScope.launch {
-            val result = registerUseCase(uiState.value.email, uiState.value.password)
+            uiState.value = uiState.value.copy(isLoading = true)
+
+            val result = loginUseCase(uiState.value.email, uiState.value.password)
             when(result){
                 is ResultWrapper.Success -> {
                     uiState.value = uiState.value.copy(
                         isLoading = false,
-                        isRegistered = true
+                        isLoggedIn = true
                     )
                 }
                 is ResultWrapper.Error -> {
                     uiState.value = uiState.value.copy(
                         isLoading = false,
-                        isRegistered = false,
+                        isLoggedIn = false,
                         error = result.message
                     )
                 }
