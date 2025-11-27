@@ -2,7 +2,7 @@ package com.ipca.socialstore.data.repository
 
 import android.util.Log
 import com.google.firebase.firestore.FirebaseFirestore
-import com.ipca.socialstore.Models.DonationModel
+import com.ipca.socialstore.data.models.DonationModel
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
