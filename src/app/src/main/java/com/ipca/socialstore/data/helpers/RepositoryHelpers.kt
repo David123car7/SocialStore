@@ -8,6 +8,7 @@ import com.google.firebase.firestore.QuerySnapshot
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.tasks.await
 
 ///For more than one document
 fun Query.snapshotFlow(): Flow<QuerySnapshot> = callbackFlow {
@@ -48,5 +49,15 @@ fun FirebaseAuth.authStateFlow(): Flow<Boolean> = callbackFlow {
 
     awaitClose {
         removeAuthStateListener(authStateListener)
+    }
+}
+
+suspend fun FirebaseAuth.reloadUserSession(): Boolean {
+    return try {
+        val user = this.currentUser ?: return false
+        user.reload().await()
+        true
+    } catch (e: Exception) {
+        false
     }
 }

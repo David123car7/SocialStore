@@ -4,6 +4,7 @@ import android.app.Activity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.OAuthProvider
 import com.ipca.socialstore.data.helpers.authStateFlow
+import com.ipca.socialstore.data.helpers.reloadUserSession
 import com.ipca.socialstore.data.resultwrappers.ResultFlowWrapper
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
 import kotlinx.coroutines.Dispatchers
@@ -19,18 +20,30 @@ import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 class AuthRepository @Inject constructor(private val auth: FirebaseAuth) {
-     fun getUserSessionState(): Flow<ResultFlowWrapper<Boolean>> {
+    fun getUserSessionState(): Flow<ResultFlowWrapper<Boolean>> {
         return auth.authStateFlow()
             .map { isLoggedIn ->
-                ResultFlowWrapper.Success(isLoggedIn) as ResultFlowWrapper<Boolean>
+                ResultFlowWrapper.Loading(false) as ResultFlowWrapper<Boolean>
+                if(isLoggedIn){
+                    val validSession = auth.reloadUserSession()
+                    if(!validSession)
+                        ResultFlowWrapper.Success(true) as ResultFlowWrapper<Boolean>
+                    else{
+                        logout()
+                        ResultFlowWrapper.Success(false) as ResultFlowWrapper<Boolean>
+                    }
+                }
+                else
+                    ResultFlowWrapper.Success(false) as ResultFlowWrapper<Boolean>
             }
             .onStart {
-                emit(ResultFlowWrapper.Loading<Boolean>())
+                emit(ResultFlowWrapper.Loading(true))
             }
             .catch { exception ->
+                logout()
                 emit(ResultFlowWrapper.Error(exception.message ?: ""))
             }
-     }
+    }
 
     suspend fun login(email: String, password: String): ResultWrapper<Boolean> {
         return try {

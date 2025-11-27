@@ -4,7 +4,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ipca.socialstore.data.resultwrappers.ResultFlowWrapper
-import com.ipca.socialstore.data.resultwrappers.ResultWrapper
 import com.ipca.socialstore.domain.login.GetUserSessionStateUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -38,7 +37,7 @@ class MainViewModel @Inject constructor(private val getUserSessionState: GetUser
                     sessionState.value = sessionState.value.copy(
                         isLoading = false,
                         error = null,
-                        isLoggedIn = true
+                        isLoggedIn = result.data == true
                     )
                 }
                 is ResultFlowWrapper.Error -> {
