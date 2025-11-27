@@ -11,7 +11,7 @@ class DonationsRepository @Inject constructor(private val db : FirebaseFirestore
 
     suspend fun addDonation(donation : DonationModel) : ResultWrapper<Boolean> {
         try {
-            val donationsCollection = db.collection("Doações")
+            val donationsCollection = db.collection("donations")
             donationsCollection.document().set(donation).await()
             return ResultWrapper.Success(true)
         }catch (e: Exception){

@@ -19,6 +19,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.ipca.socialstore.data.models.ItemModel
 import com.ipca.socialstore.ui.theme.SocialStoreTheme
 
 
@@ -28,7 +29,7 @@ fun DonationsView(modifier: Modifier = Modifier, navController: NavController){
     val donationView : DonationsViewModel = hiltViewModel()
     val uiState by donationView.uiState
 
-    val items = remember { mutableStateListOf(ItemsInput()) }
+    val item = remember { mutableStateOf(ItemInput()) }
 
     Column(
         modifier = Modifier.fillMaxSize()
@@ -43,48 +44,43 @@ fun DonationsView(modifier: Modifier = Modifier, navController: NavController){
                 onValueChange = { value -> donationView.updateCampaign(value)}
             )
         }
-        items.forEachIndexed { index, input ->
-            Row(
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                TextField(
-                    value = input.itemName ,
-                    label = { Text("Item") },
-                    modifier = Modifier.padding(8.dp),
-                    onValueChange = { value ->
-                        items[index] = items[index].copy(itemName = value)
-                    }
-                )
-                TextField(
-                    value = input.itemQuantity.toString(),
-                    label = { Text("Quantidade") },
-                    modifier = Modifier.padding(8.dp),
-                    onValueChange = { value ->
-                        items[index] = items[index].copy(itemQuantity = value.toInt())
-                    }
-                )
-            }
+        Row(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            TextField(
+                value = item.value.item?.itemName ?: "" ,
+                label = { Text("Item") },
+                modifier = Modifier.padding(8.dp),
+                onValueChange = { value ->
+                    val currentInnerModel = item.value.item ?: ItemModel()
+                    val updatedInnerModel = currentInnerModel.copy(itemName = value)
+                    item.value = item.value.copy(item = updatedInnerModel)
+                }
+            )
+            TextField(
+                value = item.value.quantity.toString(),
+                label = { Text("Quantidade") },
+                modifier = Modifier.padding(8.dp),
+                onValueChange = { value ->
+                    item.value = item.value.copy(quantity = value.toInt())
+                }
+            )
         }
         Button(
             onClick = {
-                items.add(ItemsInput())
+                donationView.addItem(item.value.item)
             },
             modifier = Modifier.padding(8.dp)
         ) {
             Text("Adiconar Item")
         }
-
         Button(
             onClick = {
-                items.forEach { item ->
-                    if(item.itemName.isNotBlank() && (item.itemQuantity !=  0) ){
-                        donationView.updateItem(item.itemName,item.itemQuantity)
-                    }
-                }
                 donationView.addDonation()
-            }
+            },
+            modifier = Modifier.padding(8.dp)
         ) {
-            Text("Adicionar Doação")
+            Text("Adiconar Item DB")
         }
     }
 }
