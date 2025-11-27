@@ -19,8 +19,13 @@ data class DonationState(
     val donation: DonationModel? = DonationModel(),
     val error : String? = null,
     val isLoading : Boolean = false,
-    val itemsList : List<ItemModel> ?= emptyList()
 )
+
+data class ItemInput(
+    val item: ItemModel? = null,
+    val quantity: Int = 0
+)
+
 @HiltViewModel
 class DonationsViewModel @Inject constructor(
     private val addDonationUseCase: AddDonationUseCase
@@ -36,28 +41,20 @@ class DonationsViewModel @Inject constructor(
         )
     }
 
-    fun updateDonationData(date : Date){
-        uiState.value.donation?.copy(
-            donationData = date
+    fun addItem(item: ItemModel?) {
+        val productName = item?.itemName ?: return
+
+        val currentDonation = uiState.value.donation ?: DonationModel()
+
+        val currentMap = (currentDonation.donatedItems ?: emptyMap()).toMutableMap()
+
+        val currentQuantity = currentMap[productName] ?: 0
+        currentMap[productName] = currentQuantity + 1
+
+        val updatedDonation = currentDonation.copy(donatedItems = currentMap)
+        uiState.value = uiState.value.copy(
+            donation = updatedDonation
         )
-    }
-
-    fun updateDonor(donor : String){
-        uiState.value.donation?.copy(
-            donorName = donor
-        )
-    }
-
-    fun updateItem(itemName: String, itemQuantity: Int){
-
-        val updateMap = uiState.value.donation?.donatedItems?.toMutableMap() ?: mutableMapOf()
-        updateMap[item] = quantity
-
-        val updateDonation = uiState.value.donation?.copy(
-            donatedItems = updateMap
-        )
-
-        uiState.value = uiState.value.copy(donation = updateDonation)
     }
 
     fun addDonation(){
@@ -65,6 +62,9 @@ class DonationsViewModel @Inject constructor(
             isLoading = true,
             error = null
         )
+
+        uiState.value = uiState.value.copy(donation = uiState.value.donation)
+
         viewModelScope.launch {
             val result = addDonationUseCase(uiState.value.donation)
             when (result){
