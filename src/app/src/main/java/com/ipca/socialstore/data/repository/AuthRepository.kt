@@ -1,90 +1,123 @@
 package com.ipca.socialstore.data.repository
 
-import com.google.firebase.auth.FirebaseAuth
-import com.ipca.socialstore.data.helpers.authStateFlow
-import com.ipca.socialstore.data.helpers.reloadUserSession
 import com.ipca.socialstore.data.resultwrappers.ResultFlowWrapper
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
+import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.auth.OtpType
+import io.github.jan.supabase.auth.auth
+import io.github.jan.supabase.auth.providers.builtin.Email
+import io.github.jan.supabase.auth.status.SessionStatus
+import io.github.jan.supabase.exceptions.RestException
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onStart
-import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
-import kotlin.math.log
 
-class AuthRepository @Inject constructor(private val auth: FirebaseAuth) {
+class AuthRepository @Inject constructor(private val supabase: SupabaseClient) {
     fun getUserSessionState(): Flow<ResultFlowWrapper<Boolean>> {
-        return auth.authStateFlow()
-            .map { isLoggedIn ->
-                ResultFlowWrapper.Loading(false) as ResultFlowWrapper<Boolean>
-                if(isLoggedIn){
-                    val validSession = auth.reloadUserSession()
-                    if(validSession)
-                        ResultFlowWrapper.Success(true) as ResultFlowWrapper<Boolean>
-                    else{
-                        logout()
-                        ResultFlowWrapper.Success(false) as ResultFlowWrapper<Boolean>
-                    }
+        return supabase.auth.sessionStatus.map { status ->
+            when (status) {
+                is SessionStatus.Authenticated -> {
+                    ResultFlowWrapper.Success(true) as ResultFlowWrapper<Boolean>
                 }
-                else
+                is SessionStatus.NotAuthenticated -> {
                     ResultFlowWrapper.Success(false) as ResultFlowWrapper<Boolean>
+                }
+                is SessionStatus.Initializing -> {
+                    ResultFlowWrapper.Loading(true)
+                }
+                else -> {
+                    ResultFlowWrapper.Error("Session Error")
+                }
             }
-            .onStart {
-                emit(ResultFlowWrapper.Loading(true))
-            }
-            .catch { exception ->
-                logout()
-                emit(ResultFlowWrapper.Error(exception.message ?: "GetUserSessionState Error"))
-            }
+        }
     }
 
     suspend fun login(email: String, password: String): ResultWrapper<Boolean> {
         return try {
-            val result = auth.signInWithEmailAndPassword(email, password).await()
-            val user = result.user
-            if(user == null || !user.isEmailVerified){
-                logout()
-                return ResultWrapper.Error("Email is not verified")
+            supabase.auth.signInWith(provider = Email){
+                this.email = email
+                this.password = password
             }
             ResultWrapper.Success(true)
-        } catch (e: Exception) {
-            ResultWrapper.Error(e.message ?: "Login Error")
         }
-    }
-
-    suspend fun verifyUserRegestry(email: String, password: String): ResultWrapper<Boolean>{
-        return try {
-
-            ResultWrapper.Success(true)
-        } catch (e: Exception) {
-            ResultWrapper.Error(e.message ?: "Register Error")
+        catch (e: RestException){
+            ResultWrapper.Error(e.error)
+        }
+        catch (e: Exception) {
+            ResultWrapper.Error(e.message ?: "Unknown Error")
         }
     }
 
     suspend fun register(email: String, password: String): ResultWrapper<Boolean> {
         return try {
-            val result = auth.createUserWithEmailAndPassword(email, password).await()
-            val user = result.user
-            if (user == null) {
-                return ResultWrapper.Error("Registration failed: User is null")
+            supabase.auth.signUpWith(provider = Email){
+                this.email = email
+                this.password = password
             }
-            user.sendEmailVerification().await()
-            auth.signOut()
             ResultWrapper.Success(true)
-        } catch (e: Exception) {
-            // 5. Catch errors (e.g. Email already used)
-            ResultWrapper.Error(e.message ?: "Register Error")
+        }catch (e: RestException){
+            ResultWrapper.Error(e.error)
+        }
+        catch (e: Exception) {
+            ResultWrapper.Error(e.message ?: "Unknown Error")
         }
     }
 
-    fun logout(): ResultWrapper<Boolean>{
+    suspend fun signInWithToken(email: String, token: String): ResultWrapper<Boolean>{
         return try{
-            auth.signOut()
+            supabase.auth.verifyEmailOtp(
+                type = OtpType.Email.RECOVERY,
+                email = email,
+                token = token
+            )
             ResultWrapper.Success(true)
         }
+        catch (e: RestException){
+            ResultWrapper.Error(e.error)
+        }
         catch (e: Exception){
-            ResultWrapper.Error(e.message ?: "Logout error")
+            ResultWrapper.Error(e.message ?: "Unknown Error")
+        }
+    }
+
+    suspend fun resetPassword(password: String): ResultWrapper<Boolean>{
+        return try{
+            supabase.auth.updateUser {
+                this.password = password
+            }
+            ResultWrapper.Success(true)
+        }
+        catch (e: RestException){
+            ResultWrapper.Error(e.error)
+        }
+        catch (e: Exception){
+            ResultWrapper.Error(e.message ?: "Unknown Error")
+        }
+    }
+
+    suspend fun requestResetPassword(email : String) : ResultWrapper<Boolean>{
+        return try{
+            supabase.auth.resetPasswordForEmail(email = email)
+            ResultWrapper.Success(true)
+        }
+        catch (e: RestException){
+            ResultWrapper.Error(e.error)
+        }
+        catch (e: Exception){
+            ResultWrapper.Error(e.message ?: "Unknown Error")
+        }
+    }
+
+    suspend fun logout(): ResultWrapper<Boolean>{
+        return try{
+            supabase.auth.signOut()
+            ResultWrapper.Success(true)
+        }
+        catch (e: RestException){
+            ResultWrapper.Error(e.error)
+        }
+        catch (e: Exception){
+            ResultWrapper.Error(e.message ?: "Unknown Error")
         }
     }
 }

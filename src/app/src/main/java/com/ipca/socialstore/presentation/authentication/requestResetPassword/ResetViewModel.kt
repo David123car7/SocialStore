@@ -1,35 +1,47 @@
-package com.ipca.socialstore.presentation.home
+package com.ipca.socialstore.presentation.authentication.requestResetPassword
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
-import com.ipca.socialstore.domain.auth.LogoutUseCase
+import com.ipca.socialstore.domain.auth.RequestResetPasswordUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-data class HomeState (
+
+data class RequestResetState (
+    var email : String = "",
     var error : String? = null,
     var isLoading : Boolean = false,
+    val resetRequested: Boolean = false
 )
 
 @HiltViewModel
-class HomeViewModel @Inject constructor(private val logoutUseCase: LogoutUseCase): ViewModel() {
-    var uiState = mutableStateOf(HomeState())
+class RequestResetPasswordViewModel @Inject constructor(private val requestResetPasswordUseCase: RequestResetPasswordUseCase): ViewModel(){
 
-    fun logout(){
+    var uiState = mutableStateOf(RequestResetState())
+
+    fun updateEmail(email : String) {
+        uiState.value = uiState.value.copy(email = email)
+    }
+
+    fun requestResetPassword() {
         viewModelScope.launch {
-            val result = logoutUseCase()
+            uiState.value = uiState.value.copy(isLoading = true)
+
+            val result = requestResetPasswordUseCase(uiState.value.email)
             when(result){
                 is ResultWrapper.Success -> {
                     uiState.value = uiState.value.copy(
                         isLoading = false,
+                        resetRequested = true
                     )
                 }
                 is ResultWrapper.Error -> {
                     uiState.value = uiState.value.copy(
                         isLoading = false,
+                        resetRequested = false,
                         error = result.message
                     )
                 }

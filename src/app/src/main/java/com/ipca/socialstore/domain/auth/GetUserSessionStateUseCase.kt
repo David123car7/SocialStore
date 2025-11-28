@@ -1,6 +1,5 @@
-package com.ipca.socialstore.domain.login
+package com.ipca.socialstore.domain.auth
 
-import com.ipca.socialstore.data.resultwrappers.ResultWrapper
 import com.ipca.socialstore.data.repository.AuthRepository
 import com.ipca.socialstore.data.resultwrappers.ResultFlowWrapper
 import kotlinx.coroutines.flow.Flow

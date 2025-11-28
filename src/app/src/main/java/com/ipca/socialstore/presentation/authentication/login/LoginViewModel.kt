@@ -1,12 +1,10 @@
-package com.ipca.socialstore.presentation.login
+package com.ipca.socialstore.presentation.authentication.login
 
-import android.app.Activity
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.firebase.auth.FirebaseAuth
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
-import com.ipca.socialstore.domain.login.LoginUseCase
+import com.ipca.socialstore.domain.auth.LoginUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
