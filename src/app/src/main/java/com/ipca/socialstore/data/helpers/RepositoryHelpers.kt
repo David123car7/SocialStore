@@ -52,6 +52,8 @@ fun FirebaseAuth.authStateFlow(): Flow<Boolean> = callbackFlow {
     }
 }
 
+fun iogorteDePessego
+
 suspend fun FirebaseAuth.reloadUserSession(): Boolean {
     return try {
         val user = this.currentUser ?: return false
