@@ -38,7 +38,7 @@ The project utilizes a hybrid architecture with the following technologies:
 
 | Layer | Technology | Description |
 | :--- | :--- | :--- |
-| **Mobile** | ![Android](https://img.shields.io/badge/Android_Studio-3DDC84?style=flat&logo=android&logoColor=white) ![Firebase](https://img.shields.io/badge/Firebase-039BE5?style=flat&logo=Firebase&logoColor=white) ![Cloud Firestore](https://img.shields.io/badge/Cloud_Firestore-FFCA28?style=flat&logo=firebase&logoColor=black) | Native Android development integrated with Firebase (Auth) and Cloud Firestore (Database) |
+| **Mobile** | ![Android](https://img.shields.io/badge/Android_Studio-3DDC84?style=flat&logo=android&logoColor=white) ![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?style=flat&logo=supabase&logoColor=white) ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=flat&logo=postgresql&logoColor=white) | Native Android development integrated with Supabase (Auth & SQL Database) |
 | **Frontend Web** | ![Next.js](https://img.shields.io/badge/Next.js-000000?style=flat&logo=nextdotjs&logoColor=white) ![React](https://img.shields.io/badge/React-20232A?style=flat&logo=react&logoColor=61DAFB) | Public informational website |
 
 ---
