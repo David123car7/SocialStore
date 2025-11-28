@@ -1,44 +1,47 @@
-package com.ipca.socialstore.presentation.authentication.resetPassword
+package com.ipca.socialstore.presentation.authentication.requestResetPassword
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
-import com.ipca.socialstore.domain.login.ResetPasswordUseCase
+import com.ipca.socialstore.domain.auth.RequestResetPasswordUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 
-data class ResetState (
+data class RequestResetState (
     var email : String = "",
     var error : String? = null,
     var isLoading : Boolean = false,
+    val resetRequested: Boolean = false
 )
 
 @HiltViewModel
-class ResetViewModel @Inject constructor(private val resetPasswordUseCase: ResetPasswordUseCase): ViewModel(){
+class RequestResetPasswordViewModel @Inject constructor(private val requestResetPasswordUseCase: RequestResetPasswordUseCase): ViewModel(){
 
-    var uiState = mutableStateOf(ResetState())
+    var uiState = mutableStateOf(RequestResetState())
 
     fun updateEmail(email : String) {
         uiState.value = uiState.value.copy(email = email)
     }
 
-    fun resetPassword() {
+    fun requestResetPassword() {
         viewModelScope.launch {
             uiState.value = uiState.value.copy(isLoading = true)
 
-            val result = resetPasswordUseCase(uiState.value.email)
+            val result = requestResetPasswordUseCase(uiState.value.email)
             when(result){
                 is ResultWrapper.Success -> {
                     uiState.value = uiState.value.copy(
                         isLoading = false,
+                        resetRequested = true
                     )
                 }
                 is ResultWrapper.Error -> {
                     uiState.value = uiState.value.copy(
                         isLoading = false,
+                        resetRequested = false,
                         error = result.message
                     )
                 }

@@ -1,4 +1,4 @@
-package com.ipca.socialstore.domain.register
+package com.ipca.socialstore.domain.auth
 
 import com.ipca.socialstore.data.objects.ValidEmailNomains
 import com.ipca.socialstore.data.repository.AuthRepository

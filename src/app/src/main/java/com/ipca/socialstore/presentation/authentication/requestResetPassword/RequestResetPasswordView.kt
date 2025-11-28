@@ -1,4 +1,4 @@
-package com.ipca.socialstore.presentation.authentication.resetPassword
+package com.ipca.socialstore.presentation.authentication.requestResetPassword
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -11,29 +11,38 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.navigation.NavController
+import com.ipca.socialstore.presentation.objects.NavigationViews
 import com.ipca.socialstore.ui.theme.SocialStoreTheme
 
 @Composable
-fun ResetView(modifier: Modifier){
-    val resetViewModel: ResetViewModel = hiltViewModel()
+fun RequestResetPasswordView(modifier: Modifier, navController: NavController){
+    val resetViewModel: RequestResetPasswordViewModel = hiltViewModel()
     val uiState by resetViewModel.uiState
 
     ResetViewContent(
         modifier = modifier,
         uiState = uiState,
         onEmailUpdate = { email -> resetViewModel.updateEmail(email = email)},
-        onClickReset = {resetViewModel.resetPassword()}
+        onClickReset = {resetViewModel.requestResetPassword()}
     )
+
+    LaunchedEffect(uiState.resetRequested) {
+        if(uiState.resetRequested){
+            navController.navigate(NavigationViews.resetPassword)
+        }
+    }
 }
 
 @Composable
-fun ResetViewContent(modifier: Modifier, uiState: ResetState, onEmailUpdate:(v: String) -> Unit,onClickReset:() -> Unit){
+fun ResetViewContent(modifier: Modifier, uiState: RequestResetState, onEmailUpdate:(v: String) -> Unit,onClickReset:() -> Unit){
     Column(modifier = modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally) {
@@ -64,7 +73,7 @@ fun ResetViewContent(modifier: Modifier, uiState: ResetState, onEmailUpdate:(v: 
 @Composable
 fun ResetPreview(){
     SocialStoreTheme() {
-        val uiState = ResetState(email = "", error = "", isLoading = false)
+        val uiState = RequestResetState(email = "", error = "", isLoading = false)
 
         ResetViewContent(modifier = Modifier, onClickReset = { Unit}, onEmailUpdate = { Unit}, uiState = uiState)
     }

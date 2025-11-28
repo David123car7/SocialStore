@@ -36,7 +36,7 @@ fun LoginView(modifier: Modifier, navController: NavController){
         onPasswordUpdate = {value -> loginViewModel.updatePassword(value)},
         onLogin = {loginViewModel.login()},
         onClickRegister = {navController.navigate(NavigationViews.register)},
-        onClickReset = {navController.navigate(NavigationViews.resetPassword)}
+        onClickReset = {navController.navigate(NavigationViews.requestResetPassword)}
     )
 }
 

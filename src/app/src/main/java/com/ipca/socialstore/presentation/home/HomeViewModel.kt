@@ -2,9 +2,11 @@ package com.ipca.socialstore.presentation.home
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
-import com.ipca.socialstore.domain.login.LogoutUseCase
+import com.ipca.socialstore.domain.auth.LogoutUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class HomeState (
@@ -17,18 +19,20 @@ class HomeViewModel @Inject constructor(private val logoutUseCase: LogoutUseCase
     var uiState = mutableStateOf(HomeState())
 
     fun logout(){
-        val result = logoutUseCase()
-        when(result){
-            is ResultWrapper.Success -> {
-                uiState.value = uiState.value.copy(
-                    isLoading = false,
-                )
-            }
-            is ResultWrapper.Error -> {
-                uiState.value = uiState.value.copy(
-                    isLoading = false,
-                    error = result.message
-                )
+        viewModelScope.launch {
+            val result = logoutUseCase()
+            when(result){
+                is ResultWrapper.Success -> {
+                    uiState.value = uiState.value.copy(
+                        isLoading = false,
+                    )
+                }
+                is ResultWrapper.Error -> {
+                    uiState.value = uiState.value.copy(
+                        isLoading = false,
+                        error = result.message
+                    )
+                }
             }
         }
     }

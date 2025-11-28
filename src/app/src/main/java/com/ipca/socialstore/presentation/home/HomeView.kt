@@ -23,7 +23,7 @@ fun HomeView(modifier: Modifier, navController: NavController) {
     HomeViewContent(
         modifier = modifier,
         onClickLogout = {homeViewModel.logout()},
-        onClickAddDonation = {navController.navigate("AddDonation")})
+        onClickAddDonation = {})
 }
 
 @Composable

@@ -20,7 +20,8 @@ import com.ipca.socialstore.presentation.authentication.login.LoginView
 import com.ipca.socialstore.presentation.main.MainViewModel
 import com.ipca.socialstore.presentation.objects.NavigationViews
 import com.ipca.socialstore.presentation.authentication.register.RegisterView
-import com.ipca.socialstore.presentation.authentication.resetPassword.ResetView
+import com.ipca.socialstore.presentation.authentication.requestResetPassword.RequestResetPasswordView
+import com.ipca.socialstore.presentation.authentication.resetPassword.ResetPasswordView
 import com.ipca.socialstore.ui.theme.SocialStoreTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -57,6 +58,12 @@ class MainActivity : ComponentActivity() {
                         composable (NavigationViews.home){
                             HomeView(modifier = Modifier.padding(innerPadding),
                                 navController = navController)
+                        }
+                        composable (NavigationViews.requestResetPassword){
+                            RequestResetPasswordView(modifier = Modifier.padding(innerPadding), navController = navController)
+                        }
+                        composable (NavigationViews.resetPassword){
+                            ResetPasswordView(modifier = Modifier.padding(innerPadding), navController = navController)
                         }
                     }
                 }
