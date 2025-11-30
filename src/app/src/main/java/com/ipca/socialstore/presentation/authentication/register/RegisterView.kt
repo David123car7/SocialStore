@@ -59,15 +59,22 @@ fun RegisterViewContent(modifier: Modifier,
             value = uiState.email,
             label = { Text("Email") },
             modifier = Modifier.padding(8.dp),
-            onValueChange = { value -> onEmailUpdate(value) })
+            onValueChange = { value -> onEmailUpdate(value) }
+        )
         TextField(
             value = uiState.password,
             label = { Text("Password") },
             modifier = Modifier.padding(8.dp),
             onValueChange = { value -> onPasswordUpdate(value)},
             visualTransformation = PasswordVisualTransformation(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password))
-
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
+        )
+        TextField(
+            value = uiState.user.firstName,
+            label = { Text("First Name") },
+            modifier = Modifier.padding(8.dp),
+            onValueChange = { value -> onEmailUpdate(value) }
+        )
         if (uiState.error != null) {
             Text(text = uiState.error!!, modifier = Modifier.padding(8.dp))
         }
