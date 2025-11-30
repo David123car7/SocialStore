@@ -5,8 +5,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class UserModel(
-    val id: Int,
-
     @SerialName("firstName")
     val firstName: String,
 
@@ -19,3 +17,7 @@ data class UserModel(
     @SerialName("birthDate") // Must be "YYYY-MM-DD"
     val birthDate: String, //supabase sends date as a string
 )
+
+fun UserModel.isValid() : Boolean{
+    return this.firstName.isNotEmpty() && this.lastName.isNotEmpty() && birthDate.isNotEmpty()
+}

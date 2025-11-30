@@ -4,6 +4,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ipca.socialstore.data.models.UserModel
+import com.ipca.socialstore.data.models.isValid
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
 import com.ipca.socialstore.domain.auth.RegisterUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -13,7 +14,7 @@ import javax.inject.Inject
 data class RegisterState (
     var email : String = "",
     var password : String = "",
-    var user: UserModel? = null,
+    var user: UserModel = UserModel(firstName = "", lastName = "", addressId = null, birthDate = ""),
     var error : String? = null,
     var isLoading : Boolean = false,
     var isRegistered : Boolean = false,
@@ -23,19 +24,15 @@ data class RegisterState (
 class RegisterViewModel @Inject constructor(private val registerUseCase: RegisterUseCase): ViewModel() {
     var uiState = mutableStateOf(RegisterState())
 
-    fun updateEmail(email : String) {
-        uiState.value = uiState.value.copy(email = email)
-    }
 
     fun updatePassword(password : String) {
         uiState.value = uiState.value.copy(password = password)
     }
 
-    fun checkUser(){
-
-    }
-
     fun register(){
+        if(!uiState.value.user.isValid()) // why "!!" if i verify first that the user is not null???
+            return
+
         viewModelScope.launch {
             val result = registerUseCase(uiState.value.email, uiState.value.password, uiState.value.user)
             when(result){
