@@ -5,6 +5,9 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class UserModel(
+    @SerialName("uid")
+    val uid: String?,
+
     @SerialName("firstName")
     val firstName: String,
 

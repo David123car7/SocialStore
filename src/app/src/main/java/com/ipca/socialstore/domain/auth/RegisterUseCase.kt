@@ -17,14 +17,18 @@ class RegisterUseCase @Inject constructor(private val authRepository: AuthReposi
 
         val registerResult = authRepository.register(email = email, password = password)
         if(registerResult is ResultWrapper.Error){
-            return registerResult
+            return ResultWrapper.Error<Boolean>(
+                message = registerResult.message ?: "Registration Failed"
+            )
         }
 
-        val registerUserResult = userRepository.RegisterUser(user)
+        val userWithId = user.copy(uid = registerResult.data)
+
+        val registerUserResult = userRepository.RegisterUser(userWithId)
         if(registerUserResult is ResultWrapper.Error){
             return registerUserResult
         }
 
-        return registerResult
+        return registerUserResult
     }
 }

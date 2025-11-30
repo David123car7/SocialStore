@@ -1,6 +1,6 @@
 package com.ipca.socialstore.data.objects
 
 object DatabaseTables {
-    val user: String = "user"
+    val profile: String = "profile"
     val address: String = "address"
 }
