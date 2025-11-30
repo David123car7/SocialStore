@@ -24,6 +24,28 @@ data class RegisterState (
 class RegisterViewModel @Inject constructor(private val registerUseCase: RegisterUseCase): ViewModel() {
     var uiState = mutableStateOf(RegisterState())
 
+    fun updateEmail(email : String) {
+        uiState.value = uiState.value.copy(email = email)
+    }
+
+    fun updateFirstName(firstName: String) {
+        uiState.value = uiState.value.copy(
+            user = uiState.value.user.copy(firstName = firstName)
+        )
+    }
+
+    fun updateLastName(lastName: String) {
+        uiState.value = uiState.value.copy(
+            user = uiState.value.user.copy(lastName = lastName)
+        )
+    }
+
+    fun updateBirthDate(birthDate: String) {
+        uiState.value = uiState.value.copy(
+            user = uiState.value.user.copy(birthDate = birthDate)
+        )
+    }
+
 
     fun updatePassword(password : String) {
         uiState.value = uiState.value.copy(password = password)
