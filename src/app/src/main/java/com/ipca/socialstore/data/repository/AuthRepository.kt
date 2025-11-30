@@ -3,6 +3,7 @@ package com.ipca.socialstore.data.repository
 import com.ipca.socialstore.data.resultwrappers.ResultFlowWrapper
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
 import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.OtpType
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.providers.builtin.Email
@@ -120,4 +121,5 @@ class AuthRepository @Inject constructor(private val supabase: SupabaseClient) {
             ResultWrapper.Error(e.message ?: "Unknown Error")
         }
     }
+
 }
