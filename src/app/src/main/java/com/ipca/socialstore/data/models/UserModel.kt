@@ -17,6 +17,9 @@ data class UserModel(
     @SerialName("addressId")
     val addressId: Int?,
 
+    @SerialName("role")
+    val role: String,
+
     @SerialName("birthDate") // Must be "YYYY-MM-DD"
     val birthDate: String, //supabase sends date as a string
 )

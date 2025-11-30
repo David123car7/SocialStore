@@ -24,7 +24,7 @@ class RegisterUseCase @Inject constructor(private val authRepository: AuthReposi
 
         val userWithId = user.copy(uid = registerResult.data)
 
-        val registerUserResult = userRepository.RegisterUser(userWithId)
+        val registerUserResult = userRepository.registerUser(userWithId)
         if(registerUserResult is ResultWrapper.Error){
             return registerUserResult
         }
