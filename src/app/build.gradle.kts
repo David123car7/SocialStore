@@ -8,6 +8,7 @@ plugins {
     id("com.google.gms.google-services")
     id("com.google.dagger.hilt.android")
     id("com.google.devtools.ksp")
+    kotlin("plugin.serialization") version "2.2.21"
 }
 
 val localProperties = Properties()

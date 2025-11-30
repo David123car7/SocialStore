@@ -3,6 +3,7 @@ package com.ipca.socialstore.presentation.authentication.register
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ipca.socialstore.data.models.UserModel
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
 import com.ipca.socialstore.domain.auth.RegisterUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -12,6 +13,7 @@ import javax.inject.Inject
 data class RegisterState (
     var email : String = "",
     var password : String = "",
+    var user: UserModel? = null,
     var error : String? = null,
     var isLoading : Boolean = false,
     var isRegistered : Boolean = false,
@@ -29,9 +31,13 @@ class RegisterViewModel @Inject constructor(private val registerUseCase: Registe
         uiState.value = uiState.value.copy(password = password)
     }
 
+    fun checkUser(){
+
+    }
+
     fun register(){
         viewModelScope.launch {
-            val result = registerUseCase(uiState.value.email, uiState.value.password)
+            val result = registerUseCase(uiState.value.email, uiState.value.password, uiState.value.user)
             when(result){
                 is ResultWrapper.Success -> {
                     uiState.value = uiState.value.copy(
