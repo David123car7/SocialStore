@@ -15,12 +15,16 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.navigation.Navigation
+import com.ipca.socialstore.presentation.campaign.create.CreateCampaingViewModel
+import com.ipca.socialstore.presentation.objects.NavigationViews
 import com.ipca.socialstore.ui.theme.SocialStoreTheme
 
 @Composable
 fun HomeView(modifier: Modifier, navController: NavController) {
     val homeViewModel: HomeViewModel = hiltViewModel()
     val uiState by homeViewModel.uiState
+
 
     HomeViewContent(
         modifier = modifier,
@@ -52,6 +56,18 @@ fun HomeViewContent(modifier: Modifier, onClickLogout:()->Unit, onClickAddDonati
                 modifier = Modifier.padding(8.dp),
                 onClick = { onClickGetRole() }) {
                 Text("Get Role")
+            }
+            Button(
+                modifier = Modifier.padding(8.dp),
+                onClick = { onClickCreateCampaign() }) {
+                Text("CreateCampaign")
+
+            }
+            Button(
+                modifier = Modifier.padding(8.dp),
+                onClick = { onClickListAllCampaigns() }) {
+                Text("ListAllCampaign")
+
             }
         }
     }

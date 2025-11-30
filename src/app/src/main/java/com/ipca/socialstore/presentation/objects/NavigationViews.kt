@@ -6,5 +6,6 @@ object NavigationViews {
     val home: String = "home"
     val requestResetPassword: String = "requestResetPassword"
     val resetPassword: String = "resetPassword"
-
+    val createCampaign : String = "createCampaign"
+    val listAllCampaign : String = "listAllCampaign"
 }

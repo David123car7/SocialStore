@@ -22,6 +22,8 @@ import com.ipca.socialstore.presentation.objects.NavigationViews
 import com.ipca.socialstore.presentation.authentication.register.RegisterView
 import com.ipca.socialstore.presentation.authentication.requestResetPassword.RequestResetPasswordView
 import com.ipca.socialstore.presentation.authentication.resetPassword.ResetPasswordView
+import com.ipca.socialstore.presentation.campaign.create.CreateCampaingView
+import com.ipca.socialstore.presentation.campaign.listAll.ListAllCampaignsView
 import com.ipca.socialstore.ui.theme.SocialStoreTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -64,6 +66,12 @@ class MainActivity : ComponentActivity() {
                         }
                         composable (NavigationViews.resetPassword){
                             ResetPasswordView(modifier = Modifier.padding(innerPadding), navController = navController)
+                        }
+                        composable (NavigationViews.createCampaign){
+                            CreateCampaingView(modifier = Modifier.padding(innerPadding), navController = navController)
+                        }
+                        composable (NavigationViews.listAllCampaign){
+                            ListAllCampaignsView(modifier = Modifier.padding(innerPadding), navController = navController)
                         }
                     }
                 }
