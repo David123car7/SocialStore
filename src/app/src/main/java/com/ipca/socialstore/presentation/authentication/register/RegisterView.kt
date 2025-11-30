@@ -36,8 +36,11 @@ fun RegisterView(modifier: Modifier, navController: NavController){
         uiState = uiState,
         onEmailUpdate = {value -> registerViewModel.updateEmail(value)},
         onPasswordUpdate = {value -> registerViewModel.updatePassword(value)},
+        onFirstNameUpdate = {value -> registerViewModel.updateFirstName(value)},
+        onLastNameUpdate = {value-> registerViewModel.updateLastName(value)},
+        onBirthDateUpdate = {value -> registerViewModel.updateBirthDate(value)},
         onRegister = {registerViewModel.register()},
-    )
+        )
 
     LaunchedEffect(uiState.isRegistered) {
         if(uiState.isRegistered)
@@ -46,11 +49,15 @@ fun RegisterView(modifier: Modifier, navController: NavController){
 }
 
 @Composable
-fun RegisterViewContent(modifier: Modifier,
-                     uiState: RegisterState,
-                     onEmailUpdate:(newValue: String)->Unit,
-                     onPasswordUpdate:(newValue: String)->Unit,
-                     onRegister:()->Unit){
+fun RegisterViewContent(
+    modifier: Modifier,
+    uiState: RegisterState,
+    onEmailUpdate:(newValue: String)->Unit,
+    onFirstNameUpdate:(newValue: String)->Unit,
+    onLastNameUpdate:(newValue: String)->Unit,
+    onBirthDateUpdate:(newValue: String)->Unit,
+    onPasswordUpdate:(newValue: String)->Unit,
+    onRegister:()->Unit){
 
     Column(modifier = modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
@@ -73,8 +80,21 @@ fun RegisterViewContent(modifier: Modifier,
             value = uiState.user.firstName,
             label = { Text("First Name") },
             modifier = Modifier.padding(8.dp),
-            onValueChange = { value -> onEmailUpdate(value) }
+            onValueChange = { value -> onFirstNameUpdate(value) }
         )
+        TextField(
+            value = uiState.user.lastName,
+            label = { Text("Last Name") },
+            modifier = Modifier.padding(8.dp),
+            onValueChange = { value -> onLastNameUpdate(value) }
+        )
+        TextField(
+            value = uiState.user.birthDate,
+            label = { Text("Birth Date (YYYY-MM-DD)") },
+            modifier = Modifier.padding(8.dp),
+            onValueChange = { value -> onBirthDateUpdate(value) }
+        )
+
         if (uiState.error != null) {
             Text(text = uiState.error!!, modifier = Modifier.padding(8.dp))
         }
@@ -104,6 +124,9 @@ fun LoginPreview(){
             onEmailUpdate = { Unit},
             onPasswordUpdate = { Unit},
             onRegister = { Unit},
+            onFirstNameUpdate = { Unit},
+            onLastNameUpdate = { Unit},
+            onBirthDateUpdate = { Unit}
         )
     }
 }

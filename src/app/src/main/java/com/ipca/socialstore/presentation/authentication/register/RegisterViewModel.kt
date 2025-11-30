@@ -46,7 +46,6 @@ class RegisterViewModel @Inject constructor(private val registerUseCase: Registe
         )
     }
 
-
     fun updatePassword(password : String) {
         uiState.value = uiState.value.copy(password = password)
     }
