@@ -14,7 +14,7 @@ import javax.inject.Inject
 data class RegisterState (
     var email : String = "",
     var password : String = "",
-    var user: UserModel = UserModel(firstName = "", lastName = "", addressId = null, birthDate = ""),
+    var user: UserModel = UserModel(uid = null,firstName = "", lastName = "", addressId = null, birthDate = ""),
     var error : String? = null,
     var isLoading : Boolean = false,
     var isRegistered : Boolean = false,

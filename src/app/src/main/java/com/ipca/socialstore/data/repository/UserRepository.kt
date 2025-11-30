@@ -12,7 +12,7 @@ class UserRepository @Inject constructor(private val supabase: SupabaseClient){
 
     suspend fun RegisterUser(user: UserModel): ResultWrapper<Boolean>{
         return try {
-            supabase.from(DatabaseTables.user).insert(user)
+            supabase.from(DatabaseTables.profile).insert(user)
             ResultWrapper.Success(true)
         }
         catch (e: RestException){

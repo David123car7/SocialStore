@@ -48,13 +48,13 @@ class AuthRepository @Inject constructor(private val supabase: SupabaseClient) {
         }
     }
 
-    suspend fun register(email: String, password: String): ResultWrapper<Boolean> {
+    suspend fun register(email: String, password: String): ResultWrapper<String> {
         return try {
             val user = supabase.auth.signUpWith(provider = Email){
                 this.email = email
                 this.password = password
             }
-            ResultWrapper.Success(true)
+            ResultWrapper.Success(user?.id ?: "")
         }catch (e: RestException){
             ResultWrapper.Error(e.error)
         }
