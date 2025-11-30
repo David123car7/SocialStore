@@ -50,7 +50,7 @@ class AuthRepository @Inject constructor(private val supabase: SupabaseClient) {
 
     suspend fun register(email: String, password: String): ResultWrapper<Boolean> {
         return try {
-            supabase.auth.signUpWith(provider = Email){
+            val user = supabase.auth.signUpWith(provider = Email){
                 this.email = email
                 this.password = password
             }
