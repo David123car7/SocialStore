@@ -15,15 +15,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.ipca.socialstore.presentation.home.HomeView
 import com.ipca.socialstore.presentation.authentication.login.LoginView
 import com.ipca.socialstore.presentation.main.MainViewModel
-import com.ipca.socialstore.presentation.objects.NavigationViews
 import com.ipca.socialstore.presentation.authentication.register.RegisterView
 import com.ipca.socialstore.presentation.authentication.requestResetPassword.RequestResetPasswordView
 import com.ipca.socialstore.presentation.authentication.resetPassword.ResetPasswordView
 import com.ipca.socialstore.presentation.campaign.create.CreateCampaingView
 import com.ipca.socialstore.presentation.campaign.listAll.ListAllCampaignsView
+import com.ipca.socialstore.presentation.home.defaultHome.DefaultHomeView
+import com.ipca.socialstore.presentation.objects.Routes
 import com.ipca.socialstore.ui.theme.SocialStoreTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -40,37 +40,37 @@ class MainActivity : ComponentActivity() {
             val mainState by mainViewModel.sessionState
 
             val startDestination = if(mainState.isLoggedIn)
-                NavigationViews.home
+                Routes.DefaultHome
             else
-                NavigationViews.login
+                Routes.Login
 
             SocialStoreTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     NavHost(navController = navController, startDestination = startDestination){
-                        composable (NavigationViews.login){
+                        composable<Routes.Login>{
                             LoginView(modifier = Modifier.padding(innerPadding),
                                 navController = navController)
                         }
-                        composable (NavigationViews.register){
+                        composable<Routes.Register>{
                             RegisterView(
                                 modifier = Modifier.padding(innerPadding),
                                 navController = navController
                             )
                         }
-                        composable (NavigationViews.home){
-                            HomeView(modifier = Modifier.padding(innerPadding),
+                        composable<Routes.DefaultHome>{
+                            DefaultHomeView(modifier = Modifier.padding(innerPadding),
                                 navController = navController)
                         }
-                        composable (NavigationViews.requestResetPassword){
+                        composable<Routes.RequestResetPassword>{
                             RequestResetPasswordView(modifier = Modifier.padding(innerPadding), navController = navController)
                         }
-                        composable (NavigationViews.resetPassword){
+                        composable<Routes.ResetPassword>{
                             ResetPasswordView(modifier = Modifier.padding(innerPadding), navController = navController)
                         }
-                        composable (NavigationViews.createCampaign){
+                        composable<Routes.CreateCampaign>{
                             CreateCampaingView(modifier = Modifier.padding(innerPadding), navController = navController)
                         }
-                        composable (NavigationViews.listAllCampaign){
+                        composable<Routes.ListAllCampaign>{
                             ListAllCampaignsView(modifier = Modifier.padding(innerPadding), navController = navController)
                         }
                     }

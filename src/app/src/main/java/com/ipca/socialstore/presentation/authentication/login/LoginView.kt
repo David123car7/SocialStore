@@ -21,7 +21,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.ipca.socialstore.presentation.objects.NavigationViews
+import com.ipca.socialstore.presentation.objects.Routes
 import com.ipca.socialstore.ui.theme.SocialStoreTheme
 
 @Composable
@@ -35,8 +35,8 @@ fun LoginView(modifier: Modifier, navController: NavController){
         onEmailUpdate = {value -> loginViewModel.updateEmail(value)},
         onPasswordUpdate = {value -> loginViewModel.updatePassword(value)},
         onLogin = {loginViewModel.login()},
-        onClickRegister = {navController.navigate(NavigationViews.register)},
-        onClickReset = {navController.navigate(NavigationViews.requestResetPassword)}
+        onClickRegister = {navController.navigate(Routes.Register)},
+        onClickReset = {navController.navigate(Routes.RequestResetPassword)}
     )
 }
 
