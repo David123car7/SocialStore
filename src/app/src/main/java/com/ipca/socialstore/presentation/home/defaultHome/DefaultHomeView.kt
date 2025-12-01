@@ -25,7 +25,7 @@ fun DefaultHomeView(modifier: Modifier, navController: NavController) {
     DefaultHomeViewContent(
         modifier = modifier,
         onClickLogout = {homeViewModel.logout()},
-        onClickCreate = {navController.navigate(Routes.CreateDonation)}
+        onClickCreate = {navController.navigate(Routes.GetSingleItem)}
     )
 }
 
@@ -43,7 +43,7 @@ fun DefaultHomeViewContent(modifier: Modifier, onClickLogout:()->Unit, onClickCr
                 modifier = Modifier.padding(8.dp),
                 onClick = {onClickCreate()}
             ) {
-                Text("CreateDonation")
+                Text("GetItem")
             }
         }
     }

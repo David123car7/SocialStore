@@ -1,5 +1,6 @@
 package com.ipca.socialstore.data.repository
 
+import android.content.ClipData
 import com.ipca.socialstore.data.enums.DatabaseTables
 import com.ipca.socialstore.data.helpers.from
 import com.ipca.socialstore.data.models.CampaignModel
@@ -17,6 +18,23 @@ class ItemRepository @Inject constructor(private val supabase : SupabaseClient, 
             supabase.from(DatabaseTables.ITEM)
                 .insert(item)
             ResultWrapper.Success(true)
+        }
+        catch (e : Exception){
+            ResultWrapper.Error(exceptionMapper.map(e))
+        }
+    }
+
+
+    suspend fun getItem(itemId : String) : ResultWrapper<ItemModel>{
+        return try {
+            val item = supabase.from(DatabaseTables.ITEM)
+                .select {
+                    filter {
+                        eq("item_id",itemId)
+                    }
+                }
+                .decodeSingle<ItemModel>()
+            ResultWrapper.Success(data = item)
         }
         catch (e : Exception){
             ResultWrapper.Error(exceptionMapper.map(e))
