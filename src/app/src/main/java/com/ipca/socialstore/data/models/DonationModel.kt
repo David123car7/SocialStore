@@ -5,16 +5,13 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class  DonationModel(
-    @SerialName("donation_id")
-    val donationId : String,
-
     @SerialName("donation_date")
     val donationDate : String?,
 
-    @SerialName("campaign")
-    val campaign : String
+    @SerialName("campaign_id")
+    val campaignId: String,
 )
 
 fun DonationModel.isValid() : Boolean{
-    return this.campaign.isNotEmpty()
+    return this.campaignId.isNotEmpty()
 }
