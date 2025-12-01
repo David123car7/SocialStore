@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.ipca.socialstore.presentation.objects.NavigationViews
+import com.ipca.socialstore.presentation.utils.ErrorText
 import com.ipca.socialstore.ui.theme.SocialStoreTheme
 
 
@@ -96,7 +97,7 @@ fun RegisterViewContent(
         )
 
         if (uiState.error != null) {
-            Text(text = uiState.error!!, modifier = Modifier.padding(8.dp))
+            Text(text = uiState.error!!.asString(), modifier = Modifier.padding(8.dp))
         }
 
         Row(modifier = modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
@@ -116,7 +117,7 @@ fun RegisterViewContent(
 @Composable
 fun LoginPreview(){
     SocialStoreTheme() {
-        val uiState = RegisterState(email = "", password = "", error = "", isLoading = false)
+        val uiState = RegisterState(email = "", password = "", error = null, isLoading = false)
 
         RegisterViewContent(
             modifier = Modifier,

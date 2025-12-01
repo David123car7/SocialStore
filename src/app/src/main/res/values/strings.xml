@@ -1,3 +1,15 @@
 <resources>
     <string name="app_name">SocialStore</string>
+	
+	<string name="error_invalid_password">Invalid password.</string>
+    <string name="error_user_not_found">User not found.</string>
+    <string name="error_user_already_exists">A user with this email already exists.</string>
+    <string name="error_invalid_email">Please enter a valid email address.</string>
+	<string name="error_user_not_logged_in">User is not logged in.</string>
+	<string name="error_invalid_reset_token">Reset token is invalid.</string>
+    <string name="error_invalid_email_domain">Email must belong to the correct organization (IPCA).</string>
+
+    <string name="error_network">No internet connection. Please check your network.</string>
+    <string name="error_technical">A technical error occurred. Please try again later.</string>
+    <string name="error_unknown">An unknown error occurred.</string>
 </resources>

@@ -5,6 +5,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
 import com.ipca.socialstore.domain.auth.ResetPasswordUseCase
+import com.ipca.socialstore.presentation.utils.ErrorText
+import com.ipca.socialstore.presentation.utils.asUiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -13,7 +15,7 @@ data class ResetPasswordState (
     var email : String = "",
     var password : String = "",
     var token : String = "",
-    var error : String? = null,
+    var error : ErrorText? = null,
     var isLoading : Boolean = false,
     val passwordReseted: Boolean = false
 )
@@ -50,7 +52,7 @@ class ResetPasswordViewModel @Inject constructor(private val resetPasswordUseCas
                     uiState.value = uiState.value.copy(
                         isLoading = false,
                         passwordReseted = false,
-                        error = result.message
+                        error = result.error.asUiText()
                     )
                 }
             }

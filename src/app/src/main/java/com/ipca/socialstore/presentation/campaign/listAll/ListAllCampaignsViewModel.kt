@@ -6,6 +6,8 @@ import androidx.lifecycle.viewModelScope
 import com.ipca.socialstore.data.models.CampaignModel
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
 import com.ipca.socialstore.domain.campaign.GetAllCampaignsUseCase
+import com.ipca.socialstore.presentation.utils.ErrorText
+import com.ipca.socialstore.presentation.utils.asUiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -13,7 +15,7 @@ import javax.inject.Inject
 data class GetAllCampaignsState(
     val campaigns : List<CampaignModel> = emptyList(),
     val isLoading : Boolean = false,
-    val error : String? = null
+    val error : ErrorText? = null
 )
 @HiltViewModel
 class ListAllCampaignsViewModel @Inject constructor(private val getAllCampaignsUseCase: GetAllCampaignsUseCase): ViewModel(){
@@ -36,7 +38,7 @@ class ListAllCampaignsViewModel @Inject constructor(private val getAllCampaignsU
                 is ResultWrapper.Error -> {
                     uiState.value = uiState.value.copy(
                         isLoading = false,
-                        error = result.message,
+                        error = result.error.asUiText(),
                     )
                 }
             }

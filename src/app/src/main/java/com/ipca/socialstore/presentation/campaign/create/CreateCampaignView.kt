@@ -73,7 +73,7 @@ fun CreateCampaignViewContent(
 fun PreviewCreateCampaignViewContent(){
     SocialStoreTheme() {
         val campaign = CampaignModel("","")
-        val uiState = CampaignState(campaign,false,"",false)
+        val uiState = CampaignState(campaign,false,null,false)
         CreateCampaignViewContent(
             modifier = Modifier,
             uiState = uiState,

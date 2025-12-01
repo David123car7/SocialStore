@@ -67,7 +67,7 @@ fun LoginViewContent(modifier: Modifier,
         )
 
         if (uiState.error != null) {
-            Text(text = uiState.error!!, modifier = Modifier.padding(8.dp))
+            Text(text = uiState.error!!.asString(), modifier = Modifier.padding(8.dp))
         }
 
         Row(modifier = modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
@@ -97,7 +97,7 @@ fun LoginViewContent(modifier: Modifier,
 @Composable
 fun LoginPreview(){
     SocialStoreTheme() {
-        val uiState = LoginState(email = "", password = "", error = "", isLoading = false)
+        val uiState = LoginState(email = "", password = "", error = null, isLoading = false)
 
         LoginViewContent(
             modifier = Modifier,

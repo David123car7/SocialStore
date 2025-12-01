@@ -7,12 +7,14 @@ import androidx.lifecycle.viewModelScope
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
 import com.ipca.socialstore.domain.profile.GetUserRoleUseCase
 import com.ipca.socialstore.domain.auth.LogoutUseCase
+import com.ipca.socialstore.presentation.utils.ErrorText
+import com.ipca.socialstore.presentation.utils.asUiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class HomeState (
-    var error : String? = null,
+    var error : ErrorText? = null,
     var userRole: String = "",
     var isLoading : Boolean = false,
 )
@@ -33,7 +35,7 @@ class HomeViewModel @Inject constructor(private val logoutUseCase: LogoutUseCase
                 is ResultWrapper.Error -> {
                     uiState.value = uiState.value.copy(
                         isLoading = false,
-                        error = result.message
+                        error = result.error.asUiText()
                     )
                 }
             }

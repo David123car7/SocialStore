@@ -53,7 +53,7 @@ fun ResetViewContent(modifier: Modifier, uiState: RequestResetState, onEmailUpda
             onValueChange = { value -> onEmailUpdate(value)})
 
         if (uiState.error != null) {
-            Text(text = uiState.error!!, modifier = Modifier.padding(8.dp))
+            Text(text = uiState.error!!.asString(), modifier = Modifier.padding(8.dp))
         }
 
         Row(modifier = modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
@@ -73,7 +73,7 @@ fun ResetViewContent(modifier: Modifier, uiState: RequestResetState, onEmailUpda
 @Composable
 fun ResetPreview(){
     SocialStoreTheme() {
-        val uiState = RequestResetState(email = "", error = "", isLoading = false)
+        val uiState = RequestResetState(email = "", error = null, isLoading = false)
 
         ResetViewContent(modifier = Modifier, onClickReset = { Unit}, onEmailUpdate = { Unit}, uiState = uiState)
     }

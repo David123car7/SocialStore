@@ -7,11 +7,6 @@ import javax.inject.Inject
 
 class GetUserRoleUseCase @Inject constructor(private val userRepository: UserRepository) {
     suspend operator fun invoke(): ResultWrapper<UserRole> {
-        val x = userRepository.getUserRole()
-
-        if(x is ResultWrapper.Error){
-            return ResultWrapper.Error(x.message ?: "")
-        }
-        return x
+        return userRepository.getUserRole()
     }
 }

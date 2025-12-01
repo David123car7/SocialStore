@@ -6,12 +6,14 @@ import androidx.lifecycle.viewModelScope
 import com.ipca.socialstore.data.models.DonationModel
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
 import com.ipca.socialstore.domain.donation.CreateDonationUseCase
+import com.ipca.socialstore.presentation.utils.ErrorText
+import com.ipca.socialstore.presentation.utils.asUiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class DonationState(
-    val error : String? = null,
+    val error : ErrorText? = null,
     val isLoading : Boolean? = null,
     val donation : DonationModel = DonationModel("","","")
 )
@@ -39,7 +41,7 @@ class DonationViewModel @Inject constructor(private val createDonationUseCase: C
                 is ResultWrapper.Error -> {
                     uiState.value = uiState.value.copy(
                         isLoading = false,
-                        error = result.message
+                        error = result.error.asUiText()
                     )
                 }
             }
