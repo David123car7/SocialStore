@@ -1,5 +1,7 @@
 package com.ipca.socialstore.data.repository
 
+import com.ipca.socialstore.data.exceptions.AppError
+import com.ipca.socialstore.data.exceptions.ExceptionMapper
 import com.ipca.socialstore.data.resultwrappers.ResultFlowWrapper
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
 import io.github.jan.supabase.SupabaseClient
@@ -10,10 +12,11 @@ import io.github.jan.supabase.auth.providers.builtin.Email
 import io.github.jan.supabase.auth.status.SessionStatus
 import io.github.jan.supabase.exceptions.RestException
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
-class AuthRepository @Inject constructor(private val supabase: SupabaseClient) {
+class AuthRepository @Inject constructor(private val supabase: SupabaseClient, private val exceptionMapper: ExceptionMapper) {
     fun getUserSessionState(): Flow<ResultFlowWrapper<Boolean>> {
         return supabase.auth.sessionStatus.map { status ->
             when (status) {
@@ -27,9 +30,11 @@ class AuthRepository @Inject constructor(private val supabase: SupabaseClient) {
                     ResultFlowWrapper.Loading(true)
                 }
                 else -> {
-                    ResultFlowWrapper.Error("Session Error")
+                    ResultFlowWrapper.Error(AppError.UnknownError("Unknown Auth State"))
                 }
             }
+        }.catch { e ->
+            emit(ResultFlowWrapper.Error(exceptionMapper.map(e)))
         }
     }
 
@@ -41,11 +46,8 @@ class AuthRepository @Inject constructor(private val supabase: SupabaseClient) {
             }
             ResultWrapper.Success(true)
         }
-        catch (e: RestException){
-            ResultWrapper.Error(e.error)
-        }
         catch (e: Exception) {
-            ResultWrapper.Error(e.message ?: "Unknown Error")
+            ResultWrapper.Error(exceptionMapper.map(e))
         }
     }
 
@@ -56,11 +58,9 @@ class AuthRepository @Inject constructor(private val supabase: SupabaseClient) {
                 this.password = password
             }
             ResultWrapper.Success(user?.id ?: "")
-        }catch (e: RestException){
-            ResultWrapper.Error(e.error)
         }
         catch (e: Exception) {
-            ResultWrapper.Error(e.message ?: "Unknown Error")
+            ResultWrapper.Error(exceptionMapper.map(e))
         }
     }
 
@@ -73,11 +73,8 @@ class AuthRepository @Inject constructor(private val supabase: SupabaseClient) {
             )
             ResultWrapper.Success(true)
         }
-        catch (e: RestException){
-            ResultWrapper.Error(e.error)
-        }
         catch (e: Exception){
-            ResultWrapper.Error(e.message ?: "Unknown Error")
+            ResultWrapper.Error(exceptionMapper.map(e))
         }
     }
 
@@ -88,11 +85,8 @@ class AuthRepository @Inject constructor(private val supabase: SupabaseClient) {
             }
             ResultWrapper.Success(true)
         }
-        catch (e: RestException){
-            ResultWrapper.Error(e.error)
-        }
         catch (e: Exception){
-            ResultWrapper.Error(e.message ?: "Unknown Error")
+            ResultWrapper.Error(exceptionMapper.map(e))
         }
     }
 
@@ -101,11 +95,8 @@ class AuthRepository @Inject constructor(private val supabase: SupabaseClient) {
             supabase.auth.resetPasswordForEmail(email = email)
             ResultWrapper.Success(true)
         }
-        catch (e: RestException){
-            ResultWrapper.Error(e.error)
-        }
         catch (e: Exception){
-            ResultWrapper.Error(e.message ?: "Unknown Error")
+            ResultWrapper.Error(exceptionMapper.map(e))
         }
     }
 
@@ -114,11 +105,8 @@ class AuthRepository @Inject constructor(private val supabase: SupabaseClient) {
             supabase.auth.signOut()
             ResultWrapper.Success(true)
         }
-        catch (e: RestException){
-            ResultWrapper.Error(e.error)
-        }
         catch (e: Exception){
-            ResultWrapper.Error(e.message ?: "Unknown Error")
+            ResultWrapper.Error(exceptionMapper.map(e))
         }
     }
 

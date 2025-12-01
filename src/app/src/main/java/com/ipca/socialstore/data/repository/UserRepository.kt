@@ -2,6 +2,8 @@ package com.ipca.socialstore.data.repository
 
 import com.ipca.socialstore.data.enums.DatabaseTables
 import com.ipca.socialstore.data.enums.UserRole
+import com.ipca.socialstore.data.exceptions.AppError
+import com.ipca.socialstore.data.exceptions.ExceptionMapper
 import com.ipca.socialstore.data.helpers.from
 import com.ipca.socialstore.data.models.UserModel
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
@@ -13,12 +15,12 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import javax.inject.Inject
 
-class UserRepository @Inject constructor(private val supabase: SupabaseClient){
+class UserRepository @Inject constructor(private val supabase: SupabaseClient, private val exceptionMapper: ExceptionMapper){
 
     suspend fun getUserRole(): ResultWrapper<UserRole> {
         return try {
             val userId = supabase.auth.currentUserOrNull()?.id
-            if(userId == null) return ResultWrapper.Error("User not logged in")
+                ?: return ResultWrapper.Error(AppError.UserNotLoggedIn)
 
             @Serializable
             data class RoleContainer(
@@ -34,10 +36,10 @@ class UserRepository @Inject constructor(private val supabase: SupabaseClient){
             if (userProfile != null) {
                 ResultWrapper.Success(userProfile.role)
             } else {
-                ResultWrapper.Error("Profile not found")
+                ResultWrapper.Error(AppError.UserNotFound)
             }
         } catch (e: Exception) {
-            ResultWrapper.Error(e.message ?: "Error")
+            ResultWrapper.Error(exceptionMapper.map(e))
         }
     }
 
@@ -46,11 +48,8 @@ class UserRepository @Inject constructor(private val supabase: SupabaseClient){
             supabase.from(DatabaseTables.PROFILE).insert(user)
             ResultWrapper.Success(true)
         }
-        catch (e: RestException){
-            ResultWrapper.Error(e.error)
-        }
         catch (e: Exception) {
-            ResultWrapper.Error(e.message ?: "Unknown Error")
+            ResultWrapper.Error(exceptionMapper.map(e))
         }
     }
 }

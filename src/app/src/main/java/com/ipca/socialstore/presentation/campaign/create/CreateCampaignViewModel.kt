@@ -6,6 +6,8 @@ import androidx.lifecycle.viewModelScope
 import com.ipca.socialstore.data.models.CampaignModel
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
 import com.ipca.socialstore.domain.campaign.CreateCampaignUseCase
+import com.ipca.socialstore.presentation.utils.ErrorText
+import com.ipca.socialstore.presentation.utils.asUiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
@@ -15,7 +17,7 @@ import javax.inject.Inject
 data class CampaignState(
     val campaign : CampaignModel = CampaignModel("",""),
     val isLoading : Boolean = false,
-    val error: String? = null,
+    val error: ErrorText? = null,
     val isCreated : Boolean  = false
 )
 
@@ -42,7 +44,6 @@ class CreateCampaingViewModel @Inject constructor(private val createCampaignUseC
         )
     }
 
-
     fun createCampaign(){
 
         uiState.value = uiState.value.copy(
@@ -63,7 +64,7 @@ class CreateCampaingViewModel @Inject constructor(private val createCampaignUseC
                 is ResultWrapper.Error -> {
                     uiState.value = uiState.value.copy(
                         isLoading = false,
-                        error = result.message,
+                        error = result.error.asUiText(),
                         isCreated = false
                     )
                 }

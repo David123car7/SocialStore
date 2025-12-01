@@ -72,7 +72,7 @@ fun SingleCampaign(
 @Composable
 fun PreviewListAllCampaigns(){
     SocialStoreTheme() {
-        val uiState = GetAllCampaignsState(emptyList(),false,"")
+        val uiState = GetAllCampaignsState(emptyList(),false,null)
         ListAllCampaignsContent(
             modifier = Modifier,
             uiState = uiState,

@@ -68,7 +68,7 @@ fun ResetPasswordContent(
         )
 
         if (uiState.error != null) {
-            Text(text = uiState.error!!, modifier = Modifier.padding(8.dp))
+            Text(text = uiState.error!!.asString(), modifier = Modifier.padding(8.dp))
         }
 
         Row(modifier = modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
@@ -89,7 +89,7 @@ fun ResetPasswordContent(
 @Composable
 fun ResetPreview(){
     SocialStoreTheme() {
-        val uiState = ResetPasswordState(email = "", password = "", token = "", error = "", isLoading = true)
+        val uiState = ResetPasswordState(email = "", password = "", token = "", error = null, isLoading = true)
         ResetPasswordContent(modifier = Modifier, uiState = uiState, onClickReset = { Unit}, onTokenUpdate = { Unit}, onPasswordUpdate = { Unit}, onEmailUpdate = { Unit})
     }
 }

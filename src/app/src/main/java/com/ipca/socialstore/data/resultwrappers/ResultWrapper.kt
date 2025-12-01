@@ -1,6 +1,8 @@
 package com.ipca.socialstore.data.resultwrappers
 
-sealed class ResultWrapper<T>(val data: T? = null, val message: String? = null) {
+import com.ipca.socialstore.data.exceptions.AppError
+
+sealed class ResultWrapper<T>(val data: T? = null) {
     class Success<T>(data: T) : ResultWrapper<T>(data)
-    class Error<T>(message: String, data: T? = null) : ResultWrapper<T>(data , message)
+    class Error<T>(val error: AppError, data: T? = null) : ResultWrapper<T>(data)
 }

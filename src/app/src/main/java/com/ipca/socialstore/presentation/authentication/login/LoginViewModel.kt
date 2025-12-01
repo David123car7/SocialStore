@@ -5,6 +5,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
 import com.ipca.socialstore.domain.auth.LoginUseCase
+import com.ipca.socialstore.presentation.utils.ErrorText
+import com.ipca.socialstore.presentation.utils.asUiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -12,7 +14,7 @@ import javax.inject.Inject
 data class LoginState (
     var email : String = "",
     var password : String = "",
-    var error : String? = null,
+    var error : ErrorText? = null,
     var isLoading : Boolean = false,
     var isLoggedIn: Boolean = false
 )
@@ -46,7 +48,7 @@ class LoginViewModel @Inject constructor(
                     uiState.value = uiState.value.copy(
                         isLoading = false,
                         isLoggedIn = false,
-                        error = result.message
+                        error = result.error.asUiText()
                     )
                 }
             }

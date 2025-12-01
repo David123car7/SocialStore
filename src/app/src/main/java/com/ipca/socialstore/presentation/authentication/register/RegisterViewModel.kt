@@ -8,6 +8,8 @@ import com.ipca.socialstore.data.models.UserModel
 import com.ipca.socialstore.data.models.isValid
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
 import com.ipca.socialstore.domain.auth.RegisterUseCase
+import com.ipca.socialstore.presentation.utils.ErrorText
+import com.ipca.socialstore.presentation.utils.asUiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -17,7 +19,7 @@ data class RegisterState (
     var password : String = "",
     var user: UserModel = UserModel(uid = null,firstName = "", lastName = "", addressId = null,
         birthDate = "", role = UserRole.NOROLE.value),
-    var error : String? = null,
+    var error : ErrorText? = null,
     var isLoading : Boolean = false,
     var isRegistered : Boolean = false,
 )
@@ -69,7 +71,7 @@ class RegisterViewModel @Inject constructor(private val registerUseCase: Registe
                     uiState.value = uiState.value.copy(
                         isLoading = false,
                         isRegistered = false,
-                        error = result.message
+                        error = result.error.asUiText()
                     )
                 }
             }

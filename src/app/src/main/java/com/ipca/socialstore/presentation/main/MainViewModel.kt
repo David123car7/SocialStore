@@ -9,6 +9,8 @@ import com.ipca.socialstore.data.resultwrappers.ResultFlowWrapper
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
 import com.ipca.socialstore.domain.profile.GetUserRoleUseCase
 import com.ipca.socialstore.domain.auth.GetUserSessionStateUseCase
+import com.ipca.socialstore.presentation.utils.ErrorText
+import com.ipca.socialstore.presentation.utils.asUiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -17,7 +19,7 @@ data class SessionState(
     val isLoading: Boolean = true,
     val isLoggedIn: Boolean = false,
     var userRole: UserRole = UserRole.NOROLE,
-    val error: String? = null
+    val error: ErrorText? = null
 )
 
 @HiltViewModel
@@ -42,7 +44,7 @@ class MainViewModel @Inject constructor(private val getUserSessionState: GetUser
             is ResultWrapper.Error -> {
                 sessionState.value = sessionState.value.copy(
                     isLoading = false,
-                    error = result.message
+                    error = result.error.asUiText()
                 )
             }
         }
@@ -74,7 +76,7 @@ class MainViewModel @Inject constructor(private val getUserSessionState: GetUser
                 is ResultFlowWrapper.Error -> {
                     sessionState.value = sessionState.value.copy(
                         isLoading = false,
-                        error = result.message,
+                        error = result.error.asUiText(),
                         isLoggedIn = false
                     )
                 }
