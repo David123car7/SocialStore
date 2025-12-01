@@ -64,7 +64,7 @@ fun CreateDonationViewContent(
 
 @Preview(showBackground = true)
 @Composable
-fun PreviewCreateDonotion(){
+fun PreviewCreateDonation(){
     SocialStoreTheme() {
         val donation = DonationModel("","")
         val uiState = DonationState(donation = donation,null,false,false)

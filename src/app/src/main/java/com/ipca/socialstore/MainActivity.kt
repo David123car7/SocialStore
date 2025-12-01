@@ -25,6 +25,7 @@ import com.ipca.socialstore.presentation.campaign.listAll.ListAllCampaignsView
 import com.ipca.socialstore.presentation.donation.create.CreateDonationView
 import com.ipca.socialstore.presentation.home.defaultHome.DefaultHomeView
 import com.ipca.socialstore.presentation.item.CreateItemView
+import com.ipca.socialstore.presentation.item.getSingleItem.GetSingleItemView
 import com.ipca.socialstore.presentation.objects.Routes
 import com.ipca.socialstore.ui.theme.SocialStoreTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -80,6 +81,9 @@ class MainActivity : ComponentActivity() {
                         }
                         composable <Routes.CreateDonation>{
                             CreateDonationView(modifier = Modifier.padding(innerPadding), navController = navController)
+                        }
+                        composable <Routes.GetSingleItem>{
+                            GetSingleItemView(modifier = Modifier.padding(innerPadding), navController = navController)
                         }
                     }
                 }

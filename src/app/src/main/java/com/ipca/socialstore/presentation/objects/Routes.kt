@@ -38,7 +38,12 @@ sealed class Routes {
     @Serializable
     object  CreateItem
 
+    @Serializable
+    object GetSingleItem
+
     // --- Donations ---
     @Serializable
     object CreateDonation
+
+
 }
