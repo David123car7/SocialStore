@@ -2,7 +2,9 @@ package com.ipca.socialstore.data.enums
 
 enum class DatabaseTables(val tableName: String) {
     PROFILE("profile"),
-    ADDRESS("address");
+    ADDRESS("address"),
+    CAMPAIGN("campaign"),
+    DONATION("donation");
 
     override fun toString() = tableName
 }

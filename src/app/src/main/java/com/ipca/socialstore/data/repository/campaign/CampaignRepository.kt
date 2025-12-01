@@ -1,7 +1,8 @@
 package com.ipca.socialstore.data.repository.campaign
 
+import com.ipca.socialstore.data.enums.DatabaseTables
+import com.ipca.socialstore.data.helpers.from
 import com.ipca.socialstore.data.models.CampaignModel
-import com.ipca.socialstore.data.objects.DatabaseTables
 import com.ipca.socialstore.data.resultwrappers.ResultFlowWrapper
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
 import io.github.jan.supabase.SupabaseClient
@@ -12,7 +13,7 @@ class CampaignRepository @Inject constructor(private val supabase: SupabaseClien
 
     suspend fun createCampaign(campaign : CampaignModel) : ResultWrapper<Boolean>{
         return try {
-            supabase.from(DatabaseTables.campaign)
+            supabase.from(DatabaseTables.CAMPAIGN)
                 .insert(campaign)
             ResultWrapper.Success(true)
         }catch (e : Exception){
@@ -22,7 +23,7 @@ class CampaignRepository @Inject constructor(private val supabase: SupabaseClien
 
     suspend fun getAllCampaign() : ResultWrapper<List<CampaignModel>>{
         return try {
-            val campaigns = supabase.from(DatabaseTables.campaign)
+            val campaigns = supabase.from(DatabaseTables.CAMPAIGN)
                 .select()
                 .decodeList<CampaignModel>()
              ResultWrapper.Success(campaigns)
