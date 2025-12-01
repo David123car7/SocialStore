@@ -3,9 +3,9 @@ package com.ipca.socialstore.presentation.authentication.register
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ipca.socialstore.data.enums.UserRole
 import com.ipca.socialstore.data.models.UserModel
 import com.ipca.socialstore.data.models.isValid
-import com.ipca.socialstore.data.objects.UserRoles
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
 import com.ipca.socialstore.domain.auth.RegisterUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -15,7 +15,8 @@ import javax.inject.Inject
 data class RegisterState (
     var email : String = "",
     var password : String = "",
-    var user: UserModel = UserModel(uid = null,firstName = "", lastName = "", addressId = null, birthDate = "", role = UserRoles.default),
+    var user: UserModel = UserModel(uid = null,firstName = "", lastName = "", addressId = null,
+        birthDate = "", role = UserRole.NOROLE.value),
     var error : String? = null,
     var isLoading : Boolean = false,
     var isRegistered : Boolean = false,

@@ -1,5 +1,7 @@
 package com.ipca.socialstore.domain.auth
 
+import android.util.Log
+import com.ipca.socialstore.data.enums.UserRole
 import com.ipca.socialstore.data.models.UserModel
 import com.ipca.socialstore.data.objects.ValidEmailNomains
 import com.ipca.socialstore.data.repository.AuthRepository
@@ -22,10 +24,11 @@ class RegisterUseCase @Inject constructor(private val authRepository: AuthReposi
             )
         }
 
-        val userWithId = user.copy(uid = registerResult.data)
+        val userWithId = user.copy(uid = registerResult.data, role = UserRole.DEFAULT.value)
 
         val registerUserResult = userRepository.registerUser(userWithId)
         if(registerUserResult is ResultWrapper.Error){
+            Log.d("AppDebug", "Register Error: ${registerUserResult.message}")
             return registerUserResult
         }
 

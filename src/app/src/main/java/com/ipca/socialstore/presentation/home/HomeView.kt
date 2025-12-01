@@ -25,16 +25,11 @@ fun HomeView(modifier: Modifier, navController: NavController) {
     HomeViewContent(
         modifier = modifier,
         onClickLogout = {homeViewModel.logout()},
-        onClickAddDonation = {},
-        onClickGetRole = {homeViewModel.getUserRole()})
-
-    LaunchedEffect(uiState.userRole) {
-        Log.d("AppDebug", "The user ID is: ${uiState.userRole}")
-    }
+        onClickAddDonation = {})
 }
 
 @Composable
-fun HomeViewContent(modifier: Modifier, onClickLogout:()->Unit, onClickAddDonation:()-> Unit, onClickGetRole:()-> Unit){
+fun HomeViewContent(modifier: Modifier, onClickLogout:()->Unit, onClickAddDonation:()-> Unit){
     Box(modifier = modifier.fillMaxSize()){
         Column(modifier = modifier) {
             Text(modifier = Modifier.padding(8.dp), text = "Home Page")
@@ -48,11 +43,6 @@ fun HomeViewContent(modifier: Modifier, onClickLogout:()->Unit, onClickAddDonati
                 onClick = { onClickAddDonation() }) {
                 Text("AddDonation")
             }
-            Button(
-                modifier = Modifier.padding(8.dp),
-                onClick = { onClickGetRole() }) {
-                Text("Get Role")
-            }
         }
     }
 }
@@ -61,6 +51,6 @@ fun HomeViewContent(modifier: Modifier, onClickLogout:()->Unit, onClickAddDonati
 @Composable
 fun HomePreview(){
     SocialStoreTheme() {
-        HomeViewContent(modifier = Modifier, onClickLogout = { Unit}, onClickAddDonation = { Unit}, onClickGetRole = { Unit})
+        HomeViewContent(modifier = Modifier, onClickLogout = { Unit}, onClickAddDonation = { Unit})
     }
 }
