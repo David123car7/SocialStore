@@ -23,7 +23,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 
 fun CreateCampaingView(modifier: Modifier, navController: NavController){
 
-    val viewModel : CreateCampaingViewModel = hiltViewModel()
+    val viewModel : CreateCampaignViewModel = hiltViewModel()
     val uiState by viewModel.uiState
     
     CreateCampaignViewContent(

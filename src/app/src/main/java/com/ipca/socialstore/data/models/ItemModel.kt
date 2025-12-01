@@ -5,9 +5,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class ItemModel(
-    @SerialName("item_id")
-    val itemId : String,
-
     @SerialName("name")
     val name : String,
 
@@ -16,5 +13,5 @@ data class ItemModel(
 )
 
 fun ItemModel.isValid() : Boolean{
-    return this.name.isNotEmpty() && this.itemId.isNotEmpty()
+    return this.name.isNotEmpty()
 }

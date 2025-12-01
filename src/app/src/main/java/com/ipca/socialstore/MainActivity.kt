@@ -22,7 +22,9 @@ import com.ipca.socialstore.presentation.authentication.requestResetPassword.Req
 import com.ipca.socialstore.presentation.authentication.resetPassword.ResetPasswordView
 import com.ipca.socialstore.presentation.campaign.create.CreateCampaingView
 import com.ipca.socialstore.presentation.campaign.listAll.ListAllCampaignsView
+import com.ipca.socialstore.presentation.donation.create.CreateDonationView
 import com.ipca.socialstore.presentation.home.defaultHome.DefaultHomeView
+import com.ipca.socialstore.presentation.item.CreateItemView
 import com.ipca.socialstore.presentation.objects.Routes
 import com.ipca.socialstore.ui.theme.SocialStoreTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -72,6 +74,12 @@ class MainActivity : ComponentActivity() {
                         }
                         composable<Routes.ListAllCampaign>{
                             ListAllCampaignsView(modifier = Modifier.padding(innerPadding), navController = navController)
+                        }
+                        composable <Routes.CreateItem>{
+                            CreateItemView(modifier = Modifier.padding(innerPadding), navController = navController)
+                        }
+                        composable <Routes.CreateDonation>{
+                            CreateDonationView(modifier = Modifier.padding(innerPadding), navController = navController)
                         }
                     }
                 }

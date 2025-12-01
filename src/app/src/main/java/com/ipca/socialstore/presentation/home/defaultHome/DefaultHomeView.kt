@@ -13,6 +13,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.ipca.socialstore.presentation.objects.Routes
 import com.ipca.socialstore.ui.theme.SocialStoreTheme
 
 @Composable
@@ -24,12 +25,12 @@ fun DefaultHomeView(modifier: Modifier, navController: NavController) {
     DefaultHomeViewContent(
         modifier = modifier,
         onClickLogout = {homeViewModel.logout()},
-        onClickAddDonation = {}
+        onClickCreate = {navController.navigate(Routes.CreateDonation)}
     )
 }
 
 @Composable
-fun DefaultHomeViewContent(modifier: Modifier, onClickLogout:()->Unit, onClickAddDonation:()-> Unit){
+fun DefaultHomeViewContent(modifier: Modifier, onClickLogout:()->Unit, onClickCreate : ()-> Unit){
     Box(modifier = modifier.fillMaxSize()){
         Column(modifier = modifier) {
             Text(modifier = Modifier.padding(8.dp), text = "Home Page")
@@ -37,6 +38,12 @@ fun DefaultHomeViewContent(modifier: Modifier, onClickLogout:()->Unit, onClickAd
                 modifier = Modifier.padding(8.dp),
                 onClick = { onClickLogout() }) {
                 Text("Logout")
+            }
+            Button(
+                modifier = Modifier.padding(8.dp),
+                onClick = {onClickCreate()}
+            ) {
+                Text("CreateDonation")
             }
         }
     }
@@ -46,6 +53,6 @@ fun DefaultHomeViewContent(modifier: Modifier, onClickLogout:()->Unit, onClickAd
 @Composable
 fun HomePreview(){
     SocialStoreTheme() {
-        DefaultHomeViewContent(modifier = Modifier, onClickLogout = { Unit}, onClickAddDonation = { Unit})
+        DefaultHomeViewContent(modifier = Modifier, onClickLogout = { Unit}, onClickCreate = { Unit})
     }
 }

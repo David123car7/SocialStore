@@ -1,50 +1,50 @@
-package com.ipca.socialstore.presentation.campaign.create
+package com.ipca.socialstore.presentation.item
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ipca.socialstore.data.models.CampaignModel
+import com.ipca.socialstore.data.models.ItemModel
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
-import com.ipca.socialstore.domain.campaign.CreateCampaignUseCase
+import com.ipca.socialstore.domain.item.CreateItemUseCase
 import com.ipca.socialstore.presentation.utils.ErrorText
 import com.ipca.socialstore.presentation.utils.asUiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
-import kotlinx.datetime.LocalDate
 import javax.inject.Inject
 
 
-data class CampaignState(
-    val campaign : CampaignModel = CampaignModel("",""),
+data class ItemState(
+    val item : ItemModel = ItemModel("",""),
     val isLoading : Boolean = false,
     val error: ErrorText? = null,
     val isCreated : Boolean  = false
 )
-
 @HiltViewModel
-class CreateCampaignViewModel @Inject constructor(private val createCampaignUseCase: CreateCampaignUseCase) : ViewModel(){
+class CreateItemViewModel @Inject constructor(private val createItemUseCase: CreateItemUseCase): ViewModel(){
 
-    val uiState = mutableStateOf(CampaignState())
+    val uiState = mutableStateOf(ItemState())
 
-    fun updateCampaignName(name : String){
-        val campaign = uiState.value.campaign.copy(
-            name = name
+
+    fun updateItemName(itemName : String){
+        val itemName = uiState.value.item.copy(
+            name = itemName
         )
         uiState.value = uiState.value.copy(
-            campaign = campaign
+            item = itemName
         )
     }
 
-    fun updateDate(date: String){
-        val campaign = uiState.value.campaign.copy(
-            date = date
+    fun updateItemType(itemType : String){
+        val itemType = uiState.value.item.copy(
+            itemType = itemType
         )
         uiState.value = uiState.value.copy(
-            campaign = campaign
+            item = itemType
         )
     }
 
-    fun createCampaign(){
+
+    fun createItem(item : ItemModel){
 
         uiState.value = uiState.value.copy(
             isLoading = true,
@@ -53,7 +53,7 @@ class CreateCampaignViewModel @Inject constructor(private val createCampaignUseC
         )
 
         viewModelScope.launch {
-            val result = createCampaignUseCase(uiState.value.campaign)
+            val result = createItemUseCase(uiState.value.item)
             when(result){
                 is ResultWrapper.Success -> {
                     uiState.value = uiState.value.copy(
