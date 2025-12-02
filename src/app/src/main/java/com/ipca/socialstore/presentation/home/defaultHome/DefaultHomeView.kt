@@ -13,19 +13,28 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import com.ipca.socialstore.presentation.objects.Routes
+import com.ipca.socialstore.data.enums.UserRole
+import com.ipca.socialstore.presentation.objects.NavigationLogic
+import com.ipca.socialstore.presentation.routes.AdminRoutes
+import com.ipca.socialstore.presentation.routes.BeneficiaryRoutes
+import com.ipca.socialstore.presentation.routes.GeneralRoutes
 import com.ipca.socialstore.ui.theme.SocialStoreTheme
 
 @Composable
-fun DefaultHomeView(modifier: Modifier, navController: NavController) {
+fun DefaultHomeView(modifier: Modifier, navController: NavController, userRole: UserRole) {
     val homeViewModel: DefaultHomeViewModel = hiltViewModel()
     val uiState by homeViewModel.uiState
-
 
     DefaultHomeViewContent(
         modifier = modifier,
         onClickLogout = {homeViewModel.logout()},
-        onClickCreate = {navController.navigate(Routes.GetSingleItem)}
+        onClickCreate = {
+            NavigationLogic.navigateTo(
+            navController = navController,
+            userRole = userRole,
+            route = AdminRoutes.GetSingleItem
+            )
+        }
     )
 }
 
