@@ -26,7 +26,10 @@ import com.ipca.socialstore.presentation.donation.create.CreateDonationView
 import com.ipca.socialstore.presentation.home.defaultHome.DefaultHomeView
 import com.ipca.socialstore.presentation.item.CreateItemView
 import com.ipca.socialstore.presentation.item.getSingleItem.GetSingleItemView
-import com.ipca.socialstore.presentation.objects.Routes
+import com.ipca.socialstore.presentation.routes.AdminRoutes
+import com.ipca.socialstore.presentation.routes.BeneficiaryRoutes
+import com.ipca.socialstore.presentation.routes.GeneralRoutes
+import com.ipca.socialstore.presentation.routes.NoRoleRoutes
 import com.ipca.socialstore.ui.theme.SocialStoreTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -43,46 +46,47 @@ class MainActivity : ComponentActivity() {
             val mainState by mainViewModel.sessionState
 
             val startDestination = if(mainState.isLoggedIn)
-                Routes.DefaultHome
+                NoRoleRoutes.DefaultHome
             else
-                Routes.Login
+                GeneralRoutes.Login
 
             SocialStoreTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     NavHost(navController = navController, startDestination = startDestination){
-                        composable<Routes.Login>{
+                        composable<GeneralRoutes.Login>{
                             LoginView(modifier = Modifier.padding(innerPadding),
-                                navController = navController)
+                                navController = navController, userRole = mainState.userRole)
                         }
-                        composable<Routes.Register>{
+                        composable<GeneralRoutes.Register>{
                             RegisterView(
                                 modifier = Modifier.padding(innerPadding),
-                                navController = navController
+                                navController = navController, userRole = mainState.userRole
                             )
                         }
-                        composable<Routes.DefaultHome>{
+                        composable<NoRoleRoutes.DefaultHome>{
                             DefaultHomeView(modifier = Modifier.padding(innerPadding),
-                                navController = navController)
+                                navController = navController, userRole = mainState.userRole)
                         }
-                        composable<Routes.RequestResetPassword>{
-                            RequestResetPasswordView(modifier = Modifier.padding(innerPadding), navController = navController)
+                        composable<GeneralRoutes.RequestResetPassword>{
+                            RequestResetPasswordView(modifier = Modifier.padding(innerPadding),
+                                navController = navController, userRole = mainState.userRole)
                         }
-                        composable<Routes.ResetPassword>{
-                            ResetPasswordView(modifier = Modifier.padding(innerPadding), navController = navController)
+                        composable<GeneralRoutes.ResetPassword>{
+                            ResetPasswordView(modifier = Modifier.padding(innerPadding))
                         }
-                        composable<Routes.CreateCampaign>{
+                        composable<AdminRoutes.CreateCampaign>{
                             CreateCampaingView(modifier = Modifier.padding(innerPadding), navController = navController)
                         }
-                        composable<Routes.ListAllCampaign>{
+                        composable<AdminRoutes.ListAllCampaign>{
                             ListAllCampaignsView(modifier = Modifier.padding(innerPadding), navController = navController)
                         }
-                        composable <Routes.CreateItem>{
+                        composable <AdminRoutes.CreateItem>{
                             CreateItemView(modifier = Modifier.padding(innerPadding), navController = navController)
                         }
-                        composable <Routes.CreateDonation>{
+                        composable <AdminRoutes.CreateDonation>{
                             CreateDonationView(modifier = Modifier.padding(innerPadding), navController = navController)
                         }
-                        composable <Routes.GetSingleItem>{
+                        composable <AdminRoutes.GetSingleItem>{
                             GetSingleItemView(modifier = Modifier.padding(innerPadding), navController = navController)
                         }
                     }

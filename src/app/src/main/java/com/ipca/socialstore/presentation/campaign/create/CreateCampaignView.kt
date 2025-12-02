@@ -33,8 +33,6 @@ fun CreateCampaingView(modifier: Modifier, navController: NavController){
         onUpdateDate = {value -> viewModel.updateDate(value)},
         createCampaign = {viewModel.createCampaign()}
     )
-
-
 }
 @Composable
 fun CreateCampaignViewContent(

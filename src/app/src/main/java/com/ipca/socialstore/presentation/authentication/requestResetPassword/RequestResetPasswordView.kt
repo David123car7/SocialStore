@@ -19,11 +19,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.ipca.socialstore.presentation.objects.Routes
+import com.ipca.socialstore.data.enums.UserRole
+import com.ipca.socialstore.presentation.objects.NavigationLogic
+import com.ipca.socialstore.presentation.routes.BeneficiaryRoutes
+import com.ipca.socialstore.presentation.routes.GeneralRoutes
 import com.ipca.socialstore.ui.theme.SocialStoreTheme
 
 @Composable
-fun RequestResetPasswordView(modifier: Modifier, navController: NavController){
+fun RequestResetPasswordView(modifier: Modifier, navController: NavController, userRole: UserRole){
     val resetViewModel: RequestResetPasswordViewModel = hiltViewModel()
     val uiState by resetViewModel.uiState
 
@@ -36,7 +39,10 @@ fun RequestResetPasswordView(modifier: Modifier, navController: NavController){
 
     LaunchedEffect(uiState.resetRequested) {
         if(uiState.resetRequested){
-            navController.navigate(Routes.ResetPassword)
+            NavigationLogic.navigateTo(
+                navController = navController,
+                userRole = userRole,
+                route =  GeneralRoutes.ResetPassword)
         }
     }
 }

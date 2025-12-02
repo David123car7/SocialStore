@@ -22,12 +22,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.ipca.socialstore.presentation.objects.Routes
+import com.ipca.socialstore.data.enums.UserRole
+import com.ipca.socialstore.presentation.objects.NavigationLogic
+import com.ipca.socialstore.presentation.routes.BeneficiaryRoutes
+import com.ipca.socialstore.presentation.routes.GeneralRoutes
 import com.ipca.socialstore.ui.theme.SocialStoreTheme
 
 
 @Composable
-fun RegisterView(modifier: Modifier, navController: NavController){
+fun RegisterView(modifier: Modifier, navController: NavController, userRole: UserRole){
     val registerViewModel: RegisterViewModel = hiltViewModel()
     val uiState by registerViewModel.uiState
 
@@ -44,7 +47,10 @@ fun RegisterView(modifier: Modifier, navController: NavController){
 
     LaunchedEffect(uiState.isRegistered) {
         if(uiState.isRegistered)
-            navController.navigate(Routes.Login)
+            NavigationLogic.navigateTo(
+                navController = navController,
+                userRole = userRole,
+                route =  GeneralRoutes.Login)
     }
 }
 
