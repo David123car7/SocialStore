@@ -6,4 +6,7 @@ import kotlinx.serialization.Serializable
 sealed class NoRoleRoutes {
     @Serializable
     object DefaultHome: NoRoleRoutes()
+
+    @Serializable
+    object Application: NoRoleRoutes()
 }

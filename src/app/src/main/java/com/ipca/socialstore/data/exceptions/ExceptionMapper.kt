@@ -1,5 +1,6 @@
 package com.ipca.socialstore.data.exceptions
 
+import android.util.Log
 import io.github.jan.supabase.exceptions.RestException
 import io.ktor.client.plugins.HttpRequestTimeoutException
 import kotlinx.serialization.SerializationException
@@ -8,11 +9,12 @@ import javax.inject.Inject
 
 class ExceptionMapper @Inject constructor(private val fileLogger: FileLogger) {
     fun map(e: Throwable): AppError {
+        Log.d("App Error:", "Error: ${e.message}")
         return when (e) {
             //api errors
             is RestException -> {
                 when (e.statusCode) {
-                    400 -> AppError.InvalidPassword // Bad Request
+                    400 -> AppError.InvalidPassword //not always...
                     404 -> AppError.UserNotFound
                     409 -> AppError.UserAlreadyExists
                     else -> {
