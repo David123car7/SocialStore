@@ -9,7 +9,11 @@ data class ItemModel(
     val name : String,
 
     @SerialName("item_type")
-    val itemType : String?
+    val itemType : String,
+
+    @SerialName("item_id")
+    val itemId : String?
+
 )
 
 fun ItemModel.isValid() : Boolean{

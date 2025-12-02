@@ -6,7 +6,6 @@ import com.ipca.socialstore.data.helpers.from
 import com.ipca.socialstore.data.models.CampaignModel
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
 import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.exceptions.RestException
 import javax.inject.Inject
 
 class CampaignRepository @Inject constructor(private val supabase: SupabaseClient, private val exceptionMapper: ExceptionMapper){

@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class GetItemState(
-    val item : ItemModel? = ItemModel("",""),
+    val item : ItemModel? = ItemModel("","",""),
     val isLoading : Boolean = false,
     val error: ErrorText? = null,
     val itemId : String? = null

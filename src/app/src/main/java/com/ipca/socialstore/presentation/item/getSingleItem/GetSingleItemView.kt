@@ -88,7 +88,7 @@ fun SingleItem(
 @Composable
 fun PreviewGetSingleItem(){
     SocialStoreTheme() {
-        val item = ItemModel("","")
+        val item = ItemModel("","","")
         val uiState = GetItemState(item,false,null,"")
         GetSingleItemContent(
             modifier = Modifier,

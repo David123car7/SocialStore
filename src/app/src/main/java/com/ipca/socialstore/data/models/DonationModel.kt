@@ -9,9 +9,8 @@ data class  DonationModel(
     val donationDate : String?,
 
     @SerialName("campaign_id")
-    val campaignId: String,
-)
+    val campaignId: String?,
 
-fun DonationModel.isValid() : Boolean{
-    return this.campaignId.isNotEmpty()
-}
+    @SerialName("donation_id")
+    val donationId : String?,
+)
