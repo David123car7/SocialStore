@@ -24,7 +24,7 @@ class UserRepository @Inject constructor(private val supabase: SupabaseClient, p
 
             @Serializable
             data class RoleContainer(
-                @SerialName("role") val role: UserRole //
+                @SerialName("role") val role: UserRole
             )
 
             val userProfile = supabase.from(DatabaseTables.PROFILE)
