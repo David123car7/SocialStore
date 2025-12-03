@@ -9,7 +9,6 @@ import io.github.jan.supabase.SupabaseClient
 import javax.inject.Inject
 
 class DonationRepository @Inject constructor(private val supabase : SupabaseClient, private val exceptionMapper: ExceptionMapper){
-
     suspend fun createDonation(donation : DonationModel) : ResultWrapper<DonationModel> {
         return try {
             val donation = supabase.from(DatabaseTables.DONATION)
