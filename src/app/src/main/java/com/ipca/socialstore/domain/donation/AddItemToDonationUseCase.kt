@@ -8,7 +8,7 @@ import com.ipca.socialstore.data.resultwrappers.ResultWrapper
 import javax.inject.Inject
 
 class AddItemToDonationUseCase @Inject constructor(private val  donationItemRepository: DonationItemRepository){
-    suspend operator fun invoke(donationItem : DonationItemModel): ResultWrapper<Boolean>{
+    suspend operator fun invoke(donationItem : DonationItemModel): ResultWrapper<DonationItemModel>{
         return donationItemRepository.addItemDonation(donationItem = donationItem)
     }
 }

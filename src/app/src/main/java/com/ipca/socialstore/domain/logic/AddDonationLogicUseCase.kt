@@ -1,9 +1,10 @@
 package com.ipca.socialstore.domain.logic
 
 import android.util.Log
-import com.ipca.socialstore.data.models.DonationItem
+import com.ipca.socialstore.data.exceptions.ExceptionMapper
 import com.ipca.socialstore.data.models.DonationItemModel
 import com.ipca.socialstore.data.models.DonationModel
+import com.ipca.socialstore.data.models.DonationModelCreation
 import com.ipca.socialstore.data.models.ItemModel
 import com.ipca.socialstore.data.models.ItemModelCreation
 import com.ipca.socialstore.data.models.StockModel
@@ -11,128 +12,89 @@ import com.ipca.socialstore.data.resultwrappers.ResultWrapper
 import com.ipca.socialstore.domain.donation.AddItemToDonationUseCase
 import com.ipca.socialstore.domain.donation.CreateDonationUseCase
 import com.ipca.socialstore.domain.item.CreateItemUseCase
-import com.ipca.socialstore.domain.item.GetItemByNameUseCase
 import com.ipca.socialstore.domain.stock.AddItemStockUseCase
-import com.ipca.socialstore.domain.stock.GetItemByIdStock
-import com.ipca.socialstore.domain.stock.UpdateStockQuantityUseCase
 import javax.inject.Inject
 
 class AddDonationLogicUseCase @Inject constructor(
     private val createItemUseCase: CreateItemUseCase,
-    private val getItemByIdStock: GetItemByIdStock,
-    private val updateStockQuantityUseCase: UpdateStockQuantityUseCase,
-    private val getItemByNameUseCase: GetItemByNameUseCase,
     private val addItemStockUseCase: AddItemStockUseCase,
     private val createDonationUseCase: CreateDonationUseCase,
-    private val addItemToDonationUseCase: AddItemToDonationUseCase
+    private val addItemToDonationUseCase: AddItemToDonationUseCase,
+    private val exceptionMapper: ExceptionMapper
+
 ){
-    suspend operator fun invoke(item: ItemModelCreation, stock: StockModel, quantity: Int, donation: DonationModel): ResultWrapper<DonationItemModel> {
-        try {
-            val currentItem: ItemModel? = null
-            val existItem = getItemByNameUseCase(item.name)
-            when(existItem){
-                is ResultWrapper.Success ->{
-                    existItem.data
+    suspend operator fun invoke(item: ItemModelCreation, stock: StockModel, quantity: Int, donation: DonationModelCreation): ResultWrapper<DonationItemModel> {
+
+        return try {
+            var currentItem : ItemModel? = null
+            val itemResult = createItemUseCase(item)
+            Log.d("ITEM BASE:", "{$itemResult}")
+            when(itemResult){
+                is ResultWrapper.Success->{
+                    currentItem = itemResult.data
+                }
+
+                is ResultWrapper.Error-> {
+                    return ResultWrapper.Error(itemResult.error)
+                }
+            }
+
+
+            //Donation
+            val donationResult = createDonationUseCase(donation)
+            var currentDonation : DonationModel? = null
+            when(donationResult){
+                is ResultWrapper.Success -> {
+                    currentDonation = donationResult.data
                 }
                 is ResultWrapper.Error ->{
-                    val createItem = createItemUseCase(item)
-                    when(createItem){
-                        is ResultWrapper.Success ->{
-                            createItem.data
-                        }
-                        is ResultWrapper.Error ->{
-                            return ResultWrapper.Error(createItem.error)
-                        }
-                    }
+                    return ResultWrapper.Error(donationResult.error)
                 }
             }
 
-            val stockItem = stock.copy(itemId = existItem.data?.itemId!!)
-
-            val stockResult = when (val getStock = getItemByIdStock(existItem.data.itemId)){
-                is ResultWrapper.Success ->{
-                    val existStock = getStock.data
-                    if(existStock != null){
-                        val updateStock = existStock.copy(
-                            expirationDate = stock.expirationDate
-                        )
-                        updateStockQuantityUseCase(updateStock,quantity)
-                    }else{
-                        addItemStockUseCase(stock)
-                    }
-                }
-                is ResultWrapper.Error -> {
-                    ResultWrapper.Error(getStock.error)
-                }
-            }
+            //Add  Stock
+            val newStock = stock.copy(
+                itemId =  currentItem?.itemId
+            )
+            val stockResult = addItemStockUseCase(newStock, quantity)
             when(stockResult){
-                is ResultWrapper.Error->{
+                is ResultWrapper.Success ->{
+                    stockResult.data
+                }
+                is ResultWrapper.Error ->{
                     return ResultWrapper.Error(stockResult.error)
                 }
-                is ResultWrapper.Success ->{
-                    val createDonation = when(val donationCreate = createDonationUseCase(donation)){
-                        is ResultWrapper.Success -> donationCreate.data
-                        is ResultWrapper.Error ->{
-                            return ResultWrapper.Error(donationCreate.error)
-                        }
-                    }
-                    val donationItemCreate = DonationItemModel(
-                        itemId = existItem.data.itemId,
-                        donationId = createDonation?.donationId ?:""
-                    )
-                    val createdDonationItemResult = addItemToDonationUseCase(donationItemCreate)
-                    return when(createdDonationItemResult){
-                        is ResultWrapper.Success ->{
-                            ResultWrapper.Success(data = createdDonationItemResult.data)
-                        }
-                        is ResultWrapper.Error ->{
-                            ResultWrapper.Error(createdDonationItemResult.error)
-                        }
-                    }
-
-                }
             }
 
-        }
 
-
-        when(existItem){
-            is ResultWrapper.Success ->{
-                val itemFound = existItem.data
-
-                updateStock = stock.copy(
-                    itemId = itemFound?.itemId ?: "",
-                    expirationDate = stock.expirationDate,
+            // Relacionar cada Item á sua doacao
+            var currentDonationItem : DonationItemModel = DonationItemModel(0,0)
+            if (currentItem?.itemId != null && currentDonation?.donationId != null){
+                val donationItem = DonationItemModel(
+                    currentItem.itemId,
+                    currentDonation.donationId
                 )
-                val stockResult = updateStockQuantityUseCase(updateStock,quantity)
-                when(stockResult){
-                    is ResultWrapper.Success ->{
-                        val updateDonation = createDonationUseCase(donation)
-                        when(updateDonation){
-                            is ResultWrapper.Success ->{
-                                donationItem.copy(
-                                    itemId = itemFound?.itemId ?:"",
-                                    donationId = donation.donationId ?: ""
-                                )
-                                val createItemDonation = addItemToDonationUseCase(donationItem!!)
-                            }
-                            is ResultWrapper.Error ->{
-                                // Falta o erro
-                            }
-                        }
+                currentDonationItem = donationItem
+            }
 
 
-                    }
-                    is ResultWrapper.Error ->{
-
-                    }
+            val itemDonation = addItemToDonationUseCase(currentDonationItem)
+            when(itemDonation){
+                is ResultWrapper.Success ->{
+                    return itemDonation
+                }
+                is ResultWrapper.Error ->{
+                    return itemDonation
                 }
             }
-            is ResultWrapper.Error->{
-
-            }
+        }catch (e: Exception){
+            ResultWrapper.Error(exceptionMapper.map(e))
         }
-        return TODO("Provide the return value")
-    }
 
+
+
+
+    }
 }
+
+

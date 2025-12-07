@@ -10,10 +10,11 @@ import javax.inject.Inject
 
 class StockRepository @Inject constructor(private val supabase: SupabaseClient, private val exceptionMapper: ExceptionMapper ){
 
-    suspend fun addItemStock(item : StockModel) : ResultWrapper<StockModel> {
+    suspend fun addItemStock(item : StockModel, quantity: Int) : ResultWrapper<StockModel> {
         return try {
+            val newStock = item.copy(quantity=quantity)
             val stock = supabase.from(DatabaseTables.STOCK)
-                .insert(item){
+                .insert(newStock){
                     select()
                 }
                 .decodeSingle<StockModel>()
@@ -24,7 +25,7 @@ class StockRepository @Inject constructor(private val supabase: SupabaseClient, 
         }
     }
 
-    suspend fun getItemByIdStock(itemId : String) : ResultWrapper<StockModel> {
+    suspend fun getItemByIdStock(itemId : Int) : ResultWrapper<StockModel?> {
         return try {
             val stock = supabase.from(DatabaseTables.STOCK)
                 .select{
@@ -32,7 +33,8 @@ class StockRepository @Inject constructor(private val supabase: SupabaseClient, 
                         eq("item_id", itemId)
                     }
                 }
-                .decodeAs<StockModel>()
+
+                .decodeSingleOrNull<StockModel>()
             ResultWrapper.Success(stock)
         }
         catch (e : Exception){
@@ -40,23 +42,35 @@ class StockRepository @Inject constructor(private val supabase: SupabaseClient, 
         }
     }
 
-    suspend fun updateStock(item : StockModel, quantity: Int) : ResultWrapper<StockModel>{
+    suspend fun getItemQuantity(item : StockModel) : ResultWrapper<StockModel>{
         return try {
-            val newQuantity = item.quantity + quantity
-            val stock = supabase.from(DatabaseTables.STOCK)
-                .update (
-            {
-                        StockModel:: quantity to newQuantity
-                    }
-                ){
+            val quantity = supabase.from(DatabaseTables.STOCK)
+                .select {
                     filter {
-                        eq("item_id", item.itemId)
+                        eq("item_id", item.itemId!!)
+                    }
+            }
+                .decodeSingle<StockModel>()
+            ResultWrapper.Success(quantity)
+        }catch (e : Exception){
+            ResultWrapper.Error(exceptionMapper.map(e))
+        }
+    }
+    suspend fun updateStock(item: StockModel, quantity: Int): ResultWrapper<Boolean> {
+        return try {
+            val getStock = getItemQuantity(item)
+            val bdQuantity = getStock.data?.quantity ?: 0
+            val newQuantity = bdQuantity + quantity
+
+            val result = supabase.from(DatabaseTables.STOCK)
+                .update(mapOf("quantity" to newQuantity)) {
+                    filter {
+                        eq("item_id", item.itemId!!)
                     }
                 }
-                .decodeSingle<StockModel>()
-            ResultWrapper.Success(stock)
-        }
-        catch (e : Exception){
+            ResultWrapper.Success(true)
+
+        } catch (e: Exception) {
             ResultWrapper.Error(exceptionMapper.map(e))
         }
     }

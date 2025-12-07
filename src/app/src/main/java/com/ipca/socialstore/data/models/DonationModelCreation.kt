@@ -4,10 +4,8 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ItemModelCreation (
-    @SerialName("name")
-    val name : String,
+data class DonationModelCreation(
+    @SerialName("donation_date")
+    val donationDate : String,
 
-    @SerialName("item_type")
-    val itemType : String,
 )

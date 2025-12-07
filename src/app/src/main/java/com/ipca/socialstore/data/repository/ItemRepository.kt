@@ -43,7 +43,7 @@ class ItemRepository @Inject constructor(private val supabase : SupabaseClient, 
         }
     }
 
-    suspend fun getItemByName(itemName : String) : ResultWrapper<ItemModel>{
+    suspend fun getItemByName(itemName : String) : ResultWrapper<ItemModel?>{
         return try {
             val item = supabase.from(DatabaseTables.ITEM)
                 .select {
@@ -51,7 +51,7 @@ class ItemRepository @Inject constructor(private val supabase : SupabaseClient, 
                         eq("name",itemName)
                     }
                 }
-                .decodeSingle<ItemModel>()
+                .decodeSingleOrNull<ItemModel>()
             ResultWrapper.Success(data = item)
         }
         catch (e : Exception){

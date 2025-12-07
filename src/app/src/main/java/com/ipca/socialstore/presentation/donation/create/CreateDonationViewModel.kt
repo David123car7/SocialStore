@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.room.util.copy
 import com.ipca.socialstore.data.models.DonationItemModel
 import com.ipca.socialstore.data.models.DonationModel
+import com.ipca.socialstore.data.models.DonationModelCreation
 import com.ipca.socialstore.data.models.ItemModel
 import com.ipca.socialstore.data.models.ItemModelCreation
 import com.ipca.socialstore.data.models.StockModel
@@ -25,10 +26,10 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class DonationState(
-    val donation : DonationModel = DonationModel("","",""),
+    val donation : DonationModelCreation = DonationModelCreation(""),
     val item : ItemModelCreation = ItemModelCreation("",""),
-    val stock : StockModel = StockModel("","",0),
-    val donationItem : DonationItemModel = DonationItemModel("",""),
+    val stock : StockModel = StockModel(0,"",0),
+    val donationItem : DonationItemModel = DonationItemModel(0,0),
     val quantity: Int? = 0,
     val error : ErrorText? = null,
     val isLoading : Boolean? = null,
@@ -70,6 +71,7 @@ class CreateDonationViewModel @Inject constructor(private val addDonationLogicUs
             donation = donation
         )
     }
+
     //endregion
 
     //region Stock
@@ -85,7 +87,7 @@ class CreateDonationViewModel @Inject constructor(private val addDonationLogicUs
 
     fun updateQuantity(quantity : String){
 
-        val newQuantity = quantity.toIntOrNull()
+        val newQuantity = quantity.toInt()
         uiState.value = uiState.value.copy(
             quantity = newQuantity
         )
@@ -122,7 +124,6 @@ class CreateDonationViewModel @Inject constructor(private val addDonationLogicUs
                 is ResultWrapper.Error -> {
                     uiState.value = uiState.value.copy(
                         isLoading = false,
-                        error = result.error.asUiText(),
                         isCreated = false
                     )
                 }

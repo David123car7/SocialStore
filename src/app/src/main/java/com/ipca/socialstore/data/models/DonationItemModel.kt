@@ -6,8 +6,8 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class DonationItemModel(
     @SerialName("item_id")
-    val itemId : String,
+    val itemId : Int,
 
     @SerialName("donation_id")
-    val donationId : String,
+    val donationId : Int,
 )

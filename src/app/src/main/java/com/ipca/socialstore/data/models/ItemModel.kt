@@ -12,7 +12,7 @@ data class ItemModel(
     val itemType : String,
 
     @SerialName("item_id")
-    val itemId : String?
+    val itemId : Int
 
 )
 

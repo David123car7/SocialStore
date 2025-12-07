@@ -10,11 +10,14 @@ import javax.inject.Inject
 
 class DonationItemRepository @Inject constructor(private val supabase: SupabaseClient, private val exceptionMapper: ExceptionMapper){
 
-    suspend fun addItemDonation(donationItem : DonationItemModel) : ResultWrapper<Boolean> {
+    suspend fun addItemDonation(donationItem : DonationItemModel) : ResultWrapper<DonationItemModel> {
         return try {
-            supabase.from(DatabaseTables.DONATION_ITEM)
-                .insert(donationItem)
-            ResultWrapper.Success(true)
+            val result = supabase.from(DatabaseTables.DONATION_ITEM)
+                .insert(donationItem){
+                    select()
+                }
+                .decodeSingle<DonationItemModel>()
+            ResultWrapper.Success(result)
         }
         catch (e : Exception){
             ResultWrapper.Error(exceptionMapper.map(e))

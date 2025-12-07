@@ -20,6 +20,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.ipca.socialstore.data.models.DonationItemModel
 import com.ipca.socialstore.data.models.DonationModel
+import com.ipca.socialstore.data.models.DonationModelCreation
 import com.ipca.socialstore.data.models.ItemModel
 import com.ipca.socialstore.data.models.ItemModelCreation
 import com.ipca.socialstore.data.models.StockModel
@@ -39,7 +40,7 @@ fun CreateDonationView(modifier: Modifier, navController: NavController){
         onUpdateName = {newValue -> viewModel.updateItemName(newValue)},
         onUpdateItemType = {newValue -> viewModel.updateItemType(newValue)},
         onUpdateExpiration = {newValue -> viewModel.updateExpirationDate(newValue)},
-        onUpdateQuantity = {newValue -> viewModel.updateQuantity(newValue)}
+        onUpdateQuantity = {newValue -> viewModel.updateQuantity(newValue)},
     )
 }
 
@@ -63,16 +64,32 @@ fun CreateDonationViewContent(
             modifier = Modifier.fillMaxWidth()
 
         ) {
-            TextField(value = uiState.item.name,
-                label = {Text("Nome Item")},
+            TextField(
+                value = uiState.item.name,
+                label = { Text("Nome Item") },
                 modifier = Modifier.padding(8.dp),
-                onValueChange = {value -> onUpdateName(value)})
+                onValueChange = { value -> onUpdateName(value) })
 
-            TextField(value = uiState.item.itemType?: "",
-            label = {Text("Tipo Item")},
-            modifier = Modifier.padding(8.dp),
-            onValueChange = {value -> onUpdateItemType(value) })
+            TextField(
+                value = uiState.item.itemType,
+                label = { Text("Tipo Item") },
+                modifier = Modifier.padding(8.dp),
+                onValueChange = { value -> onUpdateItemType(value) })
+
+
         }
+        Row(
+            modifier = Modifier.fillMaxWidth()
+
+        ) {
+            TextField(
+                value = uiState.donation.donationDate,
+                label = { Text("Data da Campanha") },
+                modifier = Modifier.padding(8.dp),
+                onValueChange = { value -> onUpdateDate(value) }
+            )
+        }
+
         Row(
             modifier = Modifier.fillMaxWidth()
 
@@ -87,12 +104,7 @@ fun CreateDonationViewContent(
                 modifier = Modifier.padding(8.dp),
                 onValueChange = {value -> onUpdateExpiration(value)})
         }
-        TextField(
-            value = uiState.donation.donationDate ?: "",
-            label = {Text("Data da Campanha")},
-            modifier = Modifier.padding(8.dp),
-            onValueChange = {value -> onUpdateDate(value)}
-        )
+
 
         Button(
             modifier = Modifier.padding(8.dp),
@@ -107,10 +119,10 @@ fun CreateDonationViewContent(
 @Composable
 fun PreviewCreateDonation() {
     SocialStoreTheme() {
-        val donation = DonationModel("", "","")
+        val donation = DonationModelCreation("")
         val item = ItemModelCreation("", "")
-        val stock = StockModel("", "", 0)
-        val donationItem = DonationItemModel("", "")
+        val stock = StockModel(0, "", 0)
+        val donationItem = DonationItemModel(0, 0)
         val uiState =
             DonationState(donation = donation, item, stock, donationItem, 0, null, false, false)
         CreateDonationViewContent(
@@ -121,6 +133,6 @@ fun PreviewCreateDonation() {
             onUpdateQuantity = { Unit},
             onUpdateExpiration = { Unit},
             onUpdateItemType = { Unit},
-            onUpdateName = { Unit})
+            onUpdateName = { Unit},)
     }
 }
