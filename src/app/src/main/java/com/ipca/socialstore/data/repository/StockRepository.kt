@@ -25,12 +25,13 @@ class StockRepository @Inject constructor(private val supabase: SupabaseClient, 
         }
     }
 
-    suspend fun getItemByIdStock(itemId : Int) : ResultWrapper<StockModel?> {
+    suspend fun getItemByIdStock(item : StockModel) : ResultWrapper<StockModel?> {
         return try {
             val stock = supabase.from(DatabaseTables.STOCK)
                 .select{
                     filter {
-                        eq("item_id", itemId)
+                        eq("item_id", item.itemId!!)
+                        eq("expiration_date", item.expirationDate)
                     }
                 }
 
