@@ -2,6 +2,7 @@ package com.ipca.socialstore.data.exceptions
 
 import android.util.Log
 import io.github.jan.supabase.exceptions.RestException
+import io.github.jan.supabase.postgrest.exception.PostgrestRestException
 import io.ktor.client.plugins.HttpRequestTimeoutException
 import kotlinx.serialization.SerializationException
 import java.net.UnknownHostException
@@ -11,6 +12,16 @@ class ExceptionMapper @Inject constructor(private val fileLogger: FileLogger) {
     fun map(e: Throwable): AppError {
         Log.d("App Error:", "Error: ${e.message}")
         return when (e) {
+            is PostgrestRestException -> {
+                when (e.code) {
+                    "22007" -> AppError.InvalidDate //is this only for invalid dates??
+                    else -> {
+                        fileLogger.logError("DB_ERROR_${e.code}", e)
+                        AppError.UnknownError("Database Error: ${e.code}")
+                    }
+                }
+            }
+
             is RestException -> {
                 when (e.statusCode) {
                     400 -> AppError.InvalidPassword //not always...
