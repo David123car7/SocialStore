@@ -17,6 +17,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.ipca.socialstore.data.models.ItemModel
+import com.ipca.socialstore.data.models.ItemModelCreation
 import com.ipca.socialstore.ui.theme.SocialStoreTheme
 
 @Composable
@@ -30,7 +31,7 @@ fun CreateItemView(modifier: Modifier, navController: NavController){
         uiState = uiState,
         onItemNameUpdate ={value -> viewModel.updateItemName(value)},
         onItemTypeUpdate ={value -> viewModel.updateItemType(value)},
-        onClickCreate = { viewModel.createItem(uiState.item) }
+        onClickCreate = { viewModel.createItem() }
     )
 }
 
@@ -72,7 +73,7 @@ fun CreateItemViewContent(
 @Composable
 fun PreviewCreateItem(){
     SocialStoreTheme() {
-        val item = ItemModel("","")
+        val item = ItemModelCreation("","")
         val uiState = ItemState(item,false, error = null,false)
         CreateItemViewContent(
             modifier = Modifier,

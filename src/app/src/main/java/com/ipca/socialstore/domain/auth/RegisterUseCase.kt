@@ -1,6 +1,5 @@
 package com.ipca.socialstore.domain.auth
 
-import android.util.Log
 import com.ipca.socialstore.data.enums.UserRole
 import com.ipca.socialstore.data.exceptions.AppError
 import com.ipca.socialstore.data.models.UserModel

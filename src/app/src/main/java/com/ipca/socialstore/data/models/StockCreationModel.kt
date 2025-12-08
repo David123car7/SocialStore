@@ -4,10 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class StockModel(
-
-    @SerialName("item_id")
-    val itemId : Int,
+data class StockCreationModel(
 
     @SerialName("expiration_date")
     val expirationDate : String,
@@ -15,7 +12,3 @@ data class StockModel(
     @SerialName("quantity")
     val quantity : Int
 )
-
-fun StockModel.isValid() : Boolean{
-    return this.expirationDate.isNotEmpty() && this.quantity >= 0
-}

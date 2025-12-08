@@ -11,7 +11,6 @@ class ExceptionMapper @Inject constructor(private val fileLogger: FileLogger) {
     fun map(e: Throwable): AppError {
         Log.d("App Error:", "Error: ${e.message}")
         return when (e) {
-            //api errors
             is RestException -> {
                 when (e.statusCode) {
                     400 -> AppError.InvalidPassword //not always...

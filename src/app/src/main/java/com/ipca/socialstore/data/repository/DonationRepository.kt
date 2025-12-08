@@ -4,18 +4,20 @@ import com.ipca.socialstore.data.enums.DatabaseTables
 import com.ipca.socialstore.data.exceptions.ExceptionMapper
 import com.ipca.socialstore.data.helpers.from
 import com.ipca.socialstore.data.models.DonationModel
+import com.ipca.socialstore.data.models.DonationModelCreation
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
 import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.exceptions.RestException
 import javax.inject.Inject
 
 class DonationRepository @Inject constructor(private val supabase : SupabaseClient, private val exceptionMapper: ExceptionMapper){
-
-    suspend fun createDonation(donation : DonationModel) : ResultWrapper<Boolean> {
+    suspend fun createDonation(donation : DonationModelCreation) : ResultWrapper<DonationModel> {
         return try {
-            supabase.from(DatabaseTables.DONATION)
-                .insert(donation)
-            ResultWrapper.Success(true)
+            val donation = supabase.from(DatabaseTables.DONATION)
+                .insert(donation){
+                    select()
+                }
+                .decodeSingle<DonationModel>()
+            ResultWrapper.Success(donation)
         }
         catch (e : Exception){
             ResultWrapper.Error(exceptionMapper.map(e))

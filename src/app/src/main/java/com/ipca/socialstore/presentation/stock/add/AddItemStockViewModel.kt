@@ -15,25 +15,24 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class StockState(
-    val item : StockModel = StockModel("","",0),
+    val item : StockModel = StockModel(0,"",0),
     val isLoading : Boolean = false,
     val error: ErrorText? = null,
 )
 
 @HiltViewModel
 class AddItemStockViewModel @Inject constructor(private val addItemStockUseCase: AddItemStockUseCase): ViewModel(){
-
+/*
     val uiState = mutableStateOf(StockState())
 
     fun addItemStock(){
-
         uiState.value = uiState.value.copy(
             isLoading = true,
             error = null,
         )
 
         viewModelScope.launch {
-            val result = addItemStockUseCase(uiState.value.item)
+            val result = addItemStockUseCase(uiState.value.item, quanttity)
             when(result){
                 is ResultWrapper.Success -> {
                     uiState.value = uiState.value.copy(
@@ -48,5 +47,5 @@ class AddItemStockViewModel @Inject constructor(private val addItemStockUseCase:
                 }
             }
         }
-    }
+    }*/
 }

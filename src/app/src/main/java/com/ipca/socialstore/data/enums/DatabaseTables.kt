@@ -6,7 +6,8 @@ enum class DatabaseTables(val tableName: String) {
     CAMPAIGN("campaign"),
     DONATION("donation"),
     ITEM("item"),
-    STOCK("stock");
+    STOCK("stock"),
+    DONATION_ITEM("donation_Item");
 
     override fun toString() = tableName
 }

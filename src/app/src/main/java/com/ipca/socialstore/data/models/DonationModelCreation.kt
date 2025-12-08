@@ -4,13 +4,8 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class  DonationModel(
+data class DonationModelCreation(
     @SerialName("donation_date")
     val donationDate : String,
 
-    @SerialName("campaign_id")
-    val campaignId: String?,
-
-    @SerialName("donation_id")
-    val donationId : Int,
 )
