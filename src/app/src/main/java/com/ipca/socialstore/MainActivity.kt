@@ -32,13 +32,7 @@ import com.ipca.socialstore.presentation.views.item.getSingleItem.GetSingleItemV
 import com.ipca.socialstore.presentation.routes.AdminRoutes
 import com.ipca.socialstore.presentation.routes.DefaultRoutes
 import com.ipca.socialstore.presentation.routes.GeneralRoutes
-<<<<<<< HEAD
-import com.ipca.socialstore.presentation.routes.NoRoleRoutes
 import com.ipca.socialstore.presentation.views.stock.add.GetAllStockView
-import com.ipca.socialstore.presentation.views.stock.add.ListAllStockViewModel
-import com.ipca.socialstore.presentation.views.stock.add.StockItemDetail
-=======
->>>>>>> 6297b083df291bc0150670d8d749ff134fb78442
 import com.ipca.socialstore.ui.theme.SocialStoreTheme
 import dagger.hilt.android.AndroidEntryPoint
 
