@@ -1,13 +1,31 @@
 <resources>
     <string name="app_name">SocialStore</string>
-	
-	<string name="error_invalid_password">Invalid password.</string>
+
+    //Fields
+    <string name="name">Name</string>
+    <string name="date">Date</string>
+    <string name="schoolYear">School Year</string>
+    <string name="cc">CC</string>
+    <string name="email">Email</string>
+    <string name="phone_number">Phone Number</string>
+    <string name="request_type">Request Type</string>
+
+    //Generic Errors
+    <string name="error_field_empty">%1$s cannot be empty.</string>
+    <string name="error_field_invalid">%1$s is invalid.</string>
+
+
+    <string name="error_invalid_password">Invalid password.</string>
+    <string name="error_invalid_date">Invalid date.</string>
     <string name="error_user_not_found">User not found.</string>
     <string name="error_user_already_exists">A user with this email already exists.</string>
     <string name="error_invalid_email">Please enter a valid email address.</string>
 	<string name="error_user_not_logged_in">User is not logged in.</string>
 	<string name="error_invalid_reset_token">Reset token is invalid.</string>
     <string name="error_invalid_email_domain">Email must belong to the correct organization (IPCA).</string>
+
+    <string name="error_invalid_files_number">The number of files is to big.</string>
+
 
     <string name="error_network">No internet connection. Please check your network.</string>
     <string name="error_technical">A technical error occurred. Please try again later.</string>

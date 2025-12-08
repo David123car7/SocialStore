@@ -2,10 +2,13 @@ package com.ipca.socialstore.data.repository
 
 import android.content.Context
 import android.net.Uri
-import android.util.Log
+import com.ipca.socialstore.data.enums.DatabaseTables
 import com.ipca.socialstore.data.enums.StorageBucket
 import com.ipca.socialstore.data.exceptions.AppError
 import com.ipca.socialstore.data.exceptions.ExceptionMapper
+import com.ipca.socialstore.data.helpers.from
+import com.ipca.socialstore.data.models.ApplicationModel
+import com.ipca.socialstore.data.models.StockModel
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.github.jan.supabase.SupabaseClient
@@ -16,9 +19,20 @@ import kotlinx.coroutines.withContext
 import java.util.UUID
 import javax.inject.Inject
 
-class ApplicationRepository @Inject constructor(private val supabaseClient: SupabaseClient,
-     private val exceptionMapper: ExceptionMapper,
-     @ApplicationContext private val context: Context){
+class ApplicationRepository @Inject constructor(
+    private val supabaseClient: SupabaseClient,
+    private val exceptionMapper: ExceptionMapper,
+    @ApplicationContext private val context: Context){
+
+    suspend fun createApplication(application: ApplicationModel): ResultWrapper<Boolean>{
+        return try {
+            supabaseClient.from(DatabaseTables.APPLICATION).insert(application)
+            ResultWrapper.Success(true)
+        }
+        catch (e : Exception){
+            ResultWrapper.Error(exceptionMapper.map(e))
+        }
+    }
 
     suspend fun uploadApplicationDocuments(uris: List<Uri>): ResultWrapper<List<String>>{
         val uploadedPaths = mutableListOf<String>()
