@@ -21,8 +21,8 @@ data class ApplicationState(
     val error: ErrorText? = null,
     val isSuccess: Boolean = false,
     val isStudent: Boolean = false,
-    val application: ApplicationModel = ApplicationModel(schoolYear = 0, name = "", birthDate = "", cc = "", phoneNumber = "", email = "", requestType = "", stateId = null),
-    val academicData: AcademicModel = AcademicModel(typeCourse = "", course = "", studenNumber = ""),
+    val application: ApplicationModel = ApplicationModel(schoolYear = 0, name = "", birthDate = "", cc = "", phoneNumber = "", email = "", requestType = "", stateId = -1, academicId = null),
+    val academicData: AcademicModel? = null,
     val selectedFiles: List<Uri> = emptyList(),
 )
 
@@ -37,6 +37,12 @@ class ApplicationViewModel @Inject constructor(
     var uiState = mutableStateOf(ApplicationState())
 
     fun updateIsStudent(state: Boolean){
+        if(state){
+            uiState.value = uiState.value.copy(academicData = AcademicModel(typeCourse = "", course = "", studenNumber = ""))
+        }
+        else{
+            uiState.value = uiState.value.copy(academicData = null)
+        }
         uiState.value = uiState.value.copy(isStudent = state)
     }
 
@@ -72,12 +78,6 @@ class ApplicationViewModel @Inject constructor(
         )
     }
 
-    fun updateEmail(value: String) {
-        uiState.value = uiState.value.copy(
-            application = uiState.value.application.copy(email = value)
-        )
-    }
-
     fun updateRequestType(value: String) {
         uiState.value = uiState.value.copy(
             application = uiState.value.application.copy(requestType = value)
@@ -85,28 +85,34 @@ class ApplicationViewModel @Inject constructor(
     }
 
     fun updateTypeCourse(value: String) {
-        uiState.value = uiState.value.copy(
-            academicData = uiState.value.academicData.copy(typeCourse = value)
-        )
+        if(uiState.value.academicData != null) {
+            uiState.value = uiState.value.copy(
+                academicData = uiState.value.academicData!!.copy(typeCourse = value)
+            )
+        }
     }
 
     fun updateCourse(value: String) {
-        uiState.value = uiState.value.copy(
-            academicData = uiState.value.academicData.copy(course = value)
-        )
+        if(uiState.value.academicData != null){
+            uiState.value = uiState.value.copy(
+                academicData = uiState.value.academicData!!.copy(course = value)
+            )
+        }
     }
 
     fun updateStudentNumber(value: String) {
-        uiState.value = uiState.value.copy(
-            academicData = uiState.value.academicData.copy(studenNumber = value)
-        )
+        if(uiState.value.academicData != null) {
+            uiState.value = uiState.value.copy(
+                academicData = uiState.value.academicData!!.copy(studenNumber = value)
+            )
+        }
     }
 
     fun createApplication(){
         viewModelScope.launch {
             uiState.value = uiState.value.copy(isLoading = true)
 
-            val result = createApplicationUseCase(uiState.value.application)
+            val result = createApplicationUseCase(uiState.value.application, uiState.value.academicData)
             when(result){
                 is ResultWrapper.Success -> {
                     uiState.value = uiState.value.copy(

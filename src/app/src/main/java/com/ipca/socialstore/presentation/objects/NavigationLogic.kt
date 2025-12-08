@@ -4,8 +4,8 @@ import androidx.navigation.NavController
 import com.ipca.socialstore.data.enums.UserRole
 import com.ipca.socialstore.presentation.routes.AdminRoutes
 import com.ipca.socialstore.presentation.routes.BeneficiaryRoutes
+import com.ipca.socialstore.presentation.routes.DefaultRoutes
 import com.ipca.socialstore.presentation.routes.GeneralRoutes
-import com.ipca.socialstore.presentation.routes.NoRoleRoutes
 
 object NavigationLogic {
     fun navigateTo(navController: NavController, userRole: UserRole, route: Any){
@@ -25,8 +25,8 @@ object NavigationLogic {
                 else
                     resetNavigation(navController = navController, userRole = userRole)
             }
-            is NoRoleRoutes -> {
-                if(userRole == UserRole.NOROLE)
+            is DefaultRoutes -> {
+                if(userRole == UserRole.DEFAULT)
                     navController.navigate(route = route)
                 else
                     resetNavigation(navController = navController, userRole = userRole)
@@ -39,7 +39,9 @@ object NavigationLogic {
             navController.navigate(AdminRoutes.AdminHome)
         else if(userRole == UserRole.BENEFICIARY)
             navController.navigate(BeneficiaryRoutes.BeneficiaryHome)
+        else if (userRole == UserRole.DEFAULT)
+            navController.navigate(DefaultRoutes.DefaultHome)
         else
-            navController.navigate(NoRoleRoutes.DefaultHome)
+            navController.navigate(GeneralRoutes.Login)
     }
 }

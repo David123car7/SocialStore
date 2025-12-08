@@ -57,7 +57,6 @@ fun ApplicationView(modifier: Modifier){
         onBirthDateUpdate = applicationViewModel::updateBirthDate,
         onCcUpdate = applicationViewModel::updateCc,
         onPhoneUpdate = applicationViewModel::updatePhoneNumber,
-        onEmailUpdate = applicationViewModel::updateEmail,
         onRequestTypeUpdate = applicationViewModel::updateRequestType,
 
         // --- Student Status Updates ---
@@ -87,7 +86,6 @@ fun ApplicationViewContent(
     onBirthDateUpdate: (String) -> Unit,
     onCcUpdate: (String) -> Unit,
     onPhoneUpdate: (String) -> Unit,
-    onEmailUpdate: (String) -> Unit,
     onRequestTypeUpdate: (String) -> Unit,
 
     // Academic Data
@@ -162,16 +160,6 @@ fun ApplicationViewContent(
         )
 
         TextField(
-            value = uiState.application.email,
-            label = { Text("Email") },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 4.dp),
-            onValueChange = onEmailUpdate
-        )
-
-        TextField(
             value = if ((uiState.application.schoolYear) == 0) "" else uiState.application.schoolYear.toString(),
             label = { Text("School Year") },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
@@ -206,7 +194,7 @@ fun ApplicationViewContent(
                 Text("Academic Information", style = MaterialTheme.typography.labelLarge)
 
                 TextField(
-                    value = uiState.academicData.typeCourse,
+                    value = uiState.academicData?.typeCourse ?: "",
                     label = { Text("Type of Course (e.g. CTeSP, Degree)") },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -215,7 +203,7 @@ fun ApplicationViewContent(
                 )
 
                 TextField(
-                    value = uiState.academicData.course,
+                    value = uiState.academicData?.course ?: "",
                     label = { Text("Course Name") },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -224,7 +212,7 @@ fun ApplicationViewContent(
                 )
 
                 TextField(
-                    value = uiState.academicData.studenNumber,
+                    value = uiState.academicData?.studenNumber ?: "",
                     label = { Text("Student Number") },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -319,7 +307,7 @@ fun ApplicationPreview() {
             error = null,
             isSuccess = false,
             selectedFiles = emptyList(),
-            application = ApplicationModel(stateId = null,schoolYear = 0, name = "", birthDate = "", cc = "", phoneNumber = "", email = "", requestType = ""),
+            application = ApplicationModel(stateId = -1,schoolYear = 0, name = "", birthDate = "", cc = "", phoneNumber = "", email = "", requestType = "", academicId = null),
             academicData = AcademicModel(typeCourse = "", course = "", studenNumber = "")
         )
 
@@ -333,7 +321,6 @@ fun ApplicationPreview() {
             onBirthDateUpdate = {},
             onCcUpdate = {},
             onPhoneUpdate = {},
-            onEmailUpdate = {},
             onRequestTypeUpdate = {},
 
             // --- Student ---

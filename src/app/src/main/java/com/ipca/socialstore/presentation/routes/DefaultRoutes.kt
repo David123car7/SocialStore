@@ -3,10 +3,10 @@ package com.ipca.socialstore.presentation.routes
 import kotlinx.serialization.Serializable
 
 @Serializable
-sealed class NoRoleRoutes {
+sealed class DefaultRoutes {
     @Serializable
-    object DefaultHome: NoRoleRoutes()
+    object Application: DefaultRoutes()
 
     @Serializable
-    object Application: NoRoleRoutes()
+    object DefaultHome: DefaultRoutes()
 }

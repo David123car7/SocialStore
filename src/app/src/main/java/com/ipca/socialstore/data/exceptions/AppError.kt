@@ -17,6 +17,8 @@ sealed class AppError {
     data class EmptyField(val fieldLabelResId: Int) : AppError()
     data class InvalidField(val fieldLabelResId: Int) : AppError()
 
+    data class ErroCreatingTable(val fieldLabelResId: Int) : AppError()
+
 
     // 2. System Errors
     object NetworkError : AppError() // No internet

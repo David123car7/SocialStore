@@ -11,6 +11,8 @@ enum class UserRole(val value: String) {
     @SerialName("beneficiary")
     BENEFICIARY("beneficiary"),
 
+    @SerialName("default")
+    DEFAULT("default"),
     @SerialName("norole")
     NOROLE("norole"),
 }

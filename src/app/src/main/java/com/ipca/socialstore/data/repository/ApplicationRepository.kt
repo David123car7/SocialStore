@@ -24,10 +24,12 @@ class ApplicationRepository @Inject constructor(
     private val exceptionMapper: ExceptionMapper,
     @ApplicationContext private val context: Context){
 
-    suspend fun createApplication(application: ApplicationModel): ResultWrapper<Boolean>{
+    suspend fun createApplication(application: ApplicationModel): ResultWrapper<Int?>{
         return try {
-            supabaseClient.from(DatabaseTables.APPLICATION).insert(application)
-            ResultWrapper.Success(true)
+            val application = supabaseClient.from(DatabaseTables.APPLICATION).insert(application){
+                select()
+            }.decodeSingle<ApplicationModel>()
+            ResultWrapper.Success(application.id)
         }
         catch (e : Exception){
             ResultWrapper.Error(exceptionMapper.map(e))

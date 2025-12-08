@@ -26,7 +26,7 @@ class ExceptionMapper @Inject constructor(private val fileLogger: FileLogger) {
                 when (e.statusCode) {
                     400 -> AppError.InvalidPassword //not always...
                     404 -> AppError.UserNotFound
-                    409 -> AppError.UserAlreadyExists
+                    422 -> AppError.UserAlreadyExists
                     else -> {
                         fileLogger.logError("SERVER_ERROR", e)
                         AppError.UnknownError("Server error: ${e.statusCode}")

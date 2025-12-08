@@ -4,6 +4,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ipca.socialstore.data.enums.UserRole
+import com.ipca.socialstore.data.models.ProfileModel
 import com.ipca.socialstore.data.models.UserModel
 import com.ipca.socialstore.data.models.isValid
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
@@ -17,8 +18,7 @@ import javax.inject.Inject
 data class RegisterState (
     var email : String = "",
     var password : String = "",
-    var user: UserModel = UserModel(uid = null,firstName = "", lastName = "", addressId = null,
-        birthDate = "", role = UserRole.NOROLE.value),
+    val profile: ProfileModel = ProfileModel(name = "", birthDate = ""),
     var error : ErrorText? = null,
     var isLoading : Boolean = false,
     var isRegistered : Boolean = false,
@@ -32,21 +32,15 @@ class RegisterViewModel @Inject constructor(private val registerUseCase: Registe
         uiState.value = uiState.value.copy(email = email)
     }
 
-    fun updateFirstName(firstName: String) {
+    fun updateName(name: String) {
         uiState.value = uiState.value.copy(
-            user = uiState.value.user.copy(firstName = firstName)
-        )
-    }
-
-    fun updateLastName(lastName: String) {
-        uiState.value = uiState.value.copy(
-            user = uiState.value.user.copy(lastName = lastName)
+            profile = uiState.value.profile.copy(name = name)
         )
     }
 
     fun updateBirthDate(birthDate: String) {
         uiState.value = uiState.value.copy(
-            user = uiState.value.user.copy(birthDate = birthDate)
+            profile = uiState.value.profile.copy(birthDate = birthDate)
         )
     }
 
@@ -55,11 +49,8 @@ class RegisterViewModel @Inject constructor(private val registerUseCase: Registe
     }
 
     fun register(){
-        if(!uiState.value.user.isValid()) // why "!!" if i verify first that the user is not null???
-            return
-
         viewModelScope.launch {
-            val result = registerUseCase(uiState.value.email, uiState.value.password, uiState.value.user)
+            val result = registerUseCase(uiState.value.email, uiState.value.password, uiState.value.profile)
             when(result){
                 is ResultWrapper.Success -> {
                     uiState.value = uiState.value.copy(

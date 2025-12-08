@@ -31,6 +31,10 @@ sealed class ErrorText {
 
 fun AppError.asUiText(): ErrorText {
     return when (this) {
+        is AppError.EmptyField -> ErrorText.StringResource(R.string.error_field_empty, ErrorText.StringResource(this.fieldLabelResId))
+        is AppError.InvalidField -> ErrorText.StringResource(R.string.error_field_invalid, ErrorText.StringResource(this.fieldLabelResId))
+        is AppError.ErroCreatingTable -> ErrorText.StringResource(R.string.error_creating_table, ErrorText.StringResource(this.fieldLabelResId))
+
         is AppError.NetworkError -> ErrorText.StringResource(R.string.error_network)
         is AppError.UserNotFound -> ErrorText.StringResource(R.string.error_user_not_found)
         is AppError.InvalidDate -> ErrorText.StringResource(R.string.error_invalid_date)
@@ -43,7 +47,5 @@ fun AppError.asUiText(): ErrorText {
         is AppError.InvalidResetToken -> ErrorText.StringResource(R.string.error_invalid_reset_token)
         is AppError.UnknownError -> ErrorText.DynamicString(this.message) // Fallback
         is AppError.InvalidFilesNumber -> ErrorText.StringResource(R.string.error_invalid_files_number)
-        is AppError.EmptyField -> ErrorText.StringResource(R.string.error_field_empty, ErrorText.StringResource(this.fieldLabelResId))
-        is AppError.InvalidField -> ErrorText.StringResource(R.string.error_field_invalid, ErrorText.StringResource(this.fieldLabelResId))
     }
 }

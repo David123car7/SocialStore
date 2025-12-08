@@ -38,8 +38,7 @@ fun RegisterView(modifier: Modifier, navController: NavController, userRole: Use
         uiState = uiState,
         onEmailUpdate = {value -> registerViewModel.updateEmail(value)},
         onPasswordUpdate = {value -> registerViewModel.updatePassword(value)},
-        onFirstNameUpdate = {value -> registerViewModel.updateFirstName(value)},
-        onLastNameUpdate = {value-> registerViewModel.updateLastName(value)},
+        onNameUpdate = {value -> registerViewModel.updateName(value)},
         onBirthDateUpdate = {value -> registerViewModel.updateBirthDate(value)},
         onRegister = {registerViewModel.register()},
         )
@@ -58,8 +57,7 @@ fun RegisterViewContent(
     modifier: Modifier,
     uiState: RegisterState,
     onEmailUpdate:(newValue: String)->Unit,
-    onFirstNameUpdate:(newValue: String)->Unit,
-    onLastNameUpdate:(newValue: String)->Unit,
+    onNameUpdate:(newValue: String)->Unit,
     onBirthDateUpdate:(newValue: String)->Unit,
     onPasswordUpdate:(newValue: String)->Unit,
     onRegister:()->Unit){
@@ -82,19 +80,13 @@ fun RegisterViewContent(
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
         )
         TextField(
-            value = uiState.user.firstName,
+            value = uiState.profile.name,
             label = { Text("First Name") },
             modifier = Modifier.padding(8.dp),
-            onValueChange = { value -> onFirstNameUpdate(value) }
+            onValueChange = { value -> onNameUpdate(value) }
         )
         TextField(
-            value = uiState.user.lastName,
-            label = { Text("Last Name") },
-            modifier = Modifier.padding(8.dp),
-            onValueChange = { value -> onLastNameUpdate(value) }
-        )
-        TextField(
-            value = uiState.user.birthDate,
+            value = uiState.profile.birthDate,
             label = { Text("Birth Date (YYYY-MM-DD)") },
             modifier = Modifier.padding(8.dp),
             onValueChange = { value -> onBirthDateUpdate(value) }
@@ -129,8 +121,7 @@ fun LoginPreview(){
             onEmailUpdate = { Unit},
             onPasswordUpdate = { Unit},
             onRegister = { Unit},
-            onFirstNameUpdate = { Unit},
-            onLastNameUpdate = { Unit},
+            onNameUpdate = { Unit},
             onBirthDateUpdate = { Unit}
         )
     }

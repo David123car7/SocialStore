@@ -9,10 +9,22 @@
     <string name="email">Email</string>
     <string name="phone_number">Phone Number</string>
     <string name="request_type">Request Type</string>
+    <string name="course">Course</string>
+    <string name="course_type">Course Type</string>
+    <string name="student_number">StudentNumber</string>
+
+    //Tables
+    <string name="table_academic">Academic</string>
+    <string name="table_application">Application</string>
+    <string name="table_application_state">Application State</string>
+    <string name="table_profile">Profile</string>
+
+
 
     //Generic Errors
     <string name="error_field_empty">%1$s cannot be empty.</string>
     <string name="error_field_invalid">%1$s is invalid.</string>
+    <string name="error_creating_table">Error creating table %1$s.</string>
 
 
     <string name="error_invalid_password">Invalid password.</string>
@@ -23,10 +35,7 @@
 	<string name="error_user_not_logged_in">User is not logged in.</string>
 	<string name="error_invalid_reset_token">Reset token is invalid.</string>
     <string name="error_invalid_email_domain">Email must belong to the correct organization (IPCA).</string>
-
     <string name="error_invalid_files_number">The number of files is to big.</string>
-
-
     <string name="error_network">No internet connection. Please check your network.</string>
     <string name="error_technical">A technical error occurred. Please try again later.</string>
     <string name="error_unknown">An unknown error occurred.</string>

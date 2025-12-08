@@ -127,7 +127,6 @@ class ListAllItemsStockUseCase @Inject constructor(
             }
             ResultWrapper.Success(finalList)
 
-
         }catch (e : Exception){
             ResultWrapper.Error(exceptionMapper.map(e))
         }
