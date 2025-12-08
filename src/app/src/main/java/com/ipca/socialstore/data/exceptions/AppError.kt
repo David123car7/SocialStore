@@ -7,6 +7,7 @@ sealed class AppError {
 
     object InvalidDate: AppError()
     object UserAlreadyExists : AppError()
+    object ApplicationAllreadyExists: AppError()
     object InvalidEmail : AppError()
     object InvalidEmailDomain : AppError()
     object UserNotLoggedIn : AppError()
@@ -16,6 +17,8 @@ sealed class AppError {
     // Generic Errors
     data class EmptyField(val fieldLabelResId: Int) : AppError()
     data class InvalidField(val fieldLabelResId: Int) : AppError()
+
+    data class ErroCreatingTable(val fieldLabelResId: Int) : AppError()
 
 
     // 2. System Errors

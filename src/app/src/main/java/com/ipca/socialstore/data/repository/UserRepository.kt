@@ -26,14 +26,14 @@ class UserRepository @Inject constructor(private val supabase: SupabaseClient, p
                 @SerialName("role") val role: UserRole
             )
 
-            val userProfile = supabase.from(DatabaseTables.PROFILE)
+            val user = supabase.from(DatabaseTables.USER)
                 .select (columns = Columns.list("role")) {
                     filter { eq("uid", userId) }
                 }
                 .decodeSingleOrNull<RoleContainer>()
 
-            if (userProfile != null) {
-                ResultWrapper.Success(userProfile.role)
+            if (user != null) {
+                ResultWrapper.Success(user.role)
             } else {
                 ResultWrapper.Error(AppError.UserNotFound)
             }
@@ -42,9 +42,49 @@ class UserRepository @Inject constructor(private val supabase: SupabaseClient, p
         }
     }
 
-    suspend fun registerUser(user: UserModel): ResultWrapper<Boolean>{
+    suspend fun createUser(user: UserModel): ResultWrapper<Boolean>{
         return try {
-            supabase.from(DatabaseTables.PROFILE).insert(user)
+            supabase.from(DatabaseTables.USER).insert(user)
+            ResultWrapper.Success(true)
+        }
+        catch (e: Exception) {
+            ResultWrapper.Error(exceptionMapper.map(e))
+        }
+    }
+
+    private suspend fun getUser(uid: String): ResultWrapper<UserModel>{
+        return try {
+            val user = supabase.from(DatabaseTables.USER).select(columns = Columns.list()){
+                filter { eq("uid", uid) }
+            }.decodeSingle<UserModel>()
+            ResultWrapper.Success(user)
+        }
+        catch (e: Exception) {
+            ResultWrapper.Error(exceptionMapper.map(e))
+        }
+    }
+
+    suspend fun getUserApplicationId(uid: String): ResultWrapper<Int?>{
+        return try {
+            val user = supabase.from(DatabaseTables.USER).select(columns = Columns.list()){
+                filter { eq("uid", uid) }
+            }.decodeSingle<UserModel>()
+            ResultWrapper.Success(user.applicationId)
+        }
+        catch (e: Exception) {
+            ResultWrapper.Error(exceptionMapper.map(e))
+        }
+    }
+
+    suspend fun setUserApplicationId(uid: String, id: Int): ResultWrapper<Boolean>{
+        return try {
+            val user = getUser(uid = uid).data ?: return ResultWrapper.Error(AppError.UserNotFound)
+
+            val newUser = user.copy(applicationId = id)
+            supabase.from(DatabaseTables.USER).update(newUser) {
+                filter { eq("uid", uid) }
+            }
+
             ResultWrapper.Success(true)
         }
         catch (e: Exception) {

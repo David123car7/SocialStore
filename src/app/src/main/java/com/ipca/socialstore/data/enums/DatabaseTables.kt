@@ -1,6 +1,7 @@
 package com.ipca.socialstore.data.enums
 
 enum class DatabaseTables(val tableName: String) {
+    USER("user"),
     PROFILE("profile"),
     ADDRESS("address"),
     CAMPAIGN("campaign"),
