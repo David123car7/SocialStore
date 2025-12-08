@@ -58,4 +58,29 @@ class ItemRepository @Inject constructor(private val supabase : SupabaseClient, 
             ResultWrapper.Error(exceptionMapper.map(e))
         }
     }
+
+    suspend fun getItemIdList(listId: List<Int>): ResultWrapper<List<ItemModel>> {
+        return try {
+            val items = mutableListOf<ItemModel>()
+
+            for (id in listId) {
+                val item = supabase
+                    .from(DatabaseTables.ITEM)
+                    .select {
+                        filter {
+                            eq("item_id", id)
+                        }
+                    }
+                    .decodeSingle<ItemModel>()
+
+                items.add(item)
+            }
+
+            ResultWrapper.Success(items)
+
+        } catch (e: Exception) {
+            ResultWrapper.Error(exceptionMapper.map(e))
+        }
+    }
+
 }

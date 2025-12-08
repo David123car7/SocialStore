@@ -54,7 +54,7 @@ class AddDonationLogicUseCase @Inject constructor(
 
             //Add  Stock
             val newStock = stock.copy(
-                itemId =  currentItem?.itemId
+                itemId =  currentItem?.itemId ?: 0
             )
             val stockResult = addItemStockUseCase(newStock, quantity)
             when(stockResult){

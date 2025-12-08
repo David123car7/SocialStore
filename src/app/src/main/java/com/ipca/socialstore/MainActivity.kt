@@ -27,6 +27,7 @@ import com.ipca.socialstore.presentation.home.defaultHome.DefaultHomeView
 import com.ipca.socialstore.presentation.item.CreateItemView
 import com.ipca.socialstore.presentation.item.getSingleItem.GetSingleItemView
 import com.ipca.socialstore.presentation.objects.Routes
+import com.ipca.socialstore.presentation.stock.add.GetAllStockView
 import com.ipca.socialstore.ui.theme.SocialStoreTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -84,6 +85,9 @@ class MainActivity : ComponentActivity() {
                         }
                         composable <Routes.GetSingleItem>{
                             GetSingleItemView(modifier = Modifier.padding(innerPadding), navController = navController)
+                        }
+                        composable <Routes.GetStock>{
+                            GetAllStockView(modifier = Modifier.padding(innerPadding), navController = navController)
                         }
                     }
                 }

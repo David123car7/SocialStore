@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
 data class StockModel(
 
     @SerialName("item_id")
-    val itemId : Int?,
+    val itemId : Int,
 
     @SerialName("expiration_date")
     val expirationDate : String,

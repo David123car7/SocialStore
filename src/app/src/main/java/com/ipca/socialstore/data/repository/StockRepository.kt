@@ -3,9 +3,12 @@ package com.ipca.socialstore.data.repository
 import com.ipca.socialstore.data.enums.DatabaseTables
 import com.ipca.socialstore.data.exceptions.ExceptionMapper
 import com.ipca.socialstore.data.helpers.from
+import com.ipca.socialstore.data.models.ItemModel
+import com.ipca.socialstore.data.models.StockHelper
 import com.ipca.socialstore.data.models.StockModel
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
 import io.github.jan.supabase.SupabaseClient
+import kotlinx.coroutines.selects.select
 import javax.inject.Inject
 
 class StockRepository @Inject constructor(private val supabase: SupabaseClient, private val exceptionMapper: ExceptionMapper ){
@@ -75,5 +78,47 @@ class StockRepository @Inject constructor(private val supabase: SupabaseClient, 
             ResultWrapper.Error(exceptionMapper.map(e))
         }
     }
+
+
+    suspend fun getFullStock(): ResultWrapper<List<StockModel>?> {
+        return try {
+            val stock = supabase
+                .from(DatabaseTables.STOCK)
+                .select()
+                .decodeAsOrNull<List<StockModel>>()
+
+            ResultWrapper.Success(stock)
+
+        } catch (e: Exception) {
+            ResultWrapper.Error(exceptionMapper.map(e))
+        }
+    }
+
+    suspend fun listStockToStock(list: List<StockModel>): ResultWrapper<List<ItemModel>> {
+        return try {
+            val result = mutableListOf<ItemModel>()
+
+            for (stock in list) {
+                val items = supabase
+                    .from(DatabaseTables.ITEM)
+                    .select {
+                        filter {
+                            eq("item_id", stock.itemId!!)
+                        }
+                    }
+                    .decodeList<ItemModel>()
+
+                result.addAll(items)
+            }
+
+            ResultWrapper.Success(result)
+
+        } catch (e: Exception) {
+            ResultWrapper.Error(exceptionMapper.map(e))
+        }
+    }
+
+
+
 }
 

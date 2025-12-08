@@ -45,5 +45,9 @@ sealed class Routes {
     @Serializable
     object CreateDonation
 
+    // --- Stock ---
+    @Serializable
+    object GetStock
+
 
 }
