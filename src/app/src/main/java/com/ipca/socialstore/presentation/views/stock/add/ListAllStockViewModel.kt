@@ -1,5 +1,6 @@
 package com.ipca.socialstore.presentation.views.stock.add
 
+import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -10,6 +11,7 @@ import com.ipca.socialstore.domain.logic.ListAllItemsStockUseCase
 import com.ipca.socialstore.presentation.utils.ErrorText
 import com.ipca.socialstore.presentation.utils.asUiText
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -24,6 +26,12 @@ data class GetStockState(
 class ListAllStockViewModel @Inject constructor(private val listAllItemsStockUseCase: ListAllItemsStockUseCase): ViewModel(){
 
     val uiState = mutableStateOf(GetStockState())
+
+    private val stockDetail = mutableStateOf<StockHelper?>(null)
+
+    fun selectStock(item : StockHelper){
+        stockDetail.value = item
+    }
     fun getAllStock(){
         uiState.value = uiState.value.copy(
             isLoading = true,

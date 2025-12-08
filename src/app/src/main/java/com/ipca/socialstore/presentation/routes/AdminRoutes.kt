@@ -23,4 +23,13 @@ sealed class AdminRoutes {
     // --- Donations ---
     @Serializable
     object CreateDonation : AdminRoutes()
+
+    @Serializable
+    object GetStock : AdminRoutes()
+
+    @Serializable
+    object StockDetails : AdminRoutes()
+
+    @Serializable
+    object CreationDonation: AdminRoutes()
 }

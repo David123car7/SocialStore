@@ -9,6 +9,7 @@ class AddItemStockUseCase @Inject constructor(private val stockRepository: Stock
     suspend operator fun invoke(item : StockModel, quantity : Int) : ResultWrapper<StockModel?>{
         return when(val stock = stockRepository.getItemByIdStock(item)){
             is ResultWrapper.Success ->{
+                println(stock.data)
                 if (stock.data != null){
                     stockRepository.updateStock(item = item,quantity)
                 }else{
