@@ -21,11 +21,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.ipca.socialstore.presentation.objects.Routes
+import com.ipca.socialstore.data.enums.UserRole
+import com.ipca.socialstore.presentation.objects.NavigationLogic
+import com.ipca.socialstore.presentation.routes.BeneficiaryRoutes
+import com.ipca.socialstore.presentation.routes.GeneralRoutes
+import com.ipca.socialstore.presentation.routes.NoRoleRoutes
 import com.ipca.socialstore.ui.theme.SocialStoreTheme
 
 @Composable
-fun LoginView(modifier: Modifier, navController: NavController){
+fun LoginView(modifier: Modifier, navController: NavController, userRole: UserRole){
     val loginViewModel: LoginViewModel = hiltViewModel()
     val uiState by loginViewModel.uiState
 
@@ -35,8 +39,16 @@ fun LoginView(modifier: Modifier, navController: NavController){
         onEmailUpdate = {value -> loginViewModel.updateEmail(value)},
         onPasswordUpdate = {value -> loginViewModel.updatePassword(value)},
         onLogin = {loginViewModel.login()},
-        onClickRegister = {navController.navigate(Routes.Register)},
-        onClickReset = {navController.navigate(Routes.RequestResetPassword)}
+        onClickRegister = { NavigationLogic.navigateTo(
+            navController = navController,
+            userRole = userRole,
+            route =  GeneralRoutes.Register
+        )},
+        onClickReset = {NavigationLogic.navigateTo(
+            navController = navController,
+            userRole = userRole,
+            route =  GeneralRoutes.RequestResetPassword
+        )}
     )
 }
 

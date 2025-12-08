@@ -13,7 +13,7 @@ class ExceptionMapper @Inject constructor(private val fileLogger: FileLogger) {
         return when (e) {
             is RestException -> {
                 when (e.statusCode) {
-                    400 -> AppError.InvalidPassword // Bad Request
+                    400 -> AppError.InvalidPassword //not always...
                     404 -> AppError.UserNotFound
                     409 -> AppError.UserAlreadyExists
                     else -> {

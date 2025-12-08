@@ -13,24 +13,41 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import com.ipca.socialstore.presentation.objects.Routes
+import com.ipca.socialstore.data.enums.UserRole
+import com.ipca.socialstore.presentation.objects.NavigationLogic
+import com.ipca.socialstore.presentation.routes.AdminRoutes
+import com.ipca.socialstore.presentation.routes.BeneficiaryRoutes
+import com.ipca.socialstore.presentation.routes.GeneralRoutes
+import com.ipca.socialstore.presentation.routes.NoRoleRoutes
 import com.ipca.socialstore.ui.theme.SocialStoreTheme
 
 @Composable
-fun DefaultHomeView(modifier: Modifier, navController: NavController) {
+fun DefaultHomeView(modifier: Modifier, navController: NavController, userRole: UserRole) {
     val homeViewModel: DefaultHomeViewModel = hiltViewModel()
     val uiState by homeViewModel.uiState
-
 
     DefaultHomeViewContent(
         modifier = modifier,
         onClickLogout = {homeViewModel.logout()},
-        onClickCreate = {navController.navigate(Routes.GetStock)}
+        onClickCreate = {
+            NavigationLogic.navigateTo(
+            navController = navController,
+            userRole = userRole,
+            route = AdminRoutes.GetSingleItem
+            )
+        },
+        onClickApplication = {
+            NavigationLogic.navigateTo(
+                navController = navController,
+                userRole = userRole,
+                route = NoRoleRoutes.Application
+            )
+        }
     )
 }
 
 @Composable
-fun DefaultHomeViewContent(modifier: Modifier, onClickLogout:()->Unit, onClickCreate : ()-> Unit){
+fun DefaultHomeViewContent(modifier: Modifier, onClickLogout:()->Unit, onClickCreate : ()-> Unit, onClickApplication : ()-> Unit){
     Box(modifier = modifier.fillMaxSize()){
         Column(modifier = modifier) {
             Text(modifier = Modifier.padding(8.dp), text = "Home Page")
@@ -45,6 +62,12 @@ fun DefaultHomeViewContent(modifier: Modifier, onClickLogout:()->Unit, onClickCr
             ) {
                 Text("GetItem")
             }
+            Button(
+                modifier = Modifier.padding(8.dp),
+                onClick = {onClickApplication()}
+            ) {
+                Text("Application")
+            }
         }
     }
 }
@@ -53,6 +76,6 @@ fun DefaultHomeViewContent(modifier: Modifier, onClickLogout:()->Unit, onClickCr
 @Composable
 fun HomePreview(){
     SocialStoreTheme() {
-        DefaultHomeViewContent(modifier = Modifier, onClickLogout = { Unit}, onClickCreate = { Unit})
+        DefaultHomeViewContent(modifier = Modifier, onClickLogout = { Unit}, onClickCreate = { Unit}, onClickApplication = { Unit})
     }
 }

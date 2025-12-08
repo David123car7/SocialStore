@@ -21,7 +21,7 @@ import androidx.navigation.NavController
 import com.ipca.socialstore.ui.theme.SocialStoreTheme
 
 @Composable
-fun ResetPasswordView(modifier: Modifier, navController: NavController){
+fun ResetPasswordView(modifier: Modifier){
     val rpViewModel: ResetPasswordViewModel = hiltViewModel()
     val uiState by rpViewModel.uiState
 
