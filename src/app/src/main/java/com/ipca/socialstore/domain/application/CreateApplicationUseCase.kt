@@ -34,6 +34,13 @@ class CreateApplicationUseCase @Inject constructor(
             return ResultWrapper.Error(AppError.UserNotLoggedIn)
         }
 
+        val userApplicationId = userRepository.getUserApplicationId(uid = uid.data)
+        if(userApplicationId is ResultWrapper.Error)
+            return ResultWrapper.Error(userApplicationId.error)
+
+        if(userApplicationId.data != null)
+            return ResultWrapper.Error(AppError.ApplicationAllreadyExists)
+
         //Application Checks
         if(applicationModel.name.isEmpty())
             return ResultWrapper.Error(AppError.EmptyField(R.string.name))

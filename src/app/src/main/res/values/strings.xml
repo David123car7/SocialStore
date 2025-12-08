@@ -30,6 +30,7 @@
     <string name="error_invalid_password">Invalid password.</string>
     <string name="error_invalid_date">Invalid date.</string>
     <string name="error_user_not_found">User not found.</string>
+    <string name="error_application_already_exists">You allready made a application.</string>
     <string name="error_user_already_exists">A user with this email already exists.</string>
     <string name="error_invalid_email">Please enter a valid email address.</string>
 	<string name="error_user_not_logged_in">User is not logged in.</string>

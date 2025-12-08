@@ -47,5 +47,6 @@ fun AppError.asUiText(): ErrorText {
         is AppError.InvalidResetToken -> ErrorText.StringResource(R.string.error_invalid_reset_token)
         is AppError.UnknownError -> ErrorText.DynamicString(this.message) // Fallback
         is AppError.InvalidFilesNumber -> ErrorText.StringResource(R.string.error_invalid_files_number)
+        is AppError.ApplicationAllreadyExists -> ErrorText.StringResource(R.string.error_application_already_exists)
     }
 }

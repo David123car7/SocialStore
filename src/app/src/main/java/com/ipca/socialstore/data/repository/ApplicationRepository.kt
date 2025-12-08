@@ -65,7 +65,7 @@ class ApplicationRepository @Inject constructor(
     }
 
 
-    suspend fun uploadApplicationDocument(uri: Uri): ResultWrapper<String> {
+    suspend fun uploadApplicationDocument(uri: Uri, documentType: String): ResultWrapper<String> {
         return try {
             val userId = supabaseClient.auth.currentUserOrNull()?.id
                 ?: return ResultWrapper.Error(AppError.UserNotFound)
@@ -78,7 +78,7 @@ class ApplicationRepository @Inject constructor(
             } ?: return ResultWrapper.Error(AppError.UnknownError("Could not read file"))
 
             val fileName = "${UUID.randomUUID()}.pdf"
-            val filePath = "$userId/$fileName"
+            val filePath = "$userId/$documentType/$fileName"
 
             val bucket = supabaseClient.storage.from(StorageBucket.APPLICATION_DOCUMENTS.bucketName)
 
