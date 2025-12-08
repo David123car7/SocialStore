@@ -8,22 +8,12 @@ data class UserModel(
     @SerialName("uid")
     val uid: String?,
 
-    @SerialName("firstName")
-    val firstName: String,
-
-    @SerialName("lastName")
-    val lastName: String,
-
-    @SerialName("addressId")
-    val addressId: Int?,
+    @SerialName("profile_id")
+    val profileId: Int,
 
     @SerialName("role")
     val role: String,
 
-    @SerialName("birthDate") // Must be "YYYY-MM-DD"
-    val birthDate: String, //supabase sends date as a string
+    @SerialName("application_id")
+    val applicationId: Int?,
 )
-
-fun UserModel.isValid() : Boolean{
-    return this.firstName.isNotEmpty() && this.lastName.isNotEmpty() && birthDate.isNotEmpty()
-}

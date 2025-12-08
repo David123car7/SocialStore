@@ -30,11 +30,15 @@ import com.ipca.socialstore.presentation.views.home.defaultHome.DefaultHomeView
 import com.ipca.socialstore.presentation.views.item.CreateItemView
 import com.ipca.socialstore.presentation.views.item.getSingleItem.GetSingleItemView
 import com.ipca.socialstore.presentation.routes.AdminRoutes
+import com.ipca.socialstore.presentation.routes.DefaultRoutes
 import com.ipca.socialstore.presentation.routes.GeneralRoutes
+<<<<<<< HEAD
 import com.ipca.socialstore.presentation.routes.NoRoleRoutes
 import com.ipca.socialstore.presentation.views.stock.add.GetAllStockView
 import com.ipca.socialstore.presentation.views.stock.add.ListAllStockViewModel
 import com.ipca.socialstore.presentation.views.stock.add.StockItemDetail
+=======
+>>>>>>> 6297b083df291bc0150670d8d749ff134fb78442
 import com.ipca.socialstore.ui.theme.SocialStoreTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -51,7 +55,7 @@ class MainActivity : ComponentActivity() {
             val mainState by mainViewModel.sessionState
 
             val startDestination = if(mainState.isLoggedIn)
-                NoRoleRoutes.DefaultHome
+                DefaultRoutes.DefaultHome
             else
                 GeneralRoutes.Login
 
@@ -68,13 +72,16 @@ class MainActivity : ComponentActivity() {
                                 navController = navController, userRole = mainState.userRole
                             )
                         }
-                        composable<NoRoleRoutes.Application> {
+                        /*
+                        composable<DefaultRoutes.Application> {
                             ApplicationView(modifier = Modifier.padding(innerPadding))
                         }
-                        composable<NoRoleRoutes.DefaultHome>{
+                        composable<DefaultRoutes.DefaultHome>{
                             DefaultHomeView(modifier = Modifier.padding(innerPadding),
                                 navController = navController, userRole = mainState.userRole)
                         }
+                        */
+
                         composable<GeneralRoutes.RequestResetPassword>{
                             RequestResetPasswordView(modifier = Modifier.padding(innerPadding),
                                 navController = navController, userRole = mainState.userRole)

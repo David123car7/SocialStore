@@ -5,6 +5,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class ApplicationModel(
+    val id: Int? = null,
+
     @SerialName("schoolyear")
     val schoolYear: Int,
 
@@ -27,5 +29,8 @@ data class ApplicationModel(
     val requestType: String,
 
     @SerialName("state_id")
-    val stateId: Int?,
+    val stateId: Int,
+
+    @SerialName("academic_id")
+    val academicId: Int?,
 )

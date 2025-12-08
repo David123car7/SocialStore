@@ -36,6 +36,26 @@ class AuthRepository @Inject constructor(private val supabase: SupabaseClient, p
         }
     }
 
+    fun getUserEmail(): ResultWrapper<String?>{
+        return try {
+            val user = supabase.auth.currentUserOrNull()
+            ResultWrapper.Success(user?.email)
+        }
+        catch (e: Exception) {
+            ResultWrapper.Error(exceptionMapper.map(e))
+        }
+    }
+
+    fun getUserUid(): ResultWrapper<String?>{
+        return try {
+            val user = supabase.auth.currentUserOrNull()
+            ResultWrapper.Success(user?.id)
+        }
+        catch (e: Exception) {
+            ResultWrapper.Error(exceptionMapper.map(e))
+        }
+    }
+
     suspend fun login(email: String, password: String): ResultWrapper<Boolean> {
         return try {
             supabase.auth.signInWith(provider = Email){
@@ -49,13 +69,13 @@ class AuthRepository @Inject constructor(private val supabase: SupabaseClient, p
         }
     }
 
-    suspend fun register(email: String, password: String): ResultWrapper<String> {
+    suspend fun register(email: String, password: String): ResultWrapper<String?> {
         return try {
             val user = supabase.auth.signUpWith(provider = Email){
                 this.email = email
                 this.password = password
             }
-            ResultWrapper.Success(user?.id ?: "")
+            ResultWrapper.Success(user?.id)
         }
         catch (e: Exception) {
             ResultWrapper.Error(exceptionMapper.map(e))
