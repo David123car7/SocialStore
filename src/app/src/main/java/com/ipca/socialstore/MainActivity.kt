@@ -10,13 +10,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.ipca.socialstore.data.models.StockHelper
 import com.ipca.socialstore.presentation.views.application.ApplicationView
 import com.ipca.socialstore.presentation.views.authentication.login.LoginView
 import com.ipca.socialstore.presentation.main.MainViewModel
@@ -28,17 +26,12 @@ import com.ipca.socialstore.presentation.views.campaign.listAll.ListAllCampaigns
 import com.ipca.socialstore.presentation.views.donation.create.CreateDonationView
 import com.ipca.socialstore.presentation.views.home.defaultHome.DefaultHomeView
 import com.ipca.socialstore.presentation.views.item.CreateItemView
-import com.ipca.socialstore.presentation.views.item.getSingleItem.GetSingleItemView
 import com.ipca.socialstore.presentation.routes.AdminRoutes
 import com.ipca.socialstore.presentation.routes.DefaultRoutes
 import com.ipca.socialstore.presentation.routes.GeneralRoutes
-<<<<<<< HEAD
-import com.ipca.socialstore.presentation.routes.NoRoleRoutes
-import com.ipca.socialstore.presentation.views.stock.add.GetAllStockView
-import com.ipca.socialstore.presentation.views.stock.add.ListAllStockViewModel
-import com.ipca.socialstore.presentation.views.stock.add.StockItemDetail
-=======
->>>>>>> 6297b083df291bc0150670d8d749ff134fb78442
+import com.ipca.socialstore.presentation.views.stock.List.GetAllStockView
+import com.ipca.socialstore.presentation.views.stock.List.ListAllStockViewModel
+import com.ipca.socialstore.presentation.views.stock.List.StockItemDetailView
 import com.ipca.socialstore.ui.theme.SocialStoreTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -46,6 +39,7 @@ import dagger.hilt.android.AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
     private val mainViewModel: MainViewModel by viewModels()
+    private val stockViewModel: ListAllStockViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -72,7 +66,6 @@ class MainActivity : ComponentActivity() {
                                 navController = navController, userRole = mainState.userRole
                             )
                         }
-                        /*
                         composable<DefaultRoutes.Application> {
                             ApplicationView(modifier = Modifier.padding(innerPadding))
                         }
@@ -80,7 +73,6 @@ class MainActivity : ComponentActivity() {
                             DefaultHomeView(modifier = Modifier.padding(innerPadding),
                                 navController = navController, userRole = mainState.userRole)
                         }
-                        */
 
                         composable<GeneralRoutes.RequestResetPassword>{
                             RequestResetPasswordView(modifier = Modifier.padding(innerPadding),
@@ -102,10 +94,13 @@ class MainActivity : ComponentActivity() {
                             CreateDonationView(modifier = Modifier.padding(innerPadding), navController = navController)
                         }
                         composable <AdminRoutes.GetStock>{
-                            GetAllStockView(modifier = Modifier.padding(innerPadding), navController = navController)
+                            GetAllStockView(modifier = Modifier.padding(innerPadding), navController = navController, viewModel = stockViewModel)
                         }
                         composable <AdminRoutes.CreateDonation>{
                             CreateDonationView(modifier = Modifier.padding(innerPadding), navController = navController)
+                        }
+                        composable <AdminRoutes.SelectStock>{
+                            StockItemDetailView(modifier = Modifier.padding(innerPadding), navController = navController, viewModel = stockViewModel)
                         }
                     }
                 }
