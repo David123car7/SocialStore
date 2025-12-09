@@ -62,7 +62,7 @@ class ItemRepository @Inject constructor(private val supabase : SupabaseClient, 
     suspend fun getItemIdList(listId: List<Int>): ResultWrapper<List<ItemModel>> {
         return try {
             val items = mutableListOf<ItemModel>()
-
+            val quantity = 0
             for (id in listId) {
                 val item = supabase
                     .from(DatabaseTables.ITEM)

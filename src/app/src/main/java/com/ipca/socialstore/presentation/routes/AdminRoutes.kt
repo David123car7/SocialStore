@@ -32,4 +32,7 @@ sealed class AdminRoutes {
 
     @Serializable
     object CreationDonation: AdminRoutes()
+
+    @Serializable
+    object SelectStock : AdminRoutes()
 }
