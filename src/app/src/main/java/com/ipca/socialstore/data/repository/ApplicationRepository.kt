@@ -21,8 +21,7 @@ import javax.inject.Inject
 
 class ApplicationRepository @Inject constructor(
     private val supabaseClient: SupabaseClient,
-    private val exceptionMapper: ExceptionMapper,
-    @ApplicationContext private val context: Context){
+    private val exceptionMapper: ExceptionMapper){
 
     suspend fun createApplication(application: ApplicationModel): ResultWrapper<Int?>{
         return try {
@@ -32,62 +31,6 @@ class ApplicationRepository @Inject constructor(
             ResultWrapper.Success(application.id)
         }
         catch (e : Exception){
-            ResultWrapper.Error(exceptionMapper.map(e))
-        }
-    }
-
-    suspend fun uploadApplicationDocuments(uris: List<Uri>): ResultWrapper<List<String>>{
-        val uploadedPaths = mutableListOf<String>()
-
-        return try {
-            for (uri in uris) {
-                val result = uploadApplicationDocument(uri)
-
-                when (result) {
-                    is ResultWrapper.Success -> {
-                        if (result.data != null) {
-                            uploadedPaths.add(result.data)
-                        } else {
-                            return ResultWrapper.Error(AppError.UnknownError("Upload success but path missing"))
-                        }
-                    }
-                    is ResultWrapper.Error -> {
-                        //Delete all files that were stored before error
-                        return ResultWrapper.Error(result.error)
-                    }
-                }
-            }
-
-            ResultWrapper.Success(uploadedPaths)
-        } catch (e: Exception) {
-            ResultWrapper.Error(exceptionMapper.map(e))
-        }
-    }
-
-
-    suspend fun uploadApplicationDocument(uri: Uri, documentType: String): ResultWrapper<String> {
-        return try {
-            val userId = supabaseClient.auth.currentUserOrNull()?.id
-                ?: return ResultWrapper.Error(AppError.UserNotFound)
-
-            // 2. Read the File Data (Run on IO Thread)
-            val bytes = withContext(Dispatchers.IO) {
-                context.contentResolver.openInputStream(uri)?.use { stream ->
-                    stream.readBytes()
-                }
-            } ?: return ResultWrapper.Error(AppError.UnknownError("Could not read file"))
-
-            val fileName = "${UUID.randomUUID()}.pdf"
-            val filePath = "$userId/$documentType/$fileName"
-
-            val bucket = supabaseClient.storage.from(StorageBucket.APPLICATION_DOCUMENTS.bucketName)
-
-            val x = bucket.upload(path = filePath, data = bytes) {
-                upsert = false // Don't overwrite existing files
-            }
-
-            ResultWrapper.Success(filePath)
-        } catch (e: Exception) {
             ResultWrapper.Error(exceptionMapper.map(e))
         }
     }

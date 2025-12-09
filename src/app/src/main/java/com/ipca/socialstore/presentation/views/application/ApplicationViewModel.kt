@@ -8,7 +8,6 @@ import com.ipca.socialstore.data.models.AcademicModel
 import com.ipca.socialstore.data.models.ApplicationModel
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
 import com.ipca.socialstore.domain.application.CreateApplicationUseCase
-import com.ipca.socialstore.domain.application.UploadApplicationDocuments
 import com.ipca.socialstore.presentation.utils.ErrorText
 import com.ipca.socialstore.presentation.utils.asUiText
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -32,8 +31,7 @@ private object DocumentsLimit{
 
 @HiltViewModel
 class ApplicationViewModel @Inject constructor(
-    private val createApplicationUseCase: CreateApplicationUseCase,
-    private val uploadApplicationDocuments: UploadApplicationDocuments): ViewModel() {
+    private val createApplicationUseCase: CreateApplicationUseCase): ViewModel() {
     var uiState = mutableStateOf(ApplicationState())
 
     fun updateIsStudent(state: Boolean){
@@ -151,29 +149,13 @@ class ApplicationViewModel @Inject constructor(
         )
     }
 
-    fun submiteFileX(){
-        submitFile(DocumentsLimit.firstDocument)
-    }
-
+    //Will be replaced in the future
     private fun submitFile(maxDocuments: Int) {
         viewModelScope.launch {
             uiState.value = uiState.value.copy(isLoading = true, error = null)
 
             if (uiState.value.selectedFiles.isNotEmpty()) {
-                val result = uploadApplicationDocuments(uiState.value.selectedFiles, maxDocuments)
-                when(result){
-                    is ResultWrapper.Success -> {
-                        uiState.value = uiState.value.copy(
-                            isLoading = false,
-                        )
-                    }
-                    is ResultWrapper.Error -> {
-                        uiState.value = uiState.value.copy(
-                            isLoading = false,
-                            error = result.error.asUiText()
-                        )
-                    }
-                }
+                //val result = uploadApplicationDocuments(uiState.value.selectedFiles, maxDocuments)
             }
         }
     }
