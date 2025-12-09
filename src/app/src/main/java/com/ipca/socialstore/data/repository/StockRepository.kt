@@ -83,7 +83,17 @@ class StockRepository @Inject constructor(private val supabase: SupabaseClient, 
         }
     }
 
-
+    suspend fun updateQuantityInStock(stockId :Int, newQuantity: Int) : ResultWrapper<Boolean>{
+        return try {
+            val result = supabase.from(DatabaseTables.STOCK)
+                .update(mapOf("quantity" to newQuantity)) {
+                    filter { eq("stock_id", stockId) }
+                }
+            ResultWrapper.Success(true)
+        }catch (e : Exception){
+            ResultWrapper.Error(exceptionMapper.map(e))
+        }
+    }
     suspend fun getFullStock(): ResultWrapper<List<StockModel>?> {
         return try {
             val stock = supabase

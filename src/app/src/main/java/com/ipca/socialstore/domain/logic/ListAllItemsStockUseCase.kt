@@ -87,6 +87,7 @@ class ListAllItemsStockUseCase @Inject constructor(
                                 StockHelper(
                                     item = itemResult,
                                     quantity = stock.quantity,
+                                    stockId = stock.stockId!!,
                                     expirationDate = dateMap
                                 )
                             )
@@ -121,6 +122,7 @@ class ListAllItemsStockUseCase @Inject constructor(
                     StockHelper(
                         item = item.item,
                         quantity = quantity,
+                        stockId = item.stockId,
                         expirationDate = item.expirationDate
                     )
                 )

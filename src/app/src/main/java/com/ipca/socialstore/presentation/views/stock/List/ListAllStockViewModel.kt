@@ -19,6 +19,8 @@ data class GetStockState(
     val items : List<StockHelper>? = null,
     val isLoading : Boolean = false,
     val error: ErrorText? = null,
+    val isEditing : Boolean? = false,
+
 )
 
 @HiltViewModel
@@ -41,11 +43,11 @@ class ListAllStockViewModel @Inject constructor(private val listAllItemsStockUse
 
         viewModelScope.launch {
             val result = listAllItemsStockUseCase()
-            println(result.data)
             when (result){
                 is ResultWrapper.Success -> {
                     uiState.value = uiState.value.copy(
                         isLoading = false,
+                        isEditing = false,
                         items = result.data
                     )
 
@@ -53,6 +55,7 @@ class ListAllStockViewModel @Inject constructor(private val listAllItemsStockUse
                 is ResultWrapper.Error -> {
                     uiState.value = uiState.value.copy(
                         isLoading = false,
+                        isEditing = false,
                         error = result.error.asUiText(),
                     )
                 }
