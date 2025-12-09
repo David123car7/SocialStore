@@ -13,7 +13,6 @@ data class ItemModel(
 
     @SerialName("item_id")
     val itemId : Int
-
 )
 
 fun ItemModel.isValid() : Boolean{

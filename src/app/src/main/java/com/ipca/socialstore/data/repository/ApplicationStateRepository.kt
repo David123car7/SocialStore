@@ -2,6 +2,7 @@ package com.ipca.socialstore.data.repository
 
 import com.ipca.socialstore.R
 import com.ipca.socialstore.data.enums.DatabaseTables
+import com.ipca.socialstore.data.enums.UnknownErrors
 import com.ipca.socialstore.data.exceptions.AppError
 import com.ipca.socialstore.data.exceptions.ExceptionMapper
 import com.ipca.socialstore.data.helpers.from
@@ -22,10 +23,10 @@ class ApplicationStateRepository @Inject constructor(
             }.decodeList<ApplicationStateModel>().firstOrNull()
 
             if(state == null)
-                return ResultWrapper.Error(AppError.ErroCreatingTable(R.string.table_application_state))
+                return ResultWrapper.Error(AppError.DataNotCreated)
 
             val id = state.id
-                ?: return ResultWrapper.Error(AppError.UnknownError("Database returned null ID"))
+                ?: return ResultWrapper.Error(AppError.UnknownError(UnknownErrors.NULL_ID.errorMessage))
 
             ResultWrapper.Success(state.id)
         } catch (e : Exception){

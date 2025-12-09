@@ -82,5 +82,4 @@ class ItemRepository @Inject constructor(private val supabase : SupabaseClient, 
             ResultWrapper.Error(exceptionMapper.map(e))
         }
     }
-
 }

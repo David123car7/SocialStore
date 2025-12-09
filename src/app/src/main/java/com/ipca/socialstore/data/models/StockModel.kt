@@ -6,6 +6,8 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class StockModel(
 
+    val stock_id: Int? = null,
+
     @SerialName("item_id")
     val itemId : Int,
 

@@ -1,6 +1,7 @@
 package com.ipca.socialstore.data.repository
 
 import com.ipca.socialstore.data.enums.DatabaseTables
+import com.ipca.socialstore.data.enums.UnknownErrors
 import com.ipca.socialstore.data.enums.UserRole
 import com.ipca.socialstore.data.exceptions.AppError
 import com.ipca.socialstore.data.exceptions.ExceptionMapper
@@ -55,7 +56,7 @@ class UserRepository @Inject constructor(private val supabase: SupabaseClient, p
     suspend fun getUserApplicationId(uid: String): ResultWrapper<Int>{
         return try {
             val user = getUser(uid = uid) ?: return ResultWrapper.Error(AppError.UserNotFound)
-            user.applicationId ?: return ResultWrapper.Error(AppError.UnknownError("Database returned null ID"))
+            user.applicationId ?: return ResultWrapper.Error(AppError.UnknownError(UnknownErrors.NULL_ID.errorMessage))
             ResultWrapper.Success(user.applicationId)
         }
         catch (e: Exception) {

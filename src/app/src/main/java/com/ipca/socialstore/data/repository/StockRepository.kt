@@ -1,6 +1,8 @@
 package com.ipca.socialstore.data.repository
 
 import com.ipca.socialstore.data.enums.DatabaseTables
+import com.ipca.socialstore.data.enums.UnknownErrors
+import com.ipca.socialstore.data.exceptions.AppError
 import com.ipca.socialstore.data.exceptions.ExceptionMapper
 import com.ipca.socialstore.data.helpers.from
 import com.ipca.socialstore.data.models.ItemModel
@@ -49,33 +51,38 @@ class StockRepository @Inject constructor(private val supabase: SupabaseClient, 
         }
     }
 
-    suspend fun getItemQuantity(item : StockModel) : ResultWrapper<StockModel>{
+    suspend fun getItemQuantity(itemId : Int) : ResultWrapper<Int>{
         return try {
-            val quantity = supabase.from(DatabaseTables.STOCK)
+            val stock = supabase.from(DatabaseTables.STOCK)
                 .select {
                     filter {
-                        eq("item_id", item.itemId)
+                        eq("item_id", itemId)
                     }
-            }.decodeSingle<StockModel>()
-            ResultWrapper.Success(quantity)
+                }.decodeSingleOrNull<StockModel>()
+            if(stock == null) return ResultWrapper.Error(AppError.DataNotFound)
+            ResultWrapper.Success(stock.quantity)
         }catch (e : Exception){
             ResultWrapper.Error(exceptionMapper.map(e))
         }
     }
-    suspend fun updateStock(item: StockModel, quantity: Int): ResultWrapper<Boolean> {
+    suspend fun updateStock(itemId: Int, quantity: Int): ResultWrapper<Int> {
         return try {
-            val getStock = getItemQuantity(item)
+            val getStock = getItemQuantity(itemId)
             if(getStock is ResultWrapper.Error) return ResultWrapper.Error(getStock.error)
-            val bdQuantity = (getStock as ResultWrapper.Success).data.quantity
+            val bdQuantity = (getStock as ResultWrapper.Success).data
             val newQuantity = bdQuantity + quantity
 
-            val result = supabase.from(DatabaseTables.STOCK)
+            val stockResult = supabase.from(DatabaseTables.STOCK)
                 .update(mapOf("quantity" to newQuantity)) {
                     filter {
-                        eq("item_id", item.itemId)
+                        eq("item_id", itemId)
                     }
-                }
-            ResultWrapper.Success(true)
+                    select()
+                }.decodeSingleOrNull<StockModel>()
+
+            if(stockResult == null) return ResultWrapper.Error(AppError.DataNotUpdated)
+            if(stockResult.stock_id == null) return ResultWrapper.Error(AppError.UnknownError(UnknownErrors.NULL_ID.errorMessage))
+            ResultWrapper.Success(stockResult.stock_id)
         } catch (e: Exception) {
             ResultWrapper.Error(exceptionMapper.map(e))
         }
@@ -92,6 +99,7 @@ class StockRepository @Inject constructor(private val supabase: SupabaseClient, 
             ResultWrapper.Error(exceptionMapper.map(e))
         }
     }
+
     suspend fun getFullStock(): ResultWrapper<List<StockModel>?> {
         return try {
             val stock = supabase

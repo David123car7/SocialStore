@@ -13,23 +13,19 @@
     <string name="course_type">Course Type</string>
     <string name="student_number">StudentNumber</string>
 
-    //Tables
-    <string name="table_academic">Academic</string>
-    <string name="table_application">Application</string>
-    <string name="table_application_state">Application State</string>
-    <string name="table_profile">Profile</string>
-
-
-
     //Generic Errors
     <string name="error_field_empty">%1$s cannot be empty.</string>
     <string name="error_field_invalid">%1$s is invalid.</string>
-    <string name="error_creating_table">Error creating table %1$s.</string>
 
 
     <string name="error_invalid_password">Invalid password.</string>
     <string name="error_invalid_date">Invalid date.</string>
     <string name="error_user_not_found">User not found.</string>
+    <string name="error_data_not_found">Data not found.</string>
+    <string name="error_data_not_created">Data not created.</string>
+    <string name="error_data_not_updated">Data not updated.</string>
+
+
     <string name="error_application_already_exists">You allready made a application.</string>
     <string name="error_user_already_exists">A user with this email already exists.</string>
     <string name="error_invalid_email">Please enter a valid email address.</string>

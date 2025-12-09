@@ -5,6 +5,7 @@ import android.net.Uri
 import com.ipca.socialstore.R
 import com.ipca.socialstore.data.enums.DatabaseTables
 import com.ipca.socialstore.data.enums.StorageBucket
+import com.ipca.socialstore.data.enums.UnknownErrors
 import com.ipca.socialstore.data.exceptions.AppError
 import com.ipca.socialstore.data.exceptions.ExceptionMapper
 import com.ipca.socialstore.data.helpers.from
@@ -32,10 +33,10 @@ class ApplicationRepository @Inject constructor(
             }.decodeList<ApplicationModel>().firstOrNull()
 
             if(application == null)
-                return ResultWrapper.Error(AppError.ErroCreatingTable(R.string.table_application))
+                return ResultWrapper.Error(AppError.DataNotCreated)
 
             if(application.id == null)
-                return ResultWrapper.Error(AppError.UnknownError("Database returned null ID"))
+                return ResultWrapper.Error(AppError.UnknownError(UnknownErrors.NULL_ID.errorMessage))
 
             ResultWrapper.Success(application.id)
         } catch (e : Exception){
