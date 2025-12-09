@@ -13,7 +13,10 @@ data class StockModel(
     val expirationDate : String,
 
     @SerialName("quantity")
-    val quantity : Int
+    val quantity : Int,
+
+    @SerialName("stock_id")
+    val stockId : Int? = null
 )
 
 fun StockModel.isValid() : Boolean{

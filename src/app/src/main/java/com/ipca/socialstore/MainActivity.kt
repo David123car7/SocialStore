@@ -10,11 +10,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.ipca.socialstore.data.models.StockHelper
 import com.ipca.socialstore.presentation.views.application.ApplicationView
 import com.ipca.socialstore.presentation.views.authentication.login.LoginView
 import com.ipca.socialstore.presentation.main.MainViewModel
@@ -30,6 +32,13 @@ import com.ipca.socialstore.presentation.views.item.getSingleItem.GetSingleItemV
 import com.ipca.socialstore.presentation.routes.AdminRoutes
 import com.ipca.socialstore.presentation.routes.DefaultRoutes
 import com.ipca.socialstore.presentation.routes.GeneralRoutes
+<<<<<<< HEAD
+import com.ipca.socialstore.presentation.routes.NoRoleRoutes
+import com.ipca.socialstore.presentation.views.stock.add.GetAllStockView
+import com.ipca.socialstore.presentation.views.stock.add.ListAllStockViewModel
+import com.ipca.socialstore.presentation.views.stock.add.StockItemDetail
+=======
+>>>>>>> 6297b083df291bc0150670d8d749ff134fb78442
 import com.ipca.socialstore.ui.theme.SocialStoreTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -63,6 +72,7 @@ class MainActivity : ComponentActivity() {
                                 navController = navController, userRole = mainState.userRole
                             )
                         }
+                        /*
                         composable<DefaultRoutes.Application> {
                             ApplicationView(modifier = Modifier.padding(innerPadding))
                         }
@@ -70,6 +80,8 @@ class MainActivity : ComponentActivity() {
                             DefaultHomeView(modifier = Modifier.padding(innerPadding),
                                 navController = navController, userRole = mainState.userRole)
                         }
+                        */
+
                         composable<GeneralRoutes.RequestResetPassword>{
                             RequestResetPasswordView(modifier = Modifier.padding(innerPadding),
                                 navController = navController, userRole = mainState.userRole)
@@ -89,8 +101,11 @@ class MainActivity : ComponentActivity() {
                         composable <AdminRoutes.CreateDonation>{
                             CreateDonationView(modifier = Modifier.padding(innerPadding), navController = navController)
                         }
-                        composable <AdminRoutes.GetSingleItem>{
-                            GetSingleItemView(modifier = Modifier.padding(innerPadding), navController = navController)
+                        composable <AdminRoutes.GetStock>{
+                            GetAllStockView(modifier = Modifier.padding(innerPadding), navController = navController)
+                        }
+                        composable <AdminRoutes.CreateDonation>{
+                            CreateDonationView(modifier = Modifier.padding(innerPadding), navController = navController)
                         }
                     }
                 }

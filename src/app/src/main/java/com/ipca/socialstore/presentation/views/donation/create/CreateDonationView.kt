@@ -118,7 +118,7 @@ fun PreviewCreateDonation() {
     SocialStoreTheme() {
         val donation = DonationModelCreation("")
         val item = ItemModelCreation("", "")
-        val stock = StockModel(0, "", 0)
+        val stock = StockModel(0, "", 0,0)
         val donationItem = DonationItemModel(0, 0)
         val uiState =
             DonationState(donation = donation, item, stock, donationItem, 0, null, false, false)

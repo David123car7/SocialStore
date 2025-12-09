@@ -17,7 +17,7 @@ import javax.inject.Inject
 data class DonationState(
     val donation : DonationModelCreation = DonationModelCreation(""),
     val item : ItemModelCreation = ItemModelCreation("",""),
-    val stock : StockModel = StockModel(0,"",0),
+    val stock : StockModel = StockModel(0,"",0,0),
     val donationItem : DonationItemModel = DonationItemModel(0,0),
     val quantity: Int? = 0,
     val error : ErrorText? = null,

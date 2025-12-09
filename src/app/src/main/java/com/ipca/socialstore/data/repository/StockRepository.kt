@@ -7,6 +7,7 @@ import com.ipca.socialstore.data.models.ItemModel
 import com.ipca.socialstore.data.models.StockHelper
 import com.ipca.socialstore.data.models.StockModel
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
+import com.ipca.socialstore.presentation.views.stock.add.StockItemDetail
 import io.github.jan.supabase.SupabaseClient
 import kotlinx.coroutines.selects.select
 import javax.inject.Inject
@@ -15,7 +16,12 @@ class StockRepository @Inject constructor(private val supabase: SupabaseClient, 
 
     suspend fun addItemStock(item : StockModel, quantity: Int) : ResultWrapper<StockModel> {
         return try {
-            val newStock = item.copy(quantity=quantity)
+            val newStock = StockModel(
+                stockId = null,
+                itemId = item.itemId,
+                quantity = quantity,
+                expirationDate = item.expirationDate
+            )
             val stock = supabase.from(DatabaseTables.STOCK)
                 .insert(newStock){
                     select()
@@ -33,7 +39,7 @@ class StockRepository @Inject constructor(private val supabase: SupabaseClient, 
             val stock = supabase.from(DatabaseTables.STOCK)
                 .select{
                     filter {
-                        eq("item_id", item.itemId!!)
+                        eq("item_id", item.itemId)
                         eq("expiration_date", item.expirationDate)
                     }
                 }
