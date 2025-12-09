@@ -51,10 +51,9 @@ class StockRepository @Inject constructor(private val supabase: SupabaseClient, 
             val quantity = supabase.from(DatabaseTables.STOCK)
                 .select {
                     filter {
-                        eq("item_id", item.itemId!!)
+                        eq("item_id", item.itemId)
                     }
-            }
-                .decodeSingle<StockModel>()
+            }.decodeSingle<StockModel>()
             ResultWrapper.Success(quantity)
         }catch (e : Exception){
             ResultWrapper.Error(exceptionMapper.map(e))
@@ -63,17 +62,17 @@ class StockRepository @Inject constructor(private val supabase: SupabaseClient, 
     suspend fun updateStock(item: StockModel, quantity: Int): ResultWrapper<Boolean> {
         return try {
             val getStock = getItemQuantity(item)
-            val bdQuantity = getStock.data?.quantity ?: 0
+            if(getStock is ResultWrapper.Error) return ResultWrapper.Error(getStock.error)
+            val bdQuantity = (getStock as ResultWrapper.Success).data.quantity
             val newQuantity = bdQuantity + quantity
 
             val result = supabase.from(DatabaseTables.STOCK)
                 .update(mapOf("quantity" to newQuantity)) {
                     filter {
-                        eq("item_id", item.itemId!!)
+                        eq("item_id", item.itemId)
                     }
                 }
             ResultWrapper.Success(true)
-
         } catch (e: Exception) {
             ResultWrapper.Error(exceptionMapper.map(e))
         }
@@ -103,7 +102,7 @@ class StockRepository @Inject constructor(private val supabase: SupabaseClient, 
                     .from(DatabaseTables.ITEM)
                     .select {
                         filter {
-                            eq("item_id", stock.itemId!!)
+                            eq("item_id", stock.itemId)
                         }
                     }
                     .decodeList<ItemModel>()
@@ -117,8 +116,5 @@ class StockRepository @Inject constructor(private val supabase: SupabaseClient, 
             ResultWrapper.Error(exceptionMapper.map(e))
         }
     }
-
-
-
 }
 

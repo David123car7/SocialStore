@@ -1,6 +1,8 @@
 package com.ipca.socialstore.data.repository
 
+import com.ipca.socialstore.R
 import com.ipca.socialstore.data.enums.DatabaseTables
+import com.ipca.socialstore.data.exceptions.AppError
 import com.ipca.socialstore.data.exceptions.ExceptionMapper
 import com.ipca.socialstore.data.helpers.from
 import com.ipca.socialstore.data.models.ProfileModel
@@ -12,12 +14,13 @@ class ProfileRepository @Inject constructor(
     private val supabase: SupabaseClient,
     private val exceptionMapper: ExceptionMapper){
 
-    suspend fun createProfile(profile: ProfileModel): ResultWrapper<Int?>{
+    suspend fun createProfile(profile: ProfileModel): ResultWrapper<Int>{
         return try {
             val profile = supabase.from(DatabaseTables.PROFILE).insert(profile){
                 select()
-            }.decodeSingle<ProfileModel>()
-
+            }.decodeAsOrNull<ProfileModel>()
+            if(profile == null) return ResultWrapper.Error(AppError.ErroCreatingTable(R.string.table_profile))
+            if(profile.id == null) return ResultWrapper.Error(AppError.UnknownError("Database returned null ID"))
             ResultWrapper.Success(profile.id)
         }
         catch (e: Exception) {

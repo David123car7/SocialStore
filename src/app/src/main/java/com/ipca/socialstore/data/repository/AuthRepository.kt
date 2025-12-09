@@ -36,20 +36,26 @@ class AuthRepository @Inject constructor(private val supabase: SupabaseClient, p
         }
     }
 
-    fun getUserEmail(): ResultWrapper<String?>{
+    fun getUserEmail(): ResultWrapper<String> {
         return try {
             val user = supabase.auth.currentUserOrNull()
-            ResultWrapper.Success(user?.email)
-        }
-        catch (e: Exception) {
+                ?: return ResultWrapper.Error(AppError.UserNotLoggedIn)
+
+            val email = user.email
+                ?: return ResultWrapper.Error(AppError.UnknownError("Supabase returned user with null email"))
+
+            ResultWrapper.Success(email)
+        } catch (e: Exception) {
             ResultWrapper.Error(exceptionMapper.map(e))
         }
     }
 
-    fun getUserUid(): ResultWrapper<String?>{
+    fun getUserUid(): ResultWrapper<String>{
         return try {
             val user = supabase.auth.currentUserOrNull()
-            ResultWrapper.Success(user?.id)
+                ?: return ResultWrapper.Error(AppError.UserNotLoggedIn)
+
+            ResultWrapper.Success(user.id)
         }
         catch (e: Exception) {
             ResultWrapper.Error(exceptionMapper.map(e))
@@ -69,13 +75,14 @@ class AuthRepository @Inject constructor(private val supabase: SupabaseClient, p
         }
     }
 
-    suspend fun register(email: String, password: String): ResultWrapper<String?> {
+    suspend fun register(email: String, password: String): ResultWrapper<String> {
         return try {
             val user = supabase.auth.signUpWith(provider = Email){
                 this.email = email
                 this.password = password
             }
-            ResultWrapper.Success(user?.id)
+            if(user == null) return ResultWrapper.Error(AppError.UserNotFound) //Maybe another type of error?
+            ResultWrapper.Success(user.id)
         }
         catch (e: Exception) {
             ResultWrapper.Error(exceptionMapper.map(e))

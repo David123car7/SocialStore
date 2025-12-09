@@ -1,6 +1,8 @@
 package com.ipca.socialstore.data.repository
 
+import com.ipca.socialstore.R
 import com.ipca.socialstore.data.enums.DatabaseTables
+import com.ipca.socialstore.data.exceptions.AppError
 import com.ipca.socialstore.data.exceptions.ExceptionMapper
 import com.ipca.socialstore.data.helpers.from
 import com.ipca.socialstore.data.models.ApplicationStateModel
@@ -13,11 +15,17 @@ class ApplicationStateRepository @Inject constructor(
     private val supabaseClient: SupabaseClient,
     private val exceptionMapper: ExceptionMapper){
 
-    suspend fun createApplicationState(applicationState: ApplicationStateModel) : ResultWrapper<Int?> {
+    suspend fun createApplicationState(applicationState: ApplicationStateModel) : ResultWrapper<Int> {
         return try {
             val state = supabaseClient.from(DatabaseTables.APPLICATION_STATE).insert(applicationState){
                 select()
-            }.decodeSingle<ApplicationStateModel>()
+            }.decodeList<ApplicationStateModel>().firstOrNull()
+
+            if(state == null)
+                return ResultWrapper.Error(AppError.ErroCreatingTable(R.string.table_application_state))
+
+            val id = state.id
+                ?: return ResultWrapper.Error(AppError.UnknownError("Database returned null ID"))
 
             ResultWrapper.Success(state.id)
         } catch (e : Exception){

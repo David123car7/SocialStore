@@ -32,14 +32,12 @@ class ListAllStockViewModel @Inject constructor(private val listAllItemsStockUse
 
         viewModelScope.launch {
             val result = listAllItemsStockUseCase()
-            println(result.data)
             when (result){
                 is ResultWrapper.Success -> {
                     uiState.value = uiState.value.copy(
                         isLoading = false,
                         items = result.data
                     )
-
                 }
                 is ResultWrapper.Error -> {
                     uiState.value = uiState.value.copy(

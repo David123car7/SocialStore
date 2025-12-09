@@ -7,13 +7,12 @@ enum class DatabaseTables(val tableName: String) {
     CAMPAIGN("campaign"),
     DONATION("donation"),
     DONATION_ITEM("donation_Item"),
-
     ITEM("item"),
     STOCK("stock"),
-
     APPLICATION("application"),
     APPLICATION_STATE("application_state"),
-    ACADEMIC("academic");
+    ACADEMIC("academic"),
+    DOCUMENT("document");
 
     override fun toString() = tableName
 }
