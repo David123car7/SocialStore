@@ -4,12 +4,9 @@ import com.ipca.socialstore.data.enums.DatabaseTables
 import com.ipca.socialstore.data.exceptions.ExceptionMapper
 import com.ipca.socialstore.data.helpers.from
 import com.ipca.socialstore.data.models.ItemModel
-import com.ipca.socialstore.data.models.StockHelper
 import com.ipca.socialstore.data.models.StockModel
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
-import com.ipca.socialstore.presentation.views.stock.add.StockItemDetail
 import io.github.jan.supabase.SupabaseClient
-import kotlinx.coroutines.selects.select
 import javax.inject.Inject
 
 class StockRepository @Inject constructor(private val supabase: SupabaseClient, private val exceptionMapper: ExceptionMapper ){
@@ -110,7 +107,7 @@ class StockRepository @Inject constructor(private val supabase: SupabaseClient, 
                     .from(DatabaseTables.ITEM)
                     .select {
                         filter {
-                            eq("item_id", stock.itemId!!)
+                            eq("item_id", stock.itemId)
                         }
                     }
                     .decodeList<ItemModel>()

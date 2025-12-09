@@ -51,7 +51,6 @@ class ListAllItemsStockUseCase @Inject constructor(
 
 
             val auxList = mutableListOf<StockHelper>()
-
             if (currentStock != null && items.data != null) {
                 for (stock in currentStock){
                     var itemResult : ItemModel? = null
@@ -78,6 +77,7 @@ class ListAllItemsStockUseCase @Inject constructor(
                             //caso item ja tenha um stockHelper(2 data de validade)
                             //adicona nova data e quantidade ao map do helper
                             existHelper.expirationDate[stock.quantity] = stock.expirationDate
+                            existHelper.quantity += stock.quantity
                         }else{
                             //cria um novo stockHelper para o item
                             val dateMap = mutableMapOf<Int, String>()

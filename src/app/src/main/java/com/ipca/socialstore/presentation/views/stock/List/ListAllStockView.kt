@@ -1,47 +1,40 @@
-package com.ipca.socialstore.presentation.views.stock.add
+package com.ipca.socialstore.presentation.views.stock.List
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material3.Card
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.ipca.socialstore.data.models.StockHelper
+import com.ipca.socialstore.presentation.routes.AdminRoutes
 
 import com.ipca.socialstore.ui.theme.SocialStoreTheme
 
 @Composable
-fun GetAllStockView(modifier: Modifier, navController: NavController){
+fun GetAllStockView(modifier: Modifier, navController: NavController, viewModel: ListAllStockViewModel){
 
-    val viewModel : ListAllStockViewModel = hiltViewModel()
     val uiState by viewModel.uiState
     LaunchedEffect(Unit) {
         viewModel.getAllStock()
-        println(uiState.stock)
     }
     GetAllStockViewContent(
         modifier,
         uiState,
-        onItemClick = { value -> viewModel.selectStock(value)
-        navController.navigate("stock_detail")}
+        navController,
+        onItemClick = { value -> viewModel.selectStock(value) }
+
     )
 }
 
@@ -49,6 +42,7 @@ fun GetAllStockView(modifier: Modifier, navController: NavController){
 fun GetAllStockViewContent(
     modifier: Modifier,
     uiState: GetStockState,
+    navController : NavController,
     onItemClick :(StockHelper) -> Unit
 ) {
     Column(
@@ -62,6 +56,9 @@ fun GetAllStockViewContent(
             ) { index, stockHelper ->
                 SingleItemStock(
                     modifier = Modifier,
+                    onClick = {onItemClick(stockHelper)
+                               navController.navigate(AdminRoutes.SelectStock)
+                        },
                     uiState = stockHelper,
                 )
             }
@@ -71,26 +68,25 @@ fun GetAllStockViewContent(
 
 @Composable
 fun SingleItemStock(
-    modifier: Modifier,
-    uiState: StockHelper
-){
-    Column(
-        modifier = Modifier.padding(18.dp)
+    modifier: Modifier = Modifier,
+    uiState: StockHelper,
+    onClick: () -> Unit
+) {
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(12.dp)
+            .clickable { onClick() }
     ) {
+        Column(modifier = Modifier.padding(12.dp)) {
+            Text("Nome: ${uiState.item.name}")
+            Text("Tipo: ${uiState.item.itemType}")
+            Text("Qtd: ${uiState.quantity}")
 
-        Text(text = "Nome : ${uiState.item.name}")
-        Text(text = "Tipo Item : ${uiState.item.itemType}")
-        Text(text = "Quantidade Total: ${uiState.quantity}")
-
-        Spacer(modifier = Modifier.height(6.dp))
-
-        Text(text = "Datas de Validade:", fontWeight = FontWeight.Bold)
-
-        uiState.expirationDate.forEach { (qty, date) ->
-            Text(text = " - Quantidade: $qty | Validade: $date")
         }
     }
 }
+
 
 @Preview(showBackground = true)
 @Composable
@@ -98,7 +94,7 @@ fun SingleItemStock(
 fun PreviewGetAllStock(){
     SocialStoreTheme() {
         val uiState = GetStockState(null,null,false,null)
-        GetAllStockViewContent(Modifier,uiState, onItemClick = { Unit})
+        GetAllStockViewContent(Modifier,uiState, onItemClick = { Unit}, navController = rememberNavController())
     }
 }
 
