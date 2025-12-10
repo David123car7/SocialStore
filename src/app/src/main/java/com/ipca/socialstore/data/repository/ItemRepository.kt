@@ -70,7 +70,7 @@ class ItemRepository @Inject constructor(private val supabase : SupabaseClient, 
             val items = supabase.from(DatabaseTables.ITEM)
                 .select {
                     filter {
-                        isIn("id", listId) // ⚡ The Magic Operator
+                        isIn("id", listId)
                     }
                 }
                 .decodeList<ItemModel>()

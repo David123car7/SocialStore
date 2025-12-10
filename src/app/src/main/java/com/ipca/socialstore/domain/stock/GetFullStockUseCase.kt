@@ -6,7 +6,7 @@ import com.ipca.socialstore.data.resultwrappers.ResultWrapper
 import javax.inject.Inject
 
 class GetFullStockUseCase @Inject constructor(private val stockRepository: StockRepository){
-    suspend operator fun invoke() : ResultWrapper<List<StockModel>?>{
+    suspend operator fun invoke() : ResultWrapper<List<StockModel>>{
         return stockRepository.getFullStock()
     }
 }
