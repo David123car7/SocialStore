@@ -6,6 +6,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class CampaignModel(
+    val id: Int? = null,
+
     @SerialName("name")
     val name : String,
 

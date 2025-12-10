@@ -56,7 +56,7 @@ class ListAllItemsStockUseCase @Inject constructor(
                     var itemResult : ItemModel? = null
 
                     for (item in items.data){
-                        if (stock.itemId  == item.itemId){
+                        if (stock.itemId  == item.id){
                             itemResult = item
 
                             break
@@ -68,7 +68,7 @@ class ListAllItemsStockUseCase @Inject constructor(
                         var existHelper: StockHelper? = null
                         // ve se o item ja esta na lista de StockHelper
                         for (helper in auxList){
-                            if (helper.item.itemId == itemResult.itemId){
+                            if (helper.item.id == itemResult.id){
                                 existHelper = helper
                                 break
                             }
@@ -87,7 +87,7 @@ class ListAllItemsStockUseCase @Inject constructor(
                                 StockHelper(
                                     item = itemResult,
                                     quantity = stock.quantity,
-                                    stockId = stock.stockId!!,
+                                    stockId = stock.id!!,
                                     expirationDate = dateMap
                                 )
                             )
@@ -102,7 +102,7 @@ class ListAllItemsStockUseCase @Inject constructor(
 
             for (item in auxList){
 
-                val currentId = item.item.itemId
+                val currentId = item.item.id
 
                 if (checkId.contains(currentId)){
                     continue
@@ -111,12 +111,12 @@ class ListAllItemsStockUseCase @Inject constructor(
                 var quantity = 0
                 var date = mutableMapOf<Int, String>()
                 for (item2 in auxList){
-                    if (currentId == item2.item.itemId){
+                    if (currentId == item2.item.id){
                         quantity += item2.quantity
 
                     }
                 }
-                checkId.add(currentId)
+                checkId.add(currentId ?: 0) //rever
 
                 finalList.add(
                     StockHelper(

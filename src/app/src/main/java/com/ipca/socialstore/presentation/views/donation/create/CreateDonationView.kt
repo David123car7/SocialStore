@@ -18,8 +18,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.ipca.socialstore.data.models.DonationItemModel
-import com.ipca.socialstore.data.models.DonationModelCreation
-import com.ipca.socialstore.data.models.ItemModelCreation
 import com.ipca.socialstore.data.models.StockModel
 import com.ipca.socialstore.ui.theme.SocialStoreTheme
 
@@ -96,7 +94,7 @@ fun CreateDonationViewContent(
                 modifier = Modifier.padding(8.dp),
                 onValueChange = {value -> onUpdateQuantity(value)})
 
-            TextField(value = uiState.stock.expirationDate,
+            TextField(value = uiState.expirationDate,
                 label = {Text("Data Validade")},
                 modifier = Modifier.padding(8.dp),
                 onValueChange = {value -> onUpdateExpiration(value)})
@@ -114,14 +112,8 @@ fun CreateDonationViewContent(
 
 @Preview(showBackground = true)
 @Composable
-fun PreviewCreateDonation() {
-    SocialStoreTheme() {
-        val donation = DonationModelCreation("")
-        val item = ItemModelCreation("", "")
-        val stock = StockModel(0, "", 0,0)
-        val donationItem = DonationItemModel(0, 0)
-        val uiState =
-            DonationState(donation = donation, item, stock, donationItem, 0, null, false, false)
+fun PreviewCreateDonation() { //falta uistate
+    SocialStoreTheme() {/*
         CreateDonationViewContent(
             Modifier,
             uiState,
@@ -130,6 +122,6 @@ fun PreviewCreateDonation() {
             onUpdateQuantity = { Unit},
             onUpdateExpiration = { Unit},
             onUpdateItemType = { Unit},
-            onUpdateName = { Unit},)
+            onUpdateName = { Unit},)*/
     }
 }

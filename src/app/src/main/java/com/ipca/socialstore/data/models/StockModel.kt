@@ -6,6 +6,8 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class StockModel(
 
+    val id: Int? = null,
+
     @SerialName("item_id")
     val itemId : Int,
 
@@ -14,9 +16,6 @@ data class StockModel(
 
     @SerialName("quantity")
     val quantity : Int,
-
-    @SerialName("stock_id")
-    val stockId : Int? = null
 )
 
 fun StockModel.isValid() : Boolean{

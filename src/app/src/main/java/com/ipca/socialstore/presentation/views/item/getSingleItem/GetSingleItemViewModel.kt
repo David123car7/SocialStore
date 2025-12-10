@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ipca.socialstore.data.models.ItemModel
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
-import com.ipca.socialstore.domain.item.GetItemUseCase
+import com.ipca.socialstore.domain.item.GetItemByIdUseCase
 import com.ipca.socialstore.presentation.utils.ErrorText
 import com.ipca.socialstore.presentation.utils.asUiText
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -13,19 +13,21 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class GetItemState(
-    val item : ItemModel? = ItemModel("","",0),
+    val item : ItemModel? = null,
     val isLoading : Boolean = false,
     val error: ErrorText? = null,
-    val itemId : String? = null
+    val itemId : Int = 0
 )
 @HiltViewModel
-class GetSingleItemViewModel @Inject constructor(private val getItemUseCase: GetItemUseCase): ViewModel(){
+class GetSingleItemViewModel @Inject constructor(private val getItemByIdUseCase: GetItemByIdUseCase): ViewModel(){
 
     val uiState = mutableStateOf(GetItemState())
 
-    fun updateSearchId(itemId : String){
+    fun updateSearchId(value : String){
+        val newValue = value.toIntOrNull() ?: return
+
         uiState.value = uiState.value.copy(
-            itemId = itemId
+            itemId = newValue
         )
     }
 
@@ -38,7 +40,7 @@ class GetSingleItemViewModel @Inject constructor(private val getItemUseCase: Get
         )
 
         viewModelScope.launch {
-            val result = getItemUseCase(uiState.value.itemId ?: "")
+            val result = getItemByIdUseCase(uiState.value.itemId)
             when(result){
                 is ResultWrapper.Success -> {
                     uiState.value = uiState.value.copy(

@@ -50,7 +50,6 @@ class ListAllStockViewModel @Inject constructor(private val listAllItemsStockUse
                         isEditing = false,
                         items = result.data
                     )
-
                 }
                 is ResultWrapper.Error -> {
                     uiState.value = uiState.value.copy(

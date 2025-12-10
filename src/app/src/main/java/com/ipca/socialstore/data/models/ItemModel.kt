@@ -5,15 +5,13 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class ItemModel(
+    val id: Int? = null,
+
     @SerialName("name")
     val name : String,
 
     @SerialName("item_type")
     val itemType : String,
-
-    @SerialName("item_id")
-    val itemId : Int
-
 )
 
 fun ItemModel.isValid() : Boolean{

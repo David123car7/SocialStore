@@ -1,6 +1,8 @@
 package com.ipca.socialstore.data.repository
 
 import com.ipca.socialstore.data.enums.DatabaseTables
+import com.ipca.socialstore.data.enums.UnknownError
+import com.ipca.socialstore.data.exceptions.AppError
 import com.ipca.socialstore.data.exceptions.ExceptionMapper
 import com.ipca.socialstore.data.helpers.from
 import com.ipca.socialstore.data.models.ItemModel
@@ -11,89 +13,92 @@ import javax.inject.Inject
 
 class StockRepository @Inject constructor(private val supabase: SupabaseClient, private val exceptionMapper: ExceptionMapper ){
 
-    suspend fun addItemStock(item : StockModel, quantity: Int) : ResultWrapper<StockModel> {
+    suspend fun addStock(stock : StockModel) : ResultWrapper<Int> {
         return try {
-            val newStock = StockModel(
-                stockId = null,
-                itemId = item.itemId,
-                quantity = quantity,
-                expirationDate = item.expirationDate
-            )
-            val stock = supabase.from(DatabaseTables.STOCK)
-                .insert(newStock){
+            val stockResult = supabase.from(DatabaseTables.STOCK)
+                .insert(stock){
                     select()
                 }
-                .decodeSingle<StockModel>()
-            ResultWrapper.Success(stock)
+                .decodeSingleOrNull<StockModel>()
+            if(stockResult == null) return ResultWrapper.Error(AppError.DataNotCreated)
+            if(stockResult.id == null) return ResultWrapper.Error(AppError.UnknownError(UnknownError.NULL_ID.errorMessage))
+            ResultWrapper.Success(stockResult.id)
         }
         catch (e : Exception){
             ResultWrapper.Error(exceptionMapper.map(e))
         }
     }
 
-    suspend fun getItemByIdStock(item : StockModel) : ResultWrapper<StockModel?> {
+    suspend fun getStockByItemInfo(id: Int, expirationDate: String) : ResultWrapper<StockModel> {
         return try {
-            val stock = supabase.from(DatabaseTables.STOCK)
+            val stockResult = supabase.from(DatabaseTables.STOCK)
                 .select{
                     filter {
-                        eq("item_id", item.itemId)
-                        eq("expiration_date", item.expirationDate)
+                        eq("item_id", id)
+                        eq("expiration_date", expirationDate)
                     }
                 }
-
                 .decodeSingleOrNull<StockModel>()
-            ResultWrapper.Success(stock)
+            if(stockResult == null) return ResultWrapper.Error(AppError.DataNotFound)
+            ResultWrapper.Success(stockResult)
         }
         catch (e : Exception){
             ResultWrapper.Error(exceptionMapper.map(e))
         }
     }
 
-    suspend fun getItemQuantity(item : StockModel) : ResultWrapper<StockModel>{
+    suspend fun getItemQuantity(itemId : Int) : ResultWrapper<Int>{
         return try {
-            val quantity = supabase.from(DatabaseTables.STOCK)
+            val stock = supabase.from(DatabaseTables.STOCK)
                 .select {
                     filter {
-                        eq("item_id", item.itemId)
+                        eq("item_id", itemId)
                     }
-            }
-                .decodeSingle<StockModel>()
-            ResultWrapper.Success(quantity)
+                }.decodeSingleOrNull<StockModel>()
+            if(stock == null) return ResultWrapper.Error(AppError.DataNotFound)
+            ResultWrapper.Success(stock.quantity)
         }catch (e : Exception){
             ResultWrapper.Error(exceptionMapper.map(e))
         }
     }
-    suspend fun updateStock(item: StockModel, quantity: Int): ResultWrapper<Boolean> {
+    suspend fun updateStock(itemId: Int, quantity: Int): ResultWrapper<Int> {
         return try {
-            val getStock = getItemQuantity(item)
-            val bdQuantity = getStock.data?.quantity ?: 0
+            val getStock = getItemQuantity(itemId)
+            if(getStock is ResultWrapper.Error) return ResultWrapper.Error(getStock.error)
+            val bdQuantity = (getStock as ResultWrapper.Success).data
             val newQuantity = bdQuantity + quantity
 
-            val result = supabase.from(DatabaseTables.STOCK)
+            val stockResult = supabase.from(DatabaseTables.STOCK)
                 .update(mapOf("quantity" to newQuantity)) {
                     filter {
-                        eq("item_id", item.itemId)
-                        eq("expiration_date", item.expirationDate)
+                        eq("item_id", itemId)
                     }
-                }
-            ResultWrapper.Success(true)
+                    select()
+                }.decodeSingleOrNull<StockModel>()
 
+            if(stockResult == null) return ResultWrapper.Error(AppError.DataNotUpdated)
+            if(stockResult.id == null) return ResultWrapper.Error(AppError.UnknownError(UnknownError.NULL_ID.errorMessage))
+            ResultWrapper.Success(stockResult.id)
         } catch (e: Exception) {
             ResultWrapper.Error(exceptionMapper.map(e))
         }
     }
 
-    suspend fun updateQuantityInStock(stockId :Int, newQuantity: Int) : ResultWrapper<Boolean>{
+    suspend fun updateQuantityInStock(stockId :Int, newQuantity: Int) : ResultWrapper<Int>{
         return try {
-            val result = supabase.from(DatabaseTables.STOCK)
+            val stockResult = supabase.from(DatabaseTables.STOCK)
                 .update(mapOf("quantity" to newQuantity)) {
                     filter { eq("stock_id", stockId) }
-                }
-            ResultWrapper.Success(true)
+                    select()
+                }.decodeSingleOrNull<StockModel>()
+            if(stockResult == null) return ResultWrapper.Error(AppError.DataNotUpdated)
+            if(stockResult.id == null) return ResultWrapper.Error(AppError.UnknownError(UnknownError.NULL_ID.errorMessage))
+            ResultWrapper.Success(stockResult.id)
         }catch (e : Exception){
             ResultWrapper.Error(exceptionMapper.map(e))
         }
     }
+
     suspend fun getFullStock(): ResultWrapper<List<StockModel>?> {
         return try {
             val stock = supabase
@@ -131,8 +136,5 @@ class StockRepository @Inject constructor(private val supabase: SupabaseClient, 
             ResultWrapper.Error(exceptionMapper.map(e))
         }
     }
-
-
-
 }
 

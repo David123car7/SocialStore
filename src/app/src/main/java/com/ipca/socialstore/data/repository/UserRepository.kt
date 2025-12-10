@@ -1,6 +1,7 @@
 package com.ipca.socialstore.data.repository
 
 import com.ipca.socialstore.data.enums.DatabaseTables
+import com.ipca.socialstore.data.enums.UnknownError
 import com.ipca.socialstore.data.enums.UserRole
 import com.ipca.socialstore.data.exceptions.AppError
 import com.ipca.socialstore.data.exceptions.ExceptionMapper
@@ -52,23 +53,10 @@ class UserRepository @Inject constructor(private val supabase: SupabaseClient, p
         }
     }
 
-    private suspend fun getUser(uid: String): ResultWrapper<UserModel>{
+    suspend fun getUserApplicationId(uid: String): ResultWrapper<Int>{
         return try {
-            val user = supabase.from(DatabaseTables.USER).select(columns = Columns.list()){
-                filter { eq("uid", uid) }
-            }.decodeSingle<UserModel>()
-            ResultWrapper.Success(user)
-        }
-        catch (e: Exception) {
-            ResultWrapper.Error(exceptionMapper.map(e))
-        }
-    }
-
-    suspend fun getUserApplicationId(uid: String): ResultWrapper<Int?>{
-        return try {
-            val user = supabase.from(DatabaseTables.USER).select(columns = Columns.list()){
-                filter { eq("uid", uid) }
-            }.decodeSingle<UserModel>()
+            val user = getUser(uid = uid) ?: return ResultWrapper.Error(AppError.UserNotFound)
+            user.applicationId ?: return ResultWrapper.Error(AppError.UnknownError(UnknownError.NULL_ID.errorMessage))
             ResultWrapper.Success(user.applicationId)
         }
         catch (e: Exception) {
@@ -78,7 +66,7 @@ class UserRepository @Inject constructor(private val supabase: SupabaseClient, p
 
     suspend fun setUserApplicationId(uid: String, id: Int): ResultWrapper<Boolean>{
         return try {
-            val user = getUser(uid = uid).data ?: return ResultWrapper.Error(AppError.UserNotFound)
+            val user = getUser(uid = uid) ?: return ResultWrapper.Error(AppError.UserNotFound)
 
             val newUser = user.copy(applicationId = id)
             supabase.from(DatabaseTables.USER).update(newUser) {
@@ -90,5 +78,13 @@ class UserRepository @Inject constructor(private val supabase: SupabaseClient, p
         catch (e: Exception) {
             ResultWrapper.Error(exceptionMapper.map(e))
         }
+    }
+
+    //Must be private
+    private suspend fun getUser(uid: String): UserModel?{
+        val user = supabase.from(DatabaseTables.USER).select(columns = Columns.list()){
+            filter { eq("uid", uid) }
+        }.decodeList<UserModel>().firstOrNull()
+        return user
     }
 }

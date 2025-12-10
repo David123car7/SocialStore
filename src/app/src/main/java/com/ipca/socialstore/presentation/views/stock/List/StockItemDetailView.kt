@@ -100,17 +100,7 @@ fun StockItemDetail(
 @Composable
 fun StockItemDetailPreview() {
     SocialStoreTheme {
-        val item = ItemModel("", "", 0)
-        val date: MutableMap<Int, String> = mutableMapOf()
-        val uiState = StockHelper(item, 0, 0,date)
-        val editState = GetStockState(null,null,false,null,false)
 
-        StockItemDetail(
-            modifier = Modifier,
-            uiState = uiState,
-            onClickEdit = { Unit},
-
-        )
     }
 }
 

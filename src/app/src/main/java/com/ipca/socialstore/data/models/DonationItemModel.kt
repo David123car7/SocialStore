@@ -5,6 +5,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class DonationItemModel(
+    val id: Int? = null,
+
     @SerialName("item_id")
     val itemId : Int,
 

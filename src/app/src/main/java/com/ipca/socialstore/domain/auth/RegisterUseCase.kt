@@ -27,20 +27,14 @@ class RegisterUseCase @Inject constructor(
             return ResultWrapper.Error(AppError.InvalidEmailDomain)
 
         val registerResult = authRepository.register(email = email, password = password)
-        if(registerResult is ResultWrapper.Error){
-            return ResultWrapper.Error(error = registerResult.error)
-        }
-        if(registerResult.data == null)
-            return ResultWrapper.Error(error = AppError.UserNotFound)
-
+        if(registerResult is ResultWrapper.Error) return ResultWrapper.Error(error = registerResult.error)
+        val newUserId = (registerResult as ResultWrapper.Success).data
 
         val profileResult = profileRepository.createProfile(profile = profile)
-        if(profileResult is ResultWrapper.Error)
-            return ResultWrapper.Error<Boolean>(error = profileResult.error)
-        if(profileResult.data == null)
-            return ResultWrapper.Error(error = AppError.ErroCreatingTable(R.string.table_profile))
+        if(profileResult is ResultWrapper.Error) return ResultWrapper.Error<Boolean>(error = profileResult.error)
+        val profileId = (profileResult as ResultWrapper.Success).data
 
-        val user = UserModel(uid = registerResult.data, role = UserRole.DEFAULT.value, profileId = profileResult.data, applicationId = null)
+        val user = UserModel(uid = newUserId, role = UserRole.DEFAULT.value, profileId = profileId, applicationId = null)
 
         return userRepository.createUser(user)
     }

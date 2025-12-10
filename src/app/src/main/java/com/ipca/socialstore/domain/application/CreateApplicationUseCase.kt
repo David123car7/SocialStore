@@ -21,24 +21,17 @@ class CreateApplicationUseCase @Inject constructor(
     private val userRepository: UserRepository,
     private val applicationStateRepository: ApplicationStateRepository) {
     suspend operator fun invoke(applicationModel: ApplicationModel, academicModel: AcademicModel?): ResultWrapper<Boolean> {
-        val email = authRepository.getUserEmail()
-        val uid = authRepository.getUserUid()
+        val emailResult = authRepository.getUserEmail()
+        if (emailResult is ResultWrapper.Error) return ResultWrapper.Error(emailResult.error)
 
-        if(email is ResultWrapper.Error)
-            return ResultWrapper.Error(email.error)
+        val uidResult = authRepository.getUserUid()
+        if (uidResult is ResultWrapper.Error) return ResultWrapper.Error(uidResult.error)
 
-        if(uid is ResultWrapper.Error)
-            return ResultWrapper.Error(uid.error)
+        val email = (emailResult as ResultWrapper.Success).data
+        val uid = (uidResult as ResultWrapper.Success).data
 
-        if(email.data == null || uid.data == null){
-            return ResultWrapper.Error(AppError.UserNotLoggedIn)
-        }
-
-        val userApplicationId = userRepository.getUserApplicationId(uid = uid.data)
-        if(userApplicationId is ResultWrapper.Error)
-            return ResultWrapper.Error(userApplicationId.error)
-
-        if(userApplicationId.data != null)
+        val userApplicationId = userRepository.getUserApplicationId(uid = uidResult.data)
+        if(userApplicationId is ResultWrapper.Success)
             return ResultWrapper.Error(AppError.ApplicationAllreadyExists)
 
         //Application Checks
@@ -72,35 +65,24 @@ class CreateApplicationUseCase @Inject constructor(
             if(academicModel.studenNumber.isEmpty())
                 return ResultWrapper.Error(AppError.EmptyField(R.string.student_number))
 
-            val academic = academicRepository.createAcademic(academicModel = academicModel)
-            if(academic is ResultWrapper.Error){
-                return ResultWrapper.Error(academic.error)
-            }
+            val academicResult = academicRepository.createAcademic(academicModel = academicModel)
 
-            if(academic.data == null){
-                return ResultWrapper.Error(AppError.ErroCreatingTable(R.string.table_academic))
-            }
-
-            academicID = academic.data
+            if(academicResult is ResultWrapper.Error) return ResultWrapper.Error(academicResult.error)
+            if (academicResult is ResultWrapper.Success) academicID = academicResult.data
         }
 
-        val applicationState = applicationStateRepository.createApplicationState(applicationState = ApplicationStateModel(state = ApplicationStatus.PENDING.value))
-        if(applicationState is ResultWrapper.Error)
-            return ResultWrapper.Error(applicationState.error)
+        val applicationStateResult = applicationStateRepository.createApplicationState(applicationState = ApplicationStateModel(state = ApplicationStatus.PENDING.value))
 
-        if(applicationState.data == null){
-            return ResultWrapper.Error(AppError.ErroCreatingTable(R.string.table_application_state))
-        }
+        if(applicationStateResult is ResultWrapper.Error) return ResultWrapper.Error(applicationStateResult.error)
+        val stateId = (applicationStateResult as ResultWrapper.Success).data
 
-        val application = applicationRepository.createApplication(
-            applicationModel.copy(stateId = applicationState.data, academicId = academicID, email = email.data)
+        val applicationResult = applicationRepository.createApplication(
+            applicationModel.copy(stateId = stateId, academicId = academicID, email = email)
         )
 
-        if(application is ResultWrapper.Error)
-            return ResultWrapper.Error(application.error)
-        if(application.data == null)
-            return ResultWrapper.Error(AppError.ErroCreatingTable(R.string.table_application))
+        if(applicationResult is ResultWrapper.Error) return ResultWrapper.Error(applicationResult.error)
+        val applicationId = (applicationResult as ResultWrapper.Success).data
 
-        return userRepository.setUserApplicationId(uid = uid.data, application.data)
+        return userRepository.setUserApplicationId(uid = uid, id = applicationId)
     }
 }

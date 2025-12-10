@@ -120,13 +120,6 @@ fun EditButton(
 @Composable
 fun Preview(){
     SocialStoreTheme() {
-        val item = ItemModel("Teste","",0)
-        val date :MutableMap<Int, String> = mutableMapOf()
-        val stock = StockHelper(item,0,0,date)
-        val uiState = EditState(stock,null,null,false,false)
-        EditStockContent(
-            modifier = Modifier,
-            uiState = uiState
-        )
+
     }
 }
