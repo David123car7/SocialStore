@@ -16,7 +16,7 @@ class RegisterUseCase @Inject constructor(
     private val authRepository: AuthRepository,
     private val userRepository: UserRepository,
     private val profileRepository: ProfileRepository) {
-    suspend operator fun invoke(email: String, password: String, profile: ProfileModel): ResultWrapper<Boolean> {
+    suspend operator fun invoke(email: String, password: String, profile: ProfileModel): ResultWrapper<Int> {
         if(email.isEmpty())
             return ResultWrapper.Error(AppError.InvalidEmail)
 
@@ -31,7 +31,7 @@ class RegisterUseCase @Inject constructor(
         val newUserId = (registerResult as ResultWrapper.Success).data
 
         val profileResult = profileRepository.createProfile(profile = profile)
-        if(profileResult is ResultWrapper.Error) return ResultWrapper.Error<Boolean>(error = profileResult.error)
+        if(profileResult is ResultWrapper.Error) return ResultWrapper.Error(error = profileResult.error)
         val profileId = (profileResult as ResultWrapper.Success).data
 
         val user = UserModel(uid = newUserId, role = UserRole.DEFAULT.value, profileId = profileId, applicationId = null)

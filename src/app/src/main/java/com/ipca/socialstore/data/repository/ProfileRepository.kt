@@ -7,8 +7,10 @@ import com.ipca.socialstore.data.exceptions.AppError
 import com.ipca.socialstore.data.exceptions.ExceptionMapper
 import com.ipca.socialstore.data.helpers.from
 import com.ipca.socialstore.data.models.ProfileModel
+import com.ipca.socialstore.data.models.TableIdModel
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
 import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.postgrest.query.Columns
 import javax.inject.Inject
 
 class ProfileRepository @Inject constructor(
@@ -18,10 +20,9 @@ class ProfileRepository @Inject constructor(
     suspend fun createProfile(profile: ProfileModel): ResultWrapper<Int>{
         return try {
             val profile = supabase.from(DatabaseTables.PROFILE).insert(profile){
-                select()
-            }.decodeAsOrNull<ProfileModel>()
+                select(columns = Columns.list("id"))
+            }.decodeAsOrNull<TableIdModel>()
             if(profile == null) return ResultWrapper.Error(AppError.DataNotCreated)
-            if(profile.id == null) return ResultWrapper.Error(AppError.UnknownError(UnknownError.NULL_ID.errorMessage))
             ResultWrapper.Success(profile.id)
         }
         catch (e: Exception) {

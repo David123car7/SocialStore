@@ -20,7 +20,7 @@ class CreateApplicationUseCase @Inject constructor(
     private val authRepository: AuthRepository,
     private val userRepository: UserRepository,
     private val applicationStateRepository: ApplicationStateRepository) {
-    suspend operator fun invoke(applicationModel: ApplicationModel, academicModel: AcademicModel?): ResultWrapper<Boolean> {
+    suspend operator fun invoke(applicationModel: ApplicationModel, academicModel: AcademicModel?): ResultWrapper<String> {
         val emailResult = authRepository.getUserEmail()
         if (emailResult is ResultWrapper.Error) return ResultWrapper.Error(emailResult.error)
 

@@ -60,7 +60,6 @@ class ListAllItemsStockUseCase @Inject constructor(
 
             ResultWrapper.Success(stockReveiverList)
         } catch (e: Exception) {
-            e.printStackTrace() // Print full stack trace to see the real crash line
             ResultWrapper.Error(exceptionMapper.map(e))
         }
     }

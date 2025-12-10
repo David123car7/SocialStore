@@ -19,6 +19,7 @@ class StorageRepository @Inject constructor(
     private val supabaseClient: SupabaseClient,
     private val exceptionMapper: ExceptionMapper,
     @ApplicationContext private val context: Context){
+
     suspend fun uploadApplicationDocuments(uris: List<Uri>): ResultWrapper<List<String>>{
         val uploadedPaths = mutableListOf<String>()
 

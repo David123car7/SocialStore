@@ -7,6 +7,6 @@ import javax.inject.Inject
 
 class GetItemsFromStockUseCase @Inject constructor(private val itemRepository: ItemRepository){
     suspend operator fun invoke(list : List<Int> ): ResultWrapper<List<ItemModel>>{
-        return itemRepository.getItemIdList(list)
+        return itemRepository.getListItemsById(list)
     }
 }

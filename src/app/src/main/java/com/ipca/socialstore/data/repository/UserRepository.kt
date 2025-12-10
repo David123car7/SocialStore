@@ -6,6 +6,7 @@ import com.ipca.socialstore.data.enums.UserRole
 import com.ipca.socialstore.data.exceptions.AppError
 import com.ipca.socialstore.data.exceptions.ExceptionMapper
 import com.ipca.socialstore.data.helpers.from
+import com.ipca.socialstore.data.models.TableIdModel
 import com.ipca.socialstore.data.models.UserModel
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
 import io.github.jan.supabase.SupabaseClient
@@ -43,10 +44,13 @@ class UserRepository @Inject constructor(private val supabase: SupabaseClient, p
         }
     }
 
-    suspend fun createUser(user: UserModel): ResultWrapper<Boolean>{
+    suspend fun createUser(user: UserModel): ResultWrapper<Int>{
         return try {
-            supabase.from(DatabaseTables.USER).insert(user)
-            ResultWrapper.Success(true)
+            val userResult = supabase.from(DatabaseTables.USER).insert(user){
+                select(columns = Columns.list("id"))
+            }.decodeSingleOrNull<TableIdModel>()
+            if(userResult == null) return ResultWrapper.Error(AppError.DataNotCreated)
+            ResultWrapper.Success(userResult.id)
         }
         catch (e: Exception) {
             ResultWrapper.Error(exceptionMapper.map(e))
@@ -64,7 +68,7 @@ class UserRepository @Inject constructor(private val supabase: SupabaseClient, p
         }
     }
 
-    suspend fun setUserApplicationId(uid: String, id: Int): ResultWrapper<Boolean>{
+    suspend fun setUserApplicationId(uid: String, id: Int): ResultWrapper<String>{
         return try {
             val user = getUser(uid = uid) ?: return ResultWrapper.Error(AppError.UserNotFound)
 
@@ -73,7 +77,7 @@ class UserRepository @Inject constructor(private val supabase: SupabaseClient, p
                 filter { eq("uid", uid) }
             }
 
-            ResultWrapper.Success(true)
+            ResultWrapper.Success(uid)
         }
         catch (e: Exception) {
             ResultWrapper.Error(exceptionMapper.map(e))

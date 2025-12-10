@@ -6,8 +6,10 @@ import com.ipca.socialstore.data.exceptions.AppError
 import com.ipca.socialstore.data.exceptions.ExceptionMapper
 import com.ipca.socialstore.data.helpers.from
 import com.ipca.socialstore.data.models.ApplicationStateModel
+import com.ipca.socialstore.data.models.TableIdModel
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
 import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.postgrest.query.Columns
 import javax.inject.Inject
 
 class ApplicationStateRepository @Inject constructor(
@@ -16,17 +18,11 @@ class ApplicationStateRepository @Inject constructor(
 
     suspend fun createApplicationState(applicationState: ApplicationStateModel) : ResultWrapper<Int> {
         return try {
-            val state = supabaseClient.from(DatabaseTables.APPLICATION_STATE).insert(applicationState){
-                select()
-            }.decodeList<ApplicationStateModel>().firstOrNull()
-
-            if(state == null)
-                return ResultWrapper.Error(AppError.DataNotCreated)
-
-            val id = state.id
-                ?: return ResultWrapper.Error(AppError.UnknownError(UnknownError.NULL_ID.errorMessage))
-
-            ResultWrapper.Success(state.id)
+            val stateResult = supabaseClient.from(DatabaseTables.APPLICATION_STATE).insert(applicationState){
+                select(columns = Columns.list("id"))
+            }.decodeSingleOrNull<TableIdModel>()
+            if(stateResult == null) return ResultWrapper.Error(AppError.DataNotCreated)
+            ResultWrapper.Success(stateResult.id)
         } catch (e : Exception){
             ResultWrapper.Error(exceptionMapper.map(e))
         }
