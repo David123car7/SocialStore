@@ -5,7 +5,7 @@ import android.net.Uri
 import com.ipca.socialstore.R
 import com.ipca.socialstore.data.enums.DatabaseTables
 import com.ipca.socialstore.data.enums.StorageBucket
-import com.ipca.socialstore.data.enums.UnknownErrors
+import com.ipca.socialstore.data.enums.UnknownError
 import com.ipca.socialstore.data.exceptions.AppError
 import com.ipca.socialstore.data.exceptions.ExceptionMapper
 import com.ipca.socialstore.data.helpers.from
@@ -36,7 +36,7 @@ class ApplicationRepository @Inject constructor(
                 return ResultWrapper.Error(AppError.DataNotCreated)
 
             if(application.id == null)
-                return ResultWrapper.Error(AppError.UnknownError(UnknownErrors.NULL_ID.errorMessage))
+                return ResultWrapper.Error(AppError.UnknownError(UnknownError.NULL_ID.errorMessage))
 
             ResultWrapper.Success(application.id)
         } catch (e : Exception){

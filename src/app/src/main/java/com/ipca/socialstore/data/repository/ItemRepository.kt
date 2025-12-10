@@ -1,58 +1,63 @@
 package com.ipca.socialstore.data.repository
 
 import com.ipca.socialstore.data.enums.DatabaseTables
+import com.ipca.socialstore.data.enums.UnknownError
+import com.ipca.socialstore.data.exceptions.AppError
 import com.ipca.socialstore.data.helpers.from
 import com.ipca.socialstore.data.models.ItemModel
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
 import io.github.jan.supabase.SupabaseClient
 import javax.inject.Inject
 import com.ipca.socialstore.data.exceptions.ExceptionMapper
-import com.ipca.socialstore.data.models.ItemModelCreation
 
 
 class ItemRepository @Inject constructor(private val supabase : SupabaseClient, private val exceptionMapper: ExceptionMapper){
 
-    suspend fun createItem(item : ItemModelCreation) : ResultWrapper<ItemModel> {
+    suspend fun createItem(item : ItemModel) : ResultWrapper<Int> {
         return try {
-            val result = supabase.from(DatabaseTables.ITEM)
+            val itemResult = supabase.from(DatabaseTables.ITEM)
                 .insert(item){
                     select()
                 }
-                .decodeSingle<ItemModel>()
-            ResultWrapper.Success(result)
+                .decodeSingleOrNull<ItemModel>()
+            if(itemResult == null) return ResultWrapper.Error(AppError.DataNotCreated)
+            if(itemResult.id == null) return ResultWrapper.Error(AppError.UnknownError(UnknownError.NULL_ID.errorMessage))
+            ResultWrapper.Success(itemResult.id)
         }
         catch (e : Exception){
             ResultWrapper.Error(exceptionMapper.map(e))
         }
     }
 
-
-    suspend fun getItem(itemId : String) : ResultWrapper<ItemModel>{
+    suspend fun getItemById(id : Int) : ResultWrapper<ItemModel>{
         return try {
-            val item = supabase.from(DatabaseTables.ITEM)
+            val itemResult = supabase.from(DatabaseTables.ITEM)
                 .select {
                     filter {
-                        eq("item_id",itemId)
-                    }
-                }
-                .decodeSingle<ItemModel>()
-            ResultWrapper.Success(data = item)
-        }
-        catch (e : Exception){
-            ResultWrapper.Error(exceptionMapper.map(e))
-        }
-    }
-
-    suspend fun getItemByName(itemName : String) : ResultWrapper<ItemModel?>{
-        return try {
-            val item = supabase.from(DatabaseTables.ITEM)
-                .select {
-                    filter {
-                        eq("name",itemName)
+                        eq("id",id)
                     }
                 }
                 .decodeSingleOrNull<ItemModel>()
-            ResultWrapper.Success(data = item)
+            if(itemResult == null) return ResultWrapper.Error(AppError.DataNotFound)
+            ResultWrapper.Success(itemResult)
+        }
+        catch (e : Exception){
+            ResultWrapper.Error(exceptionMapper.map(e))
+        }
+    }
+
+    suspend fun getItemIdByName(name : String) : ResultWrapper<Int>{
+        return try {
+            val itemResult = supabase.from(DatabaseTables.ITEM)
+                .select {
+                    filter {
+                        eq("name",name)
+                    }
+                }
+                .decodeSingleOrNull<ItemModel>()
+            if(itemResult == null) return ResultWrapper.Error(AppError.DataNotFound)
+            if(itemResult.id == null) return ResultWrapper.Error(AppError.UnknownError(UnknownError.NULL_ID.errorMessage))
+            ResultWrapper.Success(itemResult.id)
         }
         catch (e : Exception){
             ResultWrapper.Error(exceptionMapper.map(e))
@@ -61,23 +66,15 @@ class ItemRepository @Inject constructor(private val supabase : SupabaseClient, 
 
     suspend fun getItemIdList(listId: List<Int>): ResultWrapper<List<ItemModel>> {
         return try {
-            val items = mutableListOf<ItemModel>()
-            val quantity = 0
-            for (id in listId) {
-                val item = supabase
-                    .from(DatabaseTables.ITEM)
-                    .select {
-                        filter {
-                            eq("item_id", id)
-                        }
+            if (listId.isEmpty()) return ResultWrapper.Success(emptyList())
+            val items = supabase.from(DatabaseTables.ITEM)
+                .select {
+                    filter {
+                        isIn("id", listId) // ⚡ The Magic Operator
                     }
-                    .decodeSingle<ItemModel>()
-
-                items.add(item)
-            }
-
+                }
+                .decodeList<ItemModel>()
             ResultWrapper.Success(items)
-
         } catch (e: Exception) {
             ResultWrapper.Error(exceptionMapper.map(e))
         }

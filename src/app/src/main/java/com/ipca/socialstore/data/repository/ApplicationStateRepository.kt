@@ -1,14 +1,12 @@
 package com.ipca.socialstore.data.repository
 
-import com.ipca.socialstore.R
 import com.ipca.socialstore.data.enums.DatabaseTables
-import com.ipca.socialstore.data.enums.UnknownErrors
+import com.ipca.socialstore.data.enums.UnknownError
 import com.ipca.socialstore.data.exceptions.AppError
 import com.ipca.socialstore.data.exceptions.ExceptionMapper
 import com.ipca.socialstore.data.helpers.from
 import com.ipca.socialstore.data.models.ApplicationStateModel
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
-import com.ipca.socialstore.presentation.views.application.ApplicationState
 import io.github.jan.supabase.SupabaseClient
 import javax.inject.Inject
 
@@ -26,7 +24,7 @@ class ApplicationStateRepository @Inject constructor(
                 return ResultWrapper.Error(AppError.DataNotCreated)
 
             val id = state.id
-                ?: return ResultWrapper.Error(AppError.UnknownError(UnknownErrors.NULL_ID.errorMessage))
+                ?: return ResultWrapper.Error(AppError.UnknownError(UnknownError.NULL_ID.errorMessage))
 
             ResultWrapper.Success(state.id)
         } catch (e : Exception){

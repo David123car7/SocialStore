@@ -46,7 +46,7 @@ fun GetSingleItemContent(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         TextField(
-            value = uiState.itemId ?: "",
+            value = uiState.itemId.toString(),
             label = {Text("Item Id")},
             modifier = Modifier.padding(8.dp),
             onValueChange = {value -> onUpdateItemId(value) }
@@ -85,8 +85,8 @@ fun SingleItem(
 @Composable
 fun PreviewGetSingleItem(){
     SocialStoreTheme() {
-        val item = ItemModel("","",0)
-        val uiState = GetItemState(item,false,null,"")
+        val item = ItemModel(name = "", itemType = "")
+        val uiState = GetItemState(item,false,null,0)
         GetSingleItemContent(
             modifier = Modifier,
             uiState = uiState,

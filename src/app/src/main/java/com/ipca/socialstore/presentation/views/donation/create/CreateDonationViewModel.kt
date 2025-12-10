@@ -4,8 +4,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ipca.socialstore.data.models.DonationItemModel
-import com.ipca.socialstore.data.models.DonationModelCreation
-import com.ipca.socialstore.data.models.ItemModelCreation
+import com.ipca.socialstore.data.models.DonationModel
+import com.ipca.socialstore.data.models.ItemModel
 import com.ipca.socialstore.data.models.StockModel
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
 import com.ipca.socialstore.domain.logic.AddDonationLogicUseCase
@@ -15,11 +15,11 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class DonationState(
-    val donation : DonationModelCreation = DonationModelCreation(""),
-    val item : ItemModelCreation = ItemModelCreation("",""),
-    val stock : StockModel = StockModel(0,"",0,0),
-    val donationItem : DonationItemModel = DonationItemModel(0,0),
-    val quantity: Int? = 0,
+    val donation : DonationModel = DonationModel(donationDate = "", campaignId = null),
+    val item : ItemModel = ItemModel(name = "", itemType = ""),
+    val donationItem : DonationItemModel = DonationItemModel(itemId = 0, donationId = 0),
+    val expirationDate: String = "",
+    val quantity: Int = 0,
     val error : ErrorText? = null,
     val isLoading : Boolean? = null,
     val isCreated : Boolean? = false,
@@ -66,11 +66,8 @@ class CreateDonationViewModel @Inject constructor(private val addDonationLogicUs
     //region Stock
 
     fun updateExpirationDate(date : String){
-        val stock = uiState.value.stock.copy(
-            expirationDate = date
-        )
         uiState.value = uiState.value.copy(
-            stock = stock
+            expirationDate = date
         )
     }
 
@@ -98,11 +95,11 @@ class CreateDonationViewModel @Inject constructor(private val addDonationLogicUs
         )
 
         viewModelScope.launch {
-            val item = uiState.value.item
-            val donation = uiState.value.donation
-            val stock = uiState.value.stock
-            val quantity = uiState.value.quantity ?: 0
-            val result = addDonationLogicUseCase(item, stock, quantity,donation)
+            val result = addDonationLogicUseCase(
+                item = uiState.value.item,
+                donation = uiState.value.donation,
+                expirationDate = uiState.value.expirationDate,
+                quantity = uiState.value.quantity)
             when(result){
                 is ResultWrapper.Success -> {
                     uiState.value = uiState.value.copy(

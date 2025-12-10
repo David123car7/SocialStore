@@ -5,12 +5,11 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class  DonationModel(
+    val id : Int? = null,
+
     @SerialName("donation_date")
     val donationDate : String,
 
     @SerialName("campaign_id")
-    val campaignId: String?,
-
-    @SerialName("donation_id")
-    val donationId : Int,
+    val campaignId: Int?,
 )

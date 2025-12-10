@@ -2,7 +2,7 @@ package com.ipca.socialstore.data.repository
 
 import com.ipca.socialstore.R
 import com.ipca.socialstore.data.enums.DatabaseTables
-import com.ipca.socialstore.data.enums.UnknownErrors
+import com.ipca.socialstore.data.enums.UnknownError
 import com.ipca.socialstore.data.exceptions.AppError
 import com.ipca.socialstore.data.exceptions.ExceptionMapper
 import com.ipca.socialstore.data.helpers.from
@@ -21,7 +21,7 @@ class ProfileRepository @Inject constructor(
                 select()
             }.decodeAsOrNull<ProfileModel>()
             if(profile == null) return ResultWrapper.Error(AppError.DataNotCreated)
-            if(profile.id == null) return ResultWrapper.Error(AppError.UnknownError(UnknownErrors.NULL_ID.errorMessage))
+            if(profile.id == null) return ResultWrapper.Error(AppError.UnknownError(UnknownError.NULL_ID.errorMessage))
             ResultWrapper.Success(profile.id)
         }
         catch (e: Exception) {

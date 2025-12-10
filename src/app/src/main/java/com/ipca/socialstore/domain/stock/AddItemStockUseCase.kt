@@ -1,25 +1,22 @@
 package com.ipca.socialstore.domain.stock
 
+import com.ipca.socialstore.data.exceptions.AppError
 import com.ipca.socialstore.data.models.StockModel
 import com.ipca.socialstore.data.repository.StockRepository
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
 import javax.inject.Inject
 
 class AddItemStockUseCase @Inject constructor(private val stockRepository: StockRepository){
-    suspend operator fun invoke(item : StockModel, quantity : Int) : ResultWrapper<StockModel?>{
-        return when(val stock = stockRepository.getItemByIdStock(item)){
+    suspend operator fun invoke(itemId: Int, expirationDate: String, quantity : Int) : ResultWrapper<Int>{
+        return when(val stockResult = stockRepository.getStockByItemInfo(id = itemId, expirationDate = expirationDate)){
             is ResultWrapper.Success ->{
-                println(stock.data)
-                if (stock.data != null){
-                    stockRepository.updateStock(item = item,quantity)
-                }else{
-                    stockRepository.addItemStock(item, quantity)
-                }
-                ResultWrapper.Success(stock.data)
-
+                return stockRepository.updateStock(itemId = itemId, quantity = quantity)
             }
             is ResultWrapper.Error ->{
-                ResultWrapper.Error(stock.error)
+                if(stockResult.error == AppError.DataNotFound)
+                    stockRepository.addStock(StockModel(itemId = itemId, expirationDate = expirationDate, quantity = quantity))
+                else
+                    return ResultWrapper.Error(stockResult.error)
             }
         }
     }

@@ -3,7 +3,7 @@ package com.ipca.socialstore.presentation.views.item
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ipca.socialstore.data.models.ItemModelCreation
+import com.ipca.socialstore.data.models.ItemModel
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
 import com.ipca.socialstore.domain.item.CreateItemUseCase
 import com.ipca.socialstore.presentation.utils.ErrorText
@@ -14,7 +14,7 @@ import javax.inject.Inject
 
 
 data class ItemState(
-    val item : ItemModelCreation = ItemModelCreation("",""),
+    val item : ItemModel = ItemModel(name = "", itemType = ""),
     val isLoading : Boolean = false,
     val error: ErrorText? = null,
     val isCreated : Boolean  = false

@@ -6,7 +6,7 @@ import com.ipca.socialstore.data.resultwrappers.ResultWrapper
 import javax.inject.Inject
 
 class SetStockQuantityUseCase @Inject constructor( private val stockRepository: StockRepository ){
-    suspend operator fun invoke(itemId : Int, quantity : Int) : ResultWrapper<Boolean>{
+    suspend operator fun invoke(itemId : Int, quantity : Int) : ResultWrapper<Int>{
         return stockRepository.updateQuantityInStock(itemId,quantity)
     }
 }

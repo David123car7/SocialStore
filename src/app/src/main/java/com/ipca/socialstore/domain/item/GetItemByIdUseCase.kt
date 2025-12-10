@@ -5,8 +5,8 @@ import com.ipca.socialstore.data.repository.ItemRepository
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
 import javax.inject.Inject
 
-class GetItemByNameUseCase @Inject constructor(private val itemRepository: ItemRepository){
-    suspend operator fun invoke(itemName : String): ResultWrapper<ItemModel?>{
-        return itemRepository.getItemByName(itemName = itemName)
+class GetItemByIdUseCase @Inject constructor(private val itemRepository: ItemRepository){
+    suspend operator fun invoke(itemId : Int): ResultWrapper<ItemModel>{
+        return itemRepository.getItemById(id = itemId)
     }
 }
