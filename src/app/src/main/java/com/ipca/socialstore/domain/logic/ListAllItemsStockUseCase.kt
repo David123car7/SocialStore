@@ -1,9 +1,7 @@
 package com.ipca.socialstore.domain.logic
 
 import com.ipca.socialstore.data.exceptions.ExceptionMapper
-import com.ipca.socialstore.data.models.ItemModel
-import com.ipca.socialstore.data.models.StockHelper
-import com.ipca.socialstore.data.models.StockModel
+import com.ipca.socialstore.presentation.models.StockReveiverModel
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
 import com.ipca.socialstore.domain.item.GetItemsFromStockUseCase
 import com.ipca.socialstore.domain.stock.GetFullStockUseCase
@@ -14,126 +12,56 @@ class ListAllItemsStockUseCase @Inject constructor(
     private val getFullStockUseCase: GetFullStockUseCase,
     private val getItemsFromStockUseCase: GetItemsFromStockUseCase
 ){
-    suspend operator fun invoke() : ResultWrapper<List<StockHelper>>{
-
+    suspend operator fun invoke() : ResultWrapper<List<StockReveiverModel>>{
         return try {
-            var currentStock : List<StockModel>? = null
-
             val stockResult = getFullStockUseCase()
-            when(stockResult){
-                is ResultWrapper.Success ->{
-                    currentStock = stockResult.data
-                }
+            if(stockResult is ResultWrapper.Error) return ResultWrapper.Error(stockResult.error)
+            val stockList = (stockResult as ResultWrapper.Success).data
 
-                is ResultWrapper.Error ->{
-                    return ResultWrapper.Error(stockResult.error)
-                }
+            val listItemId = mutableListOf<Int>()
+            for (item in stockList){
+                listItemId.add(item.itemId)
             }
 
+            val itemsResult = getItemsFromStockUseCase(listItemId)
+            if(itemsResult is ResultWrapper.Error) return ResultWrapper.Error(itemsResult.error)
+            val itemsList = (itemsResult as ResultWrapper.Success).data
 
-            val listItem = mutableListOf<Int>()
-            if (stockResult.data != null){
-                for (item in stockResult.data){
-                    listItem.add(item.itemId)
-                }
-            }
-            val items = getItemsFromStockUseCase(listItem)
-            when(items){
-                is ResultWrapper.Success -> {
-                    println(items)
-                    items
-                }
+            // Convert List to Map for instant lookup
+            val itemsMap = itemsList.associateBy { it.id }
 
-                is ResultWrapper.Error -> {
-                    return ResultWrapper.Error(items.error)
-                }
-            }
+            // Group stock by ItemId
+            val groupedStock = stockList.groupBy { it.itemId }
 
+            val stockReveiverList = mutableListOf<StockReveiverModel>()
 
-            val auxList = mutableListOf<StockHelper>()
-            if (currentStock != null && items.data != null) {
-                for (stock in currentStock){
-                    var itemResult : ItemModel? = null
+            // 5. Process each group
+            for ((itemId, stocks) in groupedStock) {
+                val item = itemsMap[itemId] ?: continue
 
-                    for (item in items.data){
-                        if (stock.itemId  == item.id){
-                            itemResult = item
+                val totalQty = stocks.sumOf { it.quantity }
 
-                            break
-
-                        }
-                    }
-                    if (itemResult != null){
-
-                        var existHelper: StockHelper? = null
-                        // ve se o item ja esta na lista de StockHelper
-                        for (helper in auxList){
-                            if (helper.item.id == itemResult.id){
-                                existHelper = helper
-                                break
-                            }
-                        }
-                        if (existHelper != null){
-                            //caso item ja tenha um stockHelper(2 data de validade)
-                            //adicona nova data e quantidade ao map do helper
-                            existHelper.expirationDate[stock.quantity] = stock.expirationDate
-                            existHelper.quantity += stock.quantity
-                        }else{
-                            //cria um novo stockHelper para o item
-                            val dateMap = mutableMapOf<Int, String>()
-                            dateMap[stock.quantity] = stock.expirationDate
-
-                            auxList.add(
-                                StockHelper(
-                                    item = itemResult,
-                                    quantity = stock.quantity,
-                                    stockId = stock.id!!,
-                                    expirationDate = dateMap
-                                )
-                            )
-                        }
-                    }
-                }
-            }
-
-            val finalList = mutableListOf<StockHelper>()
-
-            val checkId = mutableListOf<Int>()
-
-            for (item in auxList){
-
-                val currentId = item.item.id
-
-                if (checkId.contains(currentId)){
-                    continue
+                val dateMap = mutableMapOf<String, Int>()
+                for (stock in stocks) {
+                    val date = stock.expirationDate
+                    val currentQtyForDate = dateMap.getOrDefault(date, 0)
+                    dateMap[date] = currentQtyForDate + stock.quantity
                 }
 
-                var quantity = 0
-                var date = mutableMapOf<Int, String>()
-                for (item2 in auxList){
-                    if (currentId == item2.item.id){
-                        quantity += item2.quantity
-
-                    }
-                }
-                checkId.add(currentId ?: 0) //rever
-
-                finalList.add(
-                    StockHelper(
-                        item = item.item,
-                        quantity = quantity,
-                        stockId = item.stockId,
-                        expirationDate = item.expirationDate
+                stockReveiverList.add(
+                    StockReveiverModel(
+                        item = item,
+                        totalQuantity = totalQty,
+                        stockId = stocks.first().id ?: 0,
+                        quantityMap = dateMap
                     )
                 )
             }
-            ResultWrapper.Success(finalList)
 
-        }catch (e : Exception){
+            ResultWrapper.Success(stockReveiverList)
+        } catch (e: Exception) {
+            e.printStackTrace() // Print full stack trace to see the real crash line
             ResultWrapper.Error(exceptionMapper.map(e))
         }
-
     }
-
-
 }

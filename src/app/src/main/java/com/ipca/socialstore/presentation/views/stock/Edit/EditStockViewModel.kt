@@ -3,20 +3,17 @@ package com.ipca.socialstore.presentation.views.stock.Edit
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ipca.socialstore.data.models.ItemModel
-import com.ipca.socialstore.data.models.StockHelper
-import com.ipca.socialstore.data.models.StockModel
+import com.ipca.socialstore.presentation.models.StockReveiverModel
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
 import com.ipca.socialstore.domain.stock.SetStockQuantityUseCase
 import com.ipca.socialstore.presentation.utils.ErrorText
 import com.ipca.socialstore.presentation.utils.asUiText
-import com.ipca.socialstore.presentation.views.stock.List.GetStockState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class EditState(
-    val stock: StockHelper? = null,
+    val stock: StockReveiverModel? = null,
     val quantity: String? = null,
     val error: ErrorText? = null,
     val isEditing : Boolean? = false,

@@ -99,15 +99,14 @@ class StockRepository @Inject constructor(private val supabase: SupabaseClient, 
         }
     }
 
-    suspend fun getFullStock(): ResultWrapper<List<StockModel>?> {
+    suspend fun getFullStock(): ResultWrapper<List<StockModel>> {
         return try {
-            val stock = supabase
+            val stockResult = supabase
                 .from(DatabaseTables.STOCK)
                 .select()
                 .decodeAsOrNull<List<StockModel>>()
-
-            ResultWrapper.Success(stock)
-
+            if(stockResult == null) return ResultWrapper.Error(AppError.DataNotUpdated)
+            ResultWrapper.Success(stockResult)
         } catch (e: Exception) {
             ResultWrapper.Error(exceptionMapper.map(e))
         }

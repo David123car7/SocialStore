@@ -17,7 +17,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.ipca.socialstore.data.models.StockHelper
+import com.ipca.socialstore.presentation.models.StockReveiverModel
 import com.ipca.socialstore.presentation.routes.AdminRoutes
 
 import com.ipca.socialstore.ui.theme.SocialStoreTheme
@@ -43,7 +43,7 @@ fun GetAllStockViewContent(
     modifier: Modifier,
     uiState: GetStockState,
     navController : NavController,
-    onItemClick :(StockHelper) -> Unit
+    onItemClick :(StockReveiverModel) -> Unit
 ) {
     Column(
         modifier = modifier.fillMaxSize()
@@ -69,7 +69,7 @@ fun GetAllStockViewContent(
 @Composable
 fun SingleItemStock(
     modifier: Modifier = Modifier,
-    uiState: StockHelper,
+    uiState: StockReveiverModel,
     onClick: () -> Unit
 ) {
     Card(
@@ -81,7 +81,7 @@ fun SingleItemStock(
         Column(modifier = Modifier.padding(12.dp)) {
             Text("Nome: ${uiState.item.name}")
             Text("Tipo: ${uiState.item.itemType}")
-            Text("Qtd: ${uiState.quantity}")
+            Text("Qtd: ${uiState.totalQuantity}")
 
         }
     }

@@ -4,7 +4,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ipca.socialstore.data.models.StockHelper
+import com.ipca.socialstore.presentation.models.StockReveiverModel
 import com.ipca.socialstore.data.models.StockModel
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
 import com.ipca.socialstore.domain.logic.ListAllItemsStockUseCase
@@ -16,22 +16,22 @@ import javax.inject.Inject
 
 data class GetStockState(
     val stock : List<StockModel>? = null,
-    val items : List<StockHelper>? = null,
+    val items : List<StockReveiverModel>? = null,
     val isLoading : Boolean = false,
     val error: ErrorText? = null,
     val isEditing : Boolean? = false,
 
-)
+    )
 
 @HiltViewModel
 class ListAllStockViewModel @Inject constructor(private val listAllItemsStockUseCase: ListAllItemsStockUseCase): ViewModel(){
 
     val uiState = mutableStateOf(GetStockState())
 
-    private val stockDetail = mutableStateOf<StockHelper?>(null)
-    val detail : State<StockHelper?> = stockDetail
+    private val stockDetail = mutableStateOf<StockReveiverModel?>(null)
+    val detail : State<StockReveiverModel?> = stockDetail
 
-    fun selectStock(item : StockHelper){
+    fun selectStock(item : StockReveiverModel){
         stockDetail.value = item
         println("FuncaoModel:${stockDetail.value}")
     }
