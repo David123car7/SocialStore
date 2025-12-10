@@ -14,7 +14,7 @@ class AddItemStockUseCase @Inject constructor(private val stockRepository: Stock
             }
             is ResultWrapper.Error ->{
                 if(stockResult.error == AppError.DataNotFound)
-                    stockRepository.addStock(StockModel(itemId = itemId, expirationDate = expirationDate, quantity = quantity))
+                    stockRepository.createStock(StockModel(itemId = itemId, expirationDate = expirationDate, quantity = quantity))
                 else
                     return ResultWrapper.Error(stockResult.error)
             }

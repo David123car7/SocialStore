@@ -6,8 +6,10 @@ import com.ipca.socialstore.data.exceptions.ExceptionMapper
 import com.ipca.socialstore.data.helpers.from
 import com.ipca.socialstore.data.models.AcademicModel
 import com.ipca.socialstore.data.models.ApplicationStateModel
+import com.ipca.socialstore.data.models.TableIdModel
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
 import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.postgrest.query.Columns
 import javax.inject.Inject
 
 class AcademicRepository @Inject constructor(
@@ -16,12 +18,11 @@ class AcademicRepository @Inject constructor(
 
     suspend fun createAcademic(academicModel: AcademicModel): ResultWrapper<Int> {
         return try {
-            val state = supabaseClient.from(DatabaseTables.ACADEMIC).insert(academicModel){
-                select()
-            }.decodeSingleOrNull<AcademicModel>()
-            if(state == null) return ResultWrapper.Error(AppError.DataNotCreated)
-            if(state.id == null) return ResultWrapper.Error(AppError.UnknownError(""))
-            ResultWrapper.Success(state.id)
+            val academicResult = supabaseClient.from(DatabaseTables.ACADEMIC).insert(academicModel){
+                select(columns = Columns.list("id"))
+            }.decodeSingleOrNull<TableIdModel>()
+            if(academicResult == null) return ResultWrapper.Error(AppError.DataNotCreated)
+            ResultWrapper.Success(academicResult.id)
         } catch (e : Exception){
             ResultWrapper.Error(exceptionMapper.map(e))
         }

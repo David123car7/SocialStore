@@ -12,10 +12,12 @@ import com.ipca.socialstore.data.helpers.from
 import com.ipca.socialstore.data.models.ApplicationModel
 import com.ipca.socialstore.data.models.ApplicationStateModel
 import com.ipca.socialstore.data.models.StockModel
+import com.ipca.socialstore.data.models.TableIdModel
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.auth
+import io.github.jan.supabase.postgrest.query.Columns
 import io.github.jan.supabase.storage.storage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -28,17 +30,11 @@ class ApplicationRepository @Inject constructor(
 
     suspend fun createApplication(application: ApplicationModel): ResultWrapper<Int>{
         return try {
-            val application = supabaseClient.from(DatabaseTables.APPLICATION).insert(application){
-                select()
-            }.decodeList<ApplicationModel>().firstOrNull()
-
-            if(application == null)
-                return ResultWrapper.Error(AppError.DataNotCreated)
-
-            if(application.id == null)
-                return ResultWrapper.Error(AppError.UnknownError(UnknownError.NULL_ID.errorMessage))
-
-            ResultWrapper.Success(application.id)
+            val applicationResult = supabaseClient.from(DatabaseTables.APPLICATION).insert(application){
+                select(columns = Columns.list("id"))
+            }.decodeSingleOrNull<TableIdModel>()
+            if(applicationResult == null) return ResultWrapper.Error(AppError.DataNotCreated)
+            ResultWrapper.Success(applicationResult.id)
         } catch (e : Exception){
             ResultWrapper.Error(exceptionMapper.map(e))
         }

@@ -7,6 +7,6 @@ import javax.inject.Inject
 
 class AddItemToDonationUseCase @Inject constructor(private val  donationItemRepository: DonationItemRepository){
     suspend operator fun invoke(donationItem : DonationItemModel): ResultWrapper<Int> {
-        return donationItemRepository.addItemDonation(donationItem = donationItem)
+        return donationItemRepository.createDonationItem(donationItem = donationItem)
     }
 }

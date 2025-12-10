@@ -7,21 +7,21 @@ import com.ipca.socialstore.data.exceptions.ExceptionMapper
 import com.ipca.socialstore.data.helpers.from
 import com.ipca.socialstore.data.models.ItemModel
 import com.ipca.socialstore.data.models.StockModel
+import com.ipca.socialstore.data.models.TableIdModel
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
 import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.postgrest.query.Columns
 import javax.inject.Inject
 
 class StockRepository @Inject constructor(private val supabase: SupabaseClient, private val exceptionMapper: ExceptionMapper ){
 
-    suspend fun addStock(stock : StockModel) : ResultWrapper<Int> {
+    suspend fun createStock(stock : StockModel) : ResultWrapper<Int> {
         return try {
             val stockResult = supabase.from(DatabaseTables.STOCK)
                 .insert(stock){
-                    select()
-                }
-                .decodeSingleOrNull<StockModel>()
+                    select(columns = Columns.list("id"))
+                }.decodeSingleOrNull<TableIdModel>()
             if(stockResult == null) return ResultWrapper.Error(AppError.DataNotCreated)
-            if(stockResult.id == null) return ResultWrapper.Error(AppError.UnknownError(UnknownError.NULL_ID.errorMessage))
             ResultWrapper.Success(stockResult.id)
         }
         catch (e : Exception){
@@ -37,8 +37,7 @@ class StockRepository @Inject constructor(private val supabase: SupabaseClient, 
                         eq("item_id", id)
                         eq("expiration_date", expirationDate)
                     }
-                }
-                .decodeSingleOrNull<StockModel>()
+                }.decodeSingleOrNull<StockModel>()
             if(stockResult == null) return ResultWrapper.Error(AppError.DataNotFound)
             ResultWrapper.Success(stockResult)
         }
@@ -105,7 +104,7 @@ class StockRepository @Inject constructor(private val supabase: SupabaseClient, 
                 .from(DatabaseTables.STOCK)
                 .select()
                 .decodeAsOrNull<List<StockModel>>()
-            if(stockResult == null) return ResultWrapper.Error(AppError.DataNotUpdated)
+            if(stockResult == null) return ResultWrapper.Error(AppError.DataNotFound)
             ResultWrapper.Success(stockResult)
         } catch (e: Exception) {
             ResultWrapper.Error(exceptionMapper.map(e))
@@ -115,7 +114,6 @@ class StockRepository @Inject constructor(private val supabase: SupabaseClient, 
     suspend fun listStockToStock(list: List<StockModel>): ResultWrapper<List<ItemModel>> {
         return try {
             val result = mutableListOf<ItemModel>()
-
             for (stock in list) {
                 val items = supabase
                     .from(DatabaseTables.ITEM)
@@ -123,14 +121,10 @@ class StockRepository @Inject constructor(private val supabase: SupabaseClient, 
                         filter {
                             eq("item_id", stock.itemId)
                         }
-                    }
-                    .decodeList<ItemModel>()
-
+                    }.decodeList<ItemModel>()
                 result.addAll(items)
             }
-
             ResultWrapper.Success(result)
-
         } catch (e: Exception) {
             ResultWrapper.Error(exceptionMapper.map(e))
         }
