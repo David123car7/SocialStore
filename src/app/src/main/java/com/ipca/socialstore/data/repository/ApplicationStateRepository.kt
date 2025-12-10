@@ -16,17 +16,17 @@ class ApplicationStateRepository @Inject constructor(
 
     suspend fun createApplicationState(applicationState: ApplicationStateModel) : ResultWrapper<Int> {
         return try {
-            val state = supabaseClient.from(DatabaseTables.APPLICATION_STATE).insert(applicationState){
+            val stateResult = supabaseClient.from(DatabaseTables.APPLICATION_STATE).insert(applicationState){
                 select()
             }.decodeList<ApplicationStateModel>().firstOrNull()
 
-            if(state == null)
+            if(stateResult == null)
                 return ResultWrapper.Error(AppError.DataNotCreated)
 
-            val id = state.id
-                ?: return ResultWrapper.Error(AppError.UnknownError(UnknownError.NULL_ID.errorMessage))
+            if(stateResult.id == null)
+                return ResultWrapper.Error(AppError.UnknownError(UnknownError.NULL_ID.errorMessage))
 
-            ResultWrapper.Success(state.id)
+            ResultWrapper.Success(stateResult.id)
         } catch (e : Exception){
             ResultWrapper.Error(exceptionMapper.map(e))
         }

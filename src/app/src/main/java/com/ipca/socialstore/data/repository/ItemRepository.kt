@@ -9,6 +9,7 @@ import com.ipca.socialstore.data.resultwrappers.ResultWrapper
 import io.github.jan.supabase.SupabaseClient
 import javax.inject.Inject
 import com.ipca.socialstore.data.exceptions.ExceptionMapper
+import io.github.jan.supabase.postgrest.query.Columns
 
 
 class ItemRepository @Inject constructor(private val supabase : SupabaseClient, private val exceptionMapper: ExceptionMapper){

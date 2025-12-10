@@ -6,7 +6,7 @@ import com.ipca.socialstore.data.resultwrappers.ResultWrapper
 import javax.inject.Inject
 
 class RequestResetPasswordUseCase @Inject constructor(private val authRepository: AuthRepository) {
-    suspend operator fun invoke(email: String): ResultWrapper<Boolean> {
+    suspend operator fun invoke(email: String): ResultWrapper<Unit> {
         if(email.isEmpty())
             return ResultWrapper.Error(AppError.InvalidEmail)
 

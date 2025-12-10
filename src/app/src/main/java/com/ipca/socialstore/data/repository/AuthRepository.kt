@@ -14,7 +14,9 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
-class AuthRepository @Inject constructor(private val supabase: SupabaseClient, private val exceptionMapper: ExceptionMapper) {
+class AuthRepository @Inject constructor(
+    private val supabase: SupabaseClient,
+    private val exceptionMapper: ExceptionMapper) {
     fun getUserSessionState(): Flow<ResultFlowWrapper<Boolean>> {
         return supabase.auth.sessionStatus.map { status ->
             when (status) {
@@ -62,13 +64,13 @@ class AuthRepository @Inject constructor(private val supabase: SupabaseClient, p
         }
     }
 
-    suspend fun login(email: String, password: String): ResultWrapper<Boolean> {
+    suspend fun login(email: String, password: String): ResultWrapper<Unit> {
         return try {
             supabase.auth.signInWith(provider = Email){
                 this.email = email
                 this.password = password
             }
-            ResultWrapper.Success(true)
+            ResultWrapper.Success(Unit)
         }
         catch (e: Exception) {
             ResultWrapper.Error(exceptionMapper.map(e))
@@ -89,46 +91,46 @@ class AuthRepository @Inject constructor(private val supabase: SupabaseClient, p
         }
     }
 
-    suspend fun signInWithToken(email: String, token: String): ResultWrapper<Boolean>{
+    suspend fun signInWithToken(email: String, token: String): ResultWrapper<Unit>{
         return try{
             supabase.auth.verifyEmailOtp(
                 type = OtpType.Email.RECOVERY,
                 email = email,
                 token = token
             )
-            ResultWrapper.Success(true)
+            ResultWrapper.Success(Unit)
         }
         catch (e: Exception){
             ResultWrapper.Error(exceptionMapper.map(e))
         }
     }
 
-    suspend fun resetPassword(password: String): ResultWrapper<Boolean>{
+    suspend fun resetPassword(password: String): ResultWrapper<String>{
         return try{
-            supabase.auth.updateUser {
+            val user = supabase.auth.updateUser {
                 this.password = password
             }
-            ResultWrapper.Success(true)
+            ResultWrapper.Success(user.id)
         }
         catch (e: Exception){
             ResultWrapper.Error(exceptionMapper.map(e))
         }
     }
 
-    suspend fun requestResetPassword(email : String) : ResultWrapper<Boolean>{
+    suspend fun requestResetPassword(email : String) : ResultWrapper<Unit>{
         return try{
             supabase.auth.resetPasswordForEmail(email = email)
-            ResultWrapper.Success(true)
+            ResultWrapper.Success(Unit)
         }
         catch (e: Exception){
             ResultWrapper.Error(exceptionMapper.map(e))
         }
     }
 
-    suspend fun logout(): ResultWrapper<Boolean>{
+    suspend fun logout(): ResultWrapper<Unit>{
         return try{
             supabase.auth.signOut()
-            ResultWrapper.Success(true)
+            ResultWrapper.Success(Unit)
         }
         catch (e: Exception){
             ResultWrapper.Error(exceptionMapper.map(e))

@@ -6,7 +6,7 @@ import com.ipca.socialstore.data.repository.AuthRepository
 import javax.inject.Inject
 
 class LoginUseCase @Inject constructor(private val authRepository: AuthRepository) {
-    suspend operator fun invoke(email: String, password: String): ResultWrapper<Boolean> {
+    suspend operator fun invoke(email: String, password: String): ResultWrapper<Unit> {
         if(email.isEmpty())
             return ResultWrapper.Error(AppError.InvalidEmail)
 
