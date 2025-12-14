@@ -71,7 +71,7 @@ fun StockItemDetail(
             item {
                 Text(text = "Datas de Validade:", fontWeight = FontWeight.Bold)
             }
-            items(uiState.quantityMap.toList()){ (quantity, date) ->
+            items(uiState.quantityMap.toList()){ (date, quantity) ->
                 Text(text = " - Quantidade: $quantity | Validade: $date")
             }
 

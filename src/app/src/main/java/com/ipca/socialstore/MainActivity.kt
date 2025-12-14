@@ -29,6 +29,7 @@ import com.ipca.socialstore.presentation.views.item.CreateItemView
 import com.ipca.socialstore.presentation.routes.AdminRoutes
 import com.ipca.socialstore.presentation.routes.DefaultRoutes
 import com.ipca.socialstore.presentation.routes.GeneralRoutes
+import com.ipca.socialstore.presentation.views.Scheduling.CreateSchedulingView
 import com.ipca.socialstore.presentation.views.stock.List.GetAllStockView
 import com.ipca.socialstore.presentation.views.stock.List.ListAllStockViewModel
 import com.ipca.socialstore.presentation.views.stock.List.StockItemDetailView
@@ -101,6 +102,9 @@ class MainActivity : ComponentActivity() {
                         }
                         composable <AdminRoutes.SelectStock>{
                             StockItemDetailView(modifier = Modifier.padding(innerPadding), navController = navController, viewModel = stockViewModel)
+                        }
+                        composable <AdminRoutes.CreateScheduling>{
+                            CreateSchedulingView(modifier = Modifier.padding(innerPadding), navController = navController)
                         }
                     }
                 }

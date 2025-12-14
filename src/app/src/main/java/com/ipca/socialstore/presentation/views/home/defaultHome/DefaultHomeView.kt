@@ -42,7 +42,7 @@ fun DefaultHomeView(modifier: Modifier, navController: NavController, userRole: 
             )
         },
         onClickTest = { navController.navigate(AdminRoutes.GetStock)},
-        onClickTest2 = { navController.navigate(AdminRoutes.CreateDonation)}
+        onClickTest2 = { navController.navigate(AdminRoutes.CreateScheduling)}
     )
 }
 
@@ -78,7 +78,7 @@ fun DefaultHomeViewContent(modifier: Modifier, onClickLogout:()->Unit, onClickCr
                 modifier = Modifier.padding(8.dp),
                 onClick = {onClickTest2()}
             ) {
-                Text("Criar Doacao")
+                Text("Criar Agendamento")
             }
         }
     }
