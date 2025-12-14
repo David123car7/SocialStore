@@ -34,6 +34,13 @@ fun DefaultHomeView(modifier: Modifier, navController: NavController, userRole: 
             route = AdminRoutes.GetSingleItem
             )
         },
+        onClickCreateApplication = {
+            NavigationLogic.navigateTo(
+                navController = navController,
+                userRole = userRole,
+                route = DefaultRoutes.CreateApplication
+            )
+        },
         onClickApplication = {
             NavigationLogic.navigateTo(
                 navController = navController,
@@ -47,7 +54,14 @@ fun DefaultHomeView(modifier: Modifier, navController: NavController, userRole: 
 }
 
 @Composable
-fun DefaultHomeViewContent(modifier: Modifier, onClickLogout:()->Unit, onClickCreate : ()-> Unit, onClickApplication : ()-> Unit, onClickTest : () -> Unit,onClickTest2: () -> Unit){
+fun DefaultHomeViewContent(
+    modifier: Modifier,
+    onClickLogout:()->Unit,
+    onClickCreate : ()-> Unit,
+    onClickApplication : ()-> Unit,
+    onClickCreateApplication : ()-> Unit,
+    onClickTest : () -> Unit,
+    onClickTest2: () -> Unit){
     Box(modifier = modifier.fillMaxSize()){
         Column(modifier = modifier) {
             Text(modifier = Modifier.padding(8.dp), text = "Home Page")
@@ -64,10 +78,18 @@ fun DefaultHomeViewContent(modifier: Modifier, onClickLogout:()->Unit, onClickCr
             }
             Button(
                 modifier = Modifier.padding(8.dp),
+                onClick = {onClickCreateApplication()}
+            ) {
+                Text("Create Application")
+            }
+
+            Button(
+                modifier = Modifier.padding(8.dp),
                 onClick = {onClickApplication()}
             ) {
-                Text("Application")
+                Text("Application Data")
             }
+
             Button(
                 modifier = Modifier.padding(8.dp),
                 onClick = {onClickTest()}
@@ -88,6 +110,6 @@ fun DefaultHomeViewContent(modifier: Modifier, onClickLogout:()->Unit, onClickCr
 @Composable
 fun HomePreview(){
     SocialStoreTheme() {
-        DefaultHomeViewContent(modifier = Modifier, onClickLogout = { Unit}, onClickCreate = { Unit}, onClickApplication = { Unit}, onClickTest = { Unit}, onClickTest2 = { Unit})
+        DefaultHomeViewContent(modifier = Modifier, onClickLogout = { Unit}, onClickCreate = { Unit}, onClickApplication = { Unit}, onClickCreateApplication = {},onClickTest = { Unit}, onClickTest2 = { Unit})
     }
 }

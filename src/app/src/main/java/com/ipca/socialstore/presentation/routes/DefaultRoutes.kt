@@ -5,6 +5,9 @@ import kotlinx.serialization.Serializable
 @Serializable
 sealed class DefaultRoutes {
     @Serializable
+    object CreateApplication: DefaultRoutes()
+
+    @Serializable
     object Application: DefaultRoutes()
 
     @Serializable

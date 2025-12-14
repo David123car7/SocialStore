@@ -56,7 +56,6 @@ class AuthRepository @Inject constructor(
         return try {
             val user = supabase.auth.currentUserOrNull()
                 ?: return ResultWrapper.Error(AppError.UserNotLoggedIn)
-
             ResultWrapper.Success(user.id)
         }
         catch (e: Exception) {

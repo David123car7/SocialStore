@@ -15,7 +15,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.ipca.socialstore.presentation.views.application.ApplicationView
 import com.ipca.socialstore.presentation.views.authentication.login.LoginView
 import com.ipca.socialstore.presentation.main.MainViewModel
 import com.ipca.socialstore.presentation.views.authentication.register.RegisterView
@@ -66,6 +65,9 @@ class MainActivity : ComponentActivity() {
                                 modifier = Modifier.padding(innerPadding),
                                 navController = navController, userRole = mainState.userRole
                             )
+                        }
+                        composable<DefaultRoutes.CreateApplication> {
+                            CreateApplicationView(modifier = Modifier.padding(innerPadding))
                         }
                         composable<DefaultRoutes.Application> {
                             ApplicationView(modifier = Modifier.padding(innerPadding))
