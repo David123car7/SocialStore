@@ -46,6 +46,7 @@ fun AppError.asUiText(): ErrorText {
         is AppError.UnknownError -> ErrorText.DynamicString(this.message) // Fallback
         is AppError.InvalidFilesNumber -> ErrorText.StringResource(R.string.error_invalid_files_number)
         is AppError.ApplicationAllreadyExists -> ErrorText.StringResource(R.string.error_application_already_exists)
+        is AppError.ApplicationDontExists -> ErrorText.StringResource(R.string.error_application_dont_exists)
         is AppError.DataNotFound -> ErrorText.StringResource(R.string.error_data_not_found)
         is AppError.DataNotCreated -> ErrorText.StringResource(R.string.error_data_not_created)
         is AppError.DataNotUpdated -> ErrorText.StringResource(R.string.error_data_not_updated)

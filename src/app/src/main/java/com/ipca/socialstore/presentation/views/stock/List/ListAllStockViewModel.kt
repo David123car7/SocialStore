@@ -7,7 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.ipca.socialstore.presentation.models.StockReveiverModel
 import com.ipca.socialstore.data.models.StockModel
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
-import com.ipca.socialstore.domain.logic.ListAllItemsStockUseCase
+import com.ipca.socialstore.domain.services.ListAllItemsStockService
 import com.ipca.socialstore.presentation.utils.ErrorText
 import com.ipca.socialstore.presentation.utils.asUiText
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -24,7 +24,7 @@ data class GetStockState(
     )
 
 @HiltViewModel
-class ListAllStockViewModel @Inject constructor(private val listAllItemsStockUseCase: ListAllItemsStockUseCase): ViewModel(){
+class ListAllStockViewModel @Inject constructor(private val listAllItemsStockService: ListAllItemsStockService): ViewModel(){
 
     val uiState = mutableStateOf(GetStockState())
 
@@ -42,7 +42,7 @@ class ListAllStockViewModel @Inject constructor(private val listAllItemsStockUse
         )
 
         viewModelScope.launch {
-            val result = listAllItemsStockUseCase()
+            val result = listAllItemsStockService()
             when (result){
                 is ResultWrapper.Success -> {
                     uiState.value = uiState.value.copy(

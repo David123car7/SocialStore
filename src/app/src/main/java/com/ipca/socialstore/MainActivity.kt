@@ -15,7 +15,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.ipca.socialstore.presentation.views.application.ApplicationView
 import com.ipca.socialstore.presentation.views.authentication.login.LoginView
 import com.ipca.socialstore.presentation.main.MainViewModel
 import com.ipca.socialstore.presentation.views.authentication.register.RegisterView
@@ -29,6 +28,8 @@ import com.ipca.socialstore.presentation.views.item.CreateItemView
 import com.ipca.socialstore.presentation.routes.AdminRoutes
 import com.ipca.socialstore.presentation.routes.DefaultRoutes
 import com.ipca.socialstore.presentation.routes.GeneralRoutes
+import com.ipca.socialstore.presentation.views.application.applicationData.ApplicationView
+import com.ipca.socialstore.presentation.views.application.createApplication.CreateApplicationView
 import com.ipca.socialstore.presentation.views.stock.List.GetAllStockView
 import com.ipca.socialstore.presentation.views.stock.List.ListAllStockViewModel
 import com.ipca.socialstore.presentation.views.stock.List.StockItemDetailView
@@ -65,6 +66,9 @@ class MainActivity : ComponentActivity() {
                                 modifier = Modifier.padding(innerPadding),
                                 navController = navController, userRole = mainState.userRole
                             )
+                        }
+                        composable<DefaultRoutes.CreateApplication> {
+                            CreateApplicationView(modifier = Modifier.padding(innerPadding))
                         }
                         composable<DefaultRoutes.Application> {
                             ApplicationView(modifier = Modifier.padding(innerPadding))

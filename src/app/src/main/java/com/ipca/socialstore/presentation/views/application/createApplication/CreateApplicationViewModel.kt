@@ -1,4 +1,4 @@
-package com.ipca.socialstore.presentation.views.application
+package com.ipca.socialstore.presentation.views.application.createApplication
 
 import android.net.Uri
 import androidx.compose.runtime.mutableStateOf
@@ -13,9 +13,8 @@ import com.ipca.socialstore.presentation.utils.asUiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlin.collections.plus
 
-data class ApplicationState(
+data class CreateApplicationState(
     val isLoading: Boolean = false,
     val error: ErrorText? = null,
     val isSuccess: Boolean = false,
@@ -25,14 +24,10 @@ data class ApplicationState(
     val selectedFiles: List<Uri> = emptyList(),
 )
 
-private object DocumentsLimit{
-    val firstDocument: Int = 2
-}
-
 @HiltViewModel
-class ApplicationViewModel @Inject constructor(
+class CreateApplicationViewModel @Inject constructor(
     private val createApplicationUseCase: CreateApplicationUseCase): ViewModel() {
-    var uiState = mutableStateOf(ApplicationState())
+    var uiState = mutableStateOf(CreateApplicationState())
 
     fun updateIsStudent(state: Boolean){
         if(state){
@@ -125,37 +120,6 @@ class ApplicationViewModel @Inject constructor(
                         error = result.error.asUiText()
                     )
                 }
-            }
-        }
-    }
-
-    fun addFiles(uri: List<Uri>?) {
-        if(uri == null || uri.isEmpty())
-            return
-
-        val currentList = uiState.value.selectedFiles
-        uiState.value = uiState.value.copy(
-            selectedFiles = currentList + uri
-        )
-    }
-
-    fun removeFile(uri: Uri?){
-        if(uri == null)
-            return
-
-        val newList = uiState.value.selectedFiles - uri
-        uiState.value = uiState.value.copy(
-            selectedFiles = newList
-        )
-    }
-
-    //Will be replaced in the future
-    private fun submitFile(maxDocuments: Int) {
-        viewModelScope.launch {
-            uiState.value = uiState.value.copy(isLoading = true, error = null)
-
-            if (uiState.value.selectedFiles.isNotEmpty()) {
-                //val result = uploadApplicationDocuments(uiState.value.selectedFiles, maxDocuments)
             }
         }
     }
