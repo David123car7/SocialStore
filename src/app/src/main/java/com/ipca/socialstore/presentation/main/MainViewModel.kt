@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.ipca.socialstore.data.enums.UserRole
 import com.ipca.socialstore.data.resultwrappers.ResultFlowWrapper
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
+import com.ipca.socialstore.domain.auth.GetUserIdUseCase
 import com.ipca.socialstore.domain.profile.GetUserRoleUseCase
 import com.ipca.socialstore.domain.auth.GetUserSessionStateUseCase
 import com.ipca.socialstore.presentation.utils.ErrorText
@@ -19,11 +20,15 @@ data class SessionState(
     val isLoading: Boolean = true,
     val isLoggedIn: Boolean = false,
     var userRole: UserRole = UserRole.NOROLE,
+    var userId: String? = null,
     val error: ErrorText? = null
 )
 
 @HiltViewModel
-class MainViewModel @Inject constructor(private val getUserSessionState: GetUserSessionStateUseCase, private val getUserRoleUseCase: GetUserRoleUseCase): ViewModel() {
+class MainViewModel @Inject constructor(
+    private val getUserSessionState: GetUserSessionStateUseCase,
+    private val getUserRoleUseCase: GetUserRoleUseCase,
+    private val getUserIdUseCase: GetUserIdUseCase): ViewModel() {
     var sessionState = mutableStateOf(SessionState())
 
     init {
@@ -38,7 +43,25 @@ class MainViewModel @Inject constructor(private val getUserSessionState: GetUser
             is ResultWrapper.Success -> {
                 sessionState.value = sessionState.value.copy(
                     isLoading = false,
-                    userRole = result.data ?: UserRole.NOROLE
+                    userRole = result.data
+                )
+            }
+            is ResultWrapper.Error -> {
+                sessionState.value = sessionState.value.copy(
+                    isLoading = false,
+                    error = result.error.asUiText()
+                )
+            }
+        }
+    }
+
+    suspend fun getUserId(){
+        val result = getUserIdUseCase()
+        when(result){
+            is ResultWrapper.Success -> {
+                sessionState.value = sessionState.value.copy(
+                    isLoading = false,
+                    userId = result.data
                 )
             }
             is ResultWrapper.Error -> {
@@ -66,12 +89,14 @@ class MainViewModel @Inject constructor(private val getUserSessionState: GetUser
                     )
                     if(sessionState.value.isLoggedIn){
                         getUserRole()
+                        getUserId()
                     }
                     else{
                         sessionState.value = sessionState.value.copy(userRole = UserRole.NOROLE)
                     }
-                    Log.d("AppDebug", "The user ROLE is: ${sessionState.value.userRole}")
-                    Log.d("AppDebug", "The user STATE is: ${sessionState.value.isLoggedIn}")
+                    Log.d("App Debug", "The user ROLE is: ${sessionState.value.userRole}")
+                    Log.d("App Debug", "The user STATE is: ${sessionState.value.isLoggedIn}")
+                    Log.d("App Debug", "The user ID is: ${sessionState.value.userId}")
                 }
                 is ResultFlowWrapper.Error -> {
                     sessionState.value = sessionState.value.copy(

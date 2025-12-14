@@ -39,4 +39,18 @@ class ApplicationRepository @Inject constructor(
             ResultWrapper.Error(exceptionMapper.map(e))
         }
     }
+
+    suspend fun getApplication(id: Int): ResultWrapper<ApplicationModel>{
+        return try {
+            val applicationResult = supabaseClient.from(DatabaseTables.APPLICATION).select {
+                filter {
+                    eq("id", id)
+                }
+            }.decodeSingleOrNull<ApplicationModel>()
+            if(applicationResult == null) return ResultWrapper.Error(AppError.DataNotCreated)
+            ResultWrapper.Success(applicationResult)
+        } catch (e : Exception){
+            ResultWrapper.Error(exceptionMapper.map(e))
+        }
+    }
 }

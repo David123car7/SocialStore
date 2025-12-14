@@ -21,7 +21,7 @@ class ProfileRepository @Inject constructor(
         return try {
             val profile = supabase.from(DatabaseTables.PROFILE).insert(profile){
                 select(columns = Columns.list("id"))
-            }.decodeAsOrNull<TableIdModel>()
+            }.decodeSingleOrNull<TableIdModel>()
             if(profile == null) return ResultWrapper.Error(AppError.DataNotCreated)
             ResultWrapper.Success(profile.id)
         }

@@ -10,6 +10,7 @@ sealed class AppError {
     object InvalidDate: AppError()
     object UserAlreadyExists : AppError()
     object ApplicationAllreadyExists: AppError()
+    object ApplicationDontExists: AppError()
     object InvalidEmail : AppError()
     object InvalidEmailDomain : AppError()
     object UserNotLoggedIn : AppError()

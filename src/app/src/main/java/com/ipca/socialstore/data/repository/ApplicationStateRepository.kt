@@ -5,6 +5,7 @@ import com.ipca.socialstore.data.enums.UnknownError
 import com.ipca.socialstore.data.exceptions.AppError
 import com.ipca.socialstore.data.exceptions.ExceptionMapper
 import com.ipca.socialstore.data.helpers.from
+import com.ipca.socialstore.data.models.ApplicationModel
 import com.ipca.socialstore.data.models.ApplicationStateModel
 import com.ipca.socialstore.data.models.TableIdModel
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
@@ -23,6 +24,20 @@ class ApplicationStateRepository @Inject constructor(
             }.decodeSingleOrNull<TableIdModel>()
             if(stateResult == null) return ResultWrapper.Error(AppError.DataNotCreated)
             ResultWrapper.Success(stateResult.id)
+        } catch (e : Exception){
+            ResultWrapper.Error(exceptionMapper.map(e))
+        }
+    }
+
+    suspend fun getApplicationState(id: Int): ResultWrapper<ApplicationStateModel>{
+        return try {
+            val applicationStateResult = supabaseClient.from(DatabaseTables.APPLICATION_STATE).select {
+                filter {
+                    eq("id", id)
+                }
+            }.decodeSingleOrNull<ApplicationStateModel>()
+            if(applicationStateResult == null) return ResultWrapper.Error(AppError.DataNotFound)
+            ResultWrapper.Success(applicationStateResult)
         } catch (e : Exception){
             ResultWrapper.Error(exceptionMapper.map(e))
         }

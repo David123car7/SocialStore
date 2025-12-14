@@ -6,9 +6,8 @@ import androidx.lifecycle.viewModelScope
 import com.ipca.socialstore.data.models.DonationItemModel
 import com.ipca.socialstore.data.models.DonationModel
 import com.ipca.socialstore.data.models.ItemModel
-import com.ipca.socialstore.data.models.StockModel
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
-import com.ipca.socialstore.domain.logic.AddDonationLogicUseCase
+import com.ipca.socialstore.domain.services.AddDonationService
 import com.ipca.socialstore.presentation.utils.ErrorText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -25,7 +24,7 @@ data class DonationState(
     val isCreated : Boolean? = false,
 )
 @HiltViewModel
-class CreateDonationViewModel @Inject constructor(private val addDonationLogicUseCase: AddDonationLogicUseCase) : ViewModel(){
+class CreateDonationViewModel @Inject constructor(private val addDonationService: AddDonationService) : ViewModel(){
 
     val uiState = mutableStateOf(DonationState())
 
@@ -95,7 +94,7 @@ class CreateDonationViewModel @Inject constructor(private val addDonationLogicUs
         )
 
         viewModelScope.launch {
-            val result = addDonationLogicUseCase(
+            val result = addDonationService(
                 item = uiState.value.item,
                 donation = uiState.value.donation,
                 expirationDate = uiState.value.expirationDate,

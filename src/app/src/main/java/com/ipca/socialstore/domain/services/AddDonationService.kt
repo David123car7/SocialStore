@@ -1,11 +1,9 @@
-package com.ipca.socialstore.domain.logic
+package com.ipca.socialstore.domain.services
 
-import android.util.Log
 import com.ipca.socialstore.data.exceptions.ExceptionMapper
 import com.ipca.socialstore.data.models.DonationItemModel
 import com.ipca.socialstore.data.models.DonationModel
 import com.ipca.socialstore.data.models.ItemModel
-import com.ipca.socialstore.data.models.StockModel
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
 import com.ipca.socialstore.domain.donation_item.AddItemToDonationUseCase
 import com.ipca.socialstore.domain.donation.CreateDonationUseCase
@@ -15,7 +13,7 @@ import com.ipca.socialstore.domain.item.GetItemByIdUseCase
 import com.ipca.socialstore.domain.stock.AddItemStockUseCase
 import javax.inject.Inject
 
-class AddDonationLogicUseCase @Inject constructor(
+class AddDonationService @Inject constructor(
     private val createItemUseCase: CreateItemUseCase,
     private val getItemByIdUseCase: GetItemByIdUseCase,
     private val addItemStockUseCase: AddItemStockUseCase,

@@ -30,7 +30,7 @@ class UserRepository @Inject constructor(private val supabase: SupabaseClient, p
 
             val user = supabase.from(DatabaseTables.USER)
                 .select (columns = Columns.list("role")) {
-                    filter { eq("uid", userId) }
+                    filter { eq("id", userId) }
                 }
                 .decodeSingleOrNull<RoleContainer>()
 
@@ -71,12 +71,10 @@ class UserRepository @Inject constructor(private val supabase: SupabaseClient, p
     suspend fun setUserApplicationId(uid: String, id: Int): ResultWrapper<String>{
         return try {
             val user = getUser(uid = uid) ?: return ResultWrapper.Error(AppError.UserNotFound)
-
             val newUser = user.copy(applicationId = id)
             supabase.from(DatabaseTables.USER).update(newUser) {
-                filter { eq("uid", uid) }
+                filter { eq("id", uid) }
             }
-
             ResultWrapper.Success(uid)
         }
         catch (e: Exception) {
@@ -87,7 +85,7 @@ class UserRepository @Inject constructor(private val supabase: SupabaseClient, p
     //Must be private
     private suspend fun getUser(uid: String): UserModel?{
         val user = supabase.from(DatabaseTables.USER).select(columns = Columns.list()){
-            filter { eq("uid", uid) }
+            filter { eq("id", uid) }
         }.decodeList<UserModel>().firstOrNull()
         return user
     }

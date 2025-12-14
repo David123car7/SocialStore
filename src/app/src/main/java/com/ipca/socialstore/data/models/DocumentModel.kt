@@ -5,8 +5,16 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class DocumentModel (
+    val id: Int? = null,
+
     @SerialName("path")
     val path: String,
+
+    @SerialName("name")
+    val name: String,
+
+    @SerialName("folder_name")
+    val folderName: String,
 
     @SerialName("status")
     val status: String,

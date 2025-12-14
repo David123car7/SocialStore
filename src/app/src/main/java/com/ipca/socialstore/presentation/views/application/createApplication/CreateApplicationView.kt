@@ -1,20 +1,13 @@
-package com.ipca.socialstore.presentation.views.application
+package com.ipca.socialstore.presentation.views.application.createApplication
 
 import android.net.Uri
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -24,7 +17,6 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -43,11 +35,11 @@ import com.ipca.socialstore.presentation.utils.getFileNameFromUri
 import com.ipca.socialstore.ui.theme.SocialStoreTheme
 
 @Composable
-fun ApplicationView(modifier: Modifier){
-    val applicationViewModel: ApplicationViewModel = hiltViewModel()
+fun CreateApplicationView(modifier: Modifier){
+    val applicationViewModel: CreateApplicationViewModel = hiltViewModel()
     val uiState by applicationViewModel.uiState
 
-    ApplicationViewContent(
+    CreateApplicationViewContent(
         modifier = modifier,
         uiState = uiState,
 
@@ -66,18 +58,14 @@ fun ApplicationView(modifier: Modifier){
         onTypeCourseUpdate = applicationViewModel::updateTypeCourse,
         onCourseUpdate = applicationViewModel::updateCourse,
         onStudentNumberUpdate = applicationViewModel::updateStudentNumber,
-
-        // --- Files & Submit ---
-        onAddFiles = applicationViewModel::addFiles,
-        onRemoveFile = applicationViewModel::removeFile,
         onSubmitApplication = applicationViewModel::createApplication
     )
 }
 
 @Composable
-fun ApplicationViewContent(
+fun CreateApplicationViewContent(
     modifier: Modifier = Modifier,
-    uiState: ApplicationState,
+    uiState: CreateApplicationState,
 
     // --- Actions/Callbacks ---
     onIsStudentUpdate: (Boolean) -> Unit,
@@ -93,26 +81,15 @@ fun ApplicationViewContent(
     onCourseUpdate: (String) -> Unit,
     onStudentNumberUpdate: (String) -> Unit,
 
-    // Files & Submit
-    onAddFiles: (List<Uri>) -> Unit,
-    onRemoveFile: (Uri) -> Unit,
     onSubmitApplication: () -> Unit
 ) {
-
-    val multiFilePicker = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetMultipleContents()
-    ) { uris: List<Uri> ->
-        onAddFiles(uris)
-    }
-
-    // Enable scrolling for long forms
     val scrollState = rememberScrollState()
 
     Column(
         modifier = modifier
             .fillMaxSize()
             .padding(16.dp)
-            .verticalScroll(scrollState), // <--- Critical for long forms
+            .verticalScroll(scrollState),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
@@ -221,32 +198,6 @@ fun ApplicationViewContent(
                 )
             }
         }
-        /*
-        OutlinedButton(
-            onClick = { multiFilePicker.launch("application/pdf") }, // Filter for PDFs
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Attach Documents (PDF)")
-        }
-
-        if (uiState.selectedFiles.isNotEmpty()) {
-            Text(
-                text = "Selected Documents:",
-                style = MaterialTheme.typography.labelMedium,
-                modifier = Modifier.align(Alignment.Start)
-            )
-
-            LazyColumn(
-                modifier = modifier
-                    .fillMaxWidth()
-                    .heightIn(max = 200.dp)
-                    .padding(top = 8.dp)
-            ) {
-                items(uiState.selectedFiles) { uri ->
-                    FileRowItem(uri = uri, onRemoveFile = { onRemoveFile(uri) })
-                }
-            }
-        }*/
 
         Button(
             onClick = {
@@ -300,18 +251,28 @@ fun FileRowItem(uri: Uri, onRemoveFile:(uri: Uri?)->Unit) {
 
 @Preview(showBackground = true)
 @Composable
-fun ApplicationPreview() {
+fun CreateApplicationViewPreview() {
     SocialStoreTheme {
-        val uiState = ApplicationState(
+        val uiState = CreateApplicationState(
             isLoading = false,
             error = null,
             isSuccess = false,
             selectedFiles = emptyList(),
-            application = ApplicationModel(stateId = -1,schoolYear = 0, name = "", birthDate = "", cc = "", phoneNumber = "", email = "", requestType = "", academicId = null),
+            application = ApplicationModel(
+                stateId = -1,
+                schoolYear = 0,
+                name = "",
+                birthDate = "",
+                cc = "",
+                phoneNumber = "",
+                email = "",
+                requestType = "",
+                academicId = null
+            ),
             academicData = AcademicModel(typeCourse = "", course = "", studenNumber = "")
         )
 
-        ApplicationViewContent(
+        CreateApplicationViewContent(
             modifier = Modifier,
             uiState = uiState,
 
@@ -331,9 +292,6 @@ fun ApplicationPreview() {
             onCourseUpdate = {},
             onStudentNumberUpdate = {},
 
-            // --- Files ---
-            onAddFiles = {},
-            onRemoveFile = {},
             onSubmitApplication = {}
         )
     }

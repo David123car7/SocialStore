@@ -71,7 +71,7 @@ class CreateApplicationUseCase @Inject constructor(
             if (academicResult is ResultWrapper.Success) academicID = academicResult.data
         }
 
-        val applicationStateResult = applicationStateRepository.createApplicationState(applicationState = ApplicationStateModel(state = ApplicationStatus.PENDING.value))
+        val applicationStateResult = applicationStateRepository.createApplicationState(applicationState = ApplicationStateModel(state = ApplicationStatus.PENDING.status))
 
         if(applicationStateResult is ResultWrapper.Error) return ResultWrapper.Error(applicationStateResult.error)
         val stateId = (applicationStateResult as ResultWrapper.Success).data

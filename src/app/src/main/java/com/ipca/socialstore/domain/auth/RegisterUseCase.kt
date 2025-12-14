@@ -1,5 +1,7 @@
 package com.ipca.socialstore.domain.auth
 
+import android.content.ContentValues.TAG
+import android.util.Log
 import com.ipca.socialstore.R
 import com.ipca.socialstore.data.enums.UserRole
 import com.ipca.socialstore.data.exceptions.AppError
@@ -34,8 +36,7 @@ class RegisterUseCase @Inject constructor(
         if(profileResult is ResultWrapper.Error) return ResultWrapper.Error(error = profileResult.error)
         val profileId = (profileResult as ResultWrapper.Success).data
 
-        val user = UserModel(uid = newUserId, role = UserRole.DEFAULT.value, profileId = profileId, applicationId = null)
-
+        val user = UserModel(id = newUserId, role = UserRole.DEFAULT.value, profileId = profileId, applicationId = null)
         return userRepository.createUser(user)
     }
 }
