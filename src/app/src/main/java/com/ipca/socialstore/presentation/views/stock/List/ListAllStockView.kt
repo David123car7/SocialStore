@@ -27,6 +27,8 @@ import com.ipca.socialstore.presentation.utils.ErrorText
 import com.ipca.socialstore.ui.theme.SocialStoreTheme
 import kotlin.collections.mutableMapOf
 
+import com.ipca.socialstore.presentation.ui.theme.SocialStoreTheme
+
 @Composable
 fun GetAllStockView(modifier: Modifier, navController: NavController, viewModel: ListAllStockViewModel){
     val uiState by viewModel.uiState

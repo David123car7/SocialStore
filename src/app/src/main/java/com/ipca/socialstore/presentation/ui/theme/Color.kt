@@ -1,4 +1,4 @@
-package com.ipca.socialstore.ui.theme
+package com.ipca.socialstore.presentation.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

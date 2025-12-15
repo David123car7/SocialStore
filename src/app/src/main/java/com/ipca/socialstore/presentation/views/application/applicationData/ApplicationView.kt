@@ -14,7 +14,7 @@ import com.ipca.socialstore.data.enums.DocumentType
 import com.ipca.socialstore.data.models.AcademicModel
 import com.ipca.socialstore.data.models.ApplicationModel
 import com.ipca.socialstore.data.models.DocumentModel
-import com.ipca.socialstore.ui.theme.SocialStoreTheme
+import com.ipca.socialstore.presentation.ui.theme.SocialStoreTheme
 
 @Composable
 fun ApplicationView(modifier: Modifier){
