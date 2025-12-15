@@ -1,30 +1,55 @@
 package com.ipca.socialstore.presentation.views.authentication.login
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.ipca.socialstore.data.enums.UserRole
 import com.ipca.socialstore.presentation.objects.NavigationLogic
 import com.ipca.socialstore.presentation.routes.GeneralRoutes
-import com.ipca.socialstore.ui.theme.SocialStoreTheme
+import com.ipca.socialstore.presentation.ui.components.ErrorTextComponent
+import com.ipca.socialstore.presentation.ui.components.TextFieldPasswordComponent
+import com.ipca.socialstore.presentation.ui.components.TextFieldValueComponent
+import com.ipca.socialstore.presentation.ui.theme.SocialStoreTheme
 
 @Composable
 fun LoginView(modifier: Modifier, navController: NavController, userRole: UserRole){
@@ -45,7 +70,7 @@ fun LoginView(modifier: Modifier, navController: NavController, userRole: UserRo
         onClickReset = {NavigationLogic.navigateTo(
             navController = navController,
             userRole = userRole,
-            route =  GeneralRoutes.RequestResetPassword
+            route =  GeneralRoutes.ResetPassword
         )}
     )
 }
@@ -59,46 +84,95 @@ fun LoginViewContent(modifier: Modifier,
                      onClickRegister:()->Unit,
                      onClickReset:()->Unit){
 
-    Column(modifier = modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally) {
-        TextField(
-            value = uiState.email,
-            label = { Text("Email") },
-            modifier = Modifier.padding(8.dp),
-            onValueChange = { value -> onEmailUpdate(value)})
-        TextField(
-            value = uiState.password,
-            label = { Text("Password") },
-            modifier = Modifier.padding(8.dp),
-            onValueChange = { value -> onPasswordUpdate(value) },
-            visualTransformation = PasswordVisualTransformation(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
-        )
+    var passwordVisible by remember { mutableStateOf(false) }
 
-        if (uiState.error != null) {
-            Text(text = uiState.error!!.asString(), modifier = Modifier.padding(8.dp))
-        }
+    Scaffold { padding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Surface(
+                modifier = Modifier.size(80.dp),
+                shape = RoundedCornerShape(20.dp),
+                color = MaterialTheme.colorScheme.primaryContainer
+            ) {
+                Icon(
+                    imageVector = Icons.Default.ShoppingCart,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .fillMaxSize(),
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            }
 
-        Row(modifier = modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-            Button(
-                modifier = Modifier.padding(8.dp),
-                onClick = { onLogin() }) {
-                Text("Login")
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Text(
+                text = "Social Store",
+                style = MaterialTheme.typography.headlineMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary
+            )
+
+            Text(
+                text = "Faça login para continuar",
+                style = MaterialTheme.typography.bodyMedium,
+                color = Color.Gray
+            )
+
+            Spacer(modifier = Modifier.height(48.dp))
+
+            TextFieldValueComponent(
+                modifier = Modifier,
+                label = "Email",
+                value = uiState.email,
+                icon = Icons.Default.Email,
+                onValueUpdate = onEmailUpdate
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            TextFieldPasswordComponent(
+                modifier = Modifier,
+                password = uiState.password,
+                onPasswordUpdate = onPasswordUpdate
+            )
+
+            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterEnd) {
+                TextButton(onClick = onClickReset) {
+                    Text("Esqueceu a palavra-passe?", color = Color.Gray, fontSize = 12.sp)
+                }
             }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
             Button(
-                modifier = Modifier.padding(8.dp),
-                onClick = { onClickRegister() }) {
-                Text("Register")
+                onClick = onLogin,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Text("Entrar", fontSize = 16.sp, fontWeight = FontWeight.Bold)
             }
-            Button(
-                modifier = Modifier.padding(8.dp),
-                onClick = { onClickReset() }) {
-                Text("Reset")
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            if (uiState.error != null) {
+                ErrorTextComponent(message = uiState.error!!.asString())
             }
-        }
-        if (uiState.isLoading) {
-            CircularProgressIndicator()
+
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text("Ainda não tem conta?", style = MaterialTheme.typography.bodyMedium)
+                TextButton(onClick = onClickRegister) {
+                    Text("Criar Conta", fontWeight = FontWeight.Bold)
+                }
+            }
         }
     }
 }

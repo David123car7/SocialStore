@@ -32,7 +32,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.ipca.socialstore.data.models.AcademicModel
 import com.ipca.socialstore.data.models.ApplicationModel
 import com.ipca.socialstore.presentation.utils.getFileNameFromUri
-import com.ipca.socialstore.ui.theme.SocialStoreTheme
+import com.ipca.socialstore.presentation.ui.theme.SocialStoreTheme
 
 @Composable
 fun CreateApplicationView(modifier: Modifier){

@@ -15,7 +15,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.ipca.socialstore.data.models.ItemModel
-import com.ipca.socialstore.ui.theme.SocialStoreTheme
+import com.ipca.socialstore.presentation.ui.theme.SocialStoreTheme
 
 @Composable
 fun GetSingleItemView(modifier: Modifier, navController: NavController){

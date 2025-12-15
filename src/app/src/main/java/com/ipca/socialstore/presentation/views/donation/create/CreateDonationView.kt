@@ -17,9 +17,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.ipca.socialstore.data.models.DonationItemModel
-import com.ipca.socialstore.data.models.StockModel
-import com.ipca.socialstore.ui.theme.SocialStoreTheme
+import com.ipca.socialstore.presentation.ui.theme.SocialStoreTheme
 
 @Composable
 fun CreateDonationView(modifier: Modifier, navController: NavController){

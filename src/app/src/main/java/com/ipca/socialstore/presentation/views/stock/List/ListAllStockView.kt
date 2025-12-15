@@ -20,7 +20,7 @@ import androidx.navigation.compose.rememberNavController
 import com.ipca.socialstore.presentation.models.StockReveiverModel
 import com.ipca.socialstore.presentation.routes.AdminRoutes
 
-import com.ipca.socialstore.ui.theme.SocialStoreTheme
+import com.ipca.socialstore.presentation.ui.theme.SocialStoreTheme
 
 @Composable
 fun GetAllStockView(modifier: Modifier, navController: NavController, viewModel: ListAllStockViewModel){

@@ -3,7 +3,7 @@ package com.ipca.socialstore.presentation.views.home.adminHome
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.ipca.socialstore.ui.theme.SocialStoreTheme
+import com.ipca.socialstore.presentation.ui.theme.SocialStoreTheme
 
 @Composable
 fun AdminHomeView(modifier: Modifier){
