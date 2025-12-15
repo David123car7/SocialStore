@@ -19,6 +19,7 @@
 
 
     <string name="error_invalid_password">Invalid password.</string>
+    <string name="error_passwords_dont_match">Passwords dont match.</string>
     <string name="error_invalid_date">Invalid date.</string>
     <string name="error_user_not_found">User not found.</string>
     <string name="error_data_not_found">Data not found.</string>

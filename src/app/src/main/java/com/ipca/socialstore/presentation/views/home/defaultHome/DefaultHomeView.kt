@@ -17,7 +17,7 @@ import com.ipca.socialstore.data.enums.UserRole
 import com.ipca.socialstore.presentation.objects.NavigationLogic
 import com.ipca.socialstore.presentation.routes.AdminRoutes
 import com.ipca.socialstore.presentation.routes.DefaultRoutes
-import com.ipca.socialstore.ui.theme.SocialStoreTheme
+import com.ipca.socialstore.presentation.ui.theme.SocialStoreTheme
 
 @Composable
 fun DefaultHomeView(modifier: Modifier, navController: NavController, userRole: UserRole) {

@@ -61,7 +61,6 @@ class ApplicationViewModel @Inject constructor(
     var uiState = mutableStateOf(ApplicationState())
 
     init {
-        //Gets the application data and it the application has student data also gets the academic data
         if(uiState.value.application == null){
             viewModelScope.launch {
                 uiState.value = uiState.value.copy(isLoading = true)
@@ -71,8 +70,6 @@ class ApplicationViewModel @Inject constructor(
                             application =  applicationResult.data,
                             isLoading = false,
                         )
-
-
                         val applicationStateResult = getUserApplicationState(applicationId = uiState.value.application?.stateId!!)
                         when(applicationStateResult){
                             is ResultWrapper.Success -> {

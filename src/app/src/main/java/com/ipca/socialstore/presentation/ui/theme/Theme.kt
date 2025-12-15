@@ -1,6 +1,5 @@
-package com.ipca.socialstore.ui.theme
+package com.ipca.socialstore.presentation.ui.theme
 
-import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
