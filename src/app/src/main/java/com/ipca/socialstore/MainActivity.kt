@@ -34,6 +34,7 @@ import com.ipca.socialstore.presentation.views.stock.List.ListAllStockViewModel
 import com.ipca.socialstore.presentation.views.stock.List.StockItemDetailView
 import com.ipca.socialstore.presentation.ui.theme.SocialStoreTheme
 import com.ipca.socialstore.presentation.views.authentication.resetPassword.ResetPasswordView
+import com.ipca.socialstore.presentation.views.home.notUserHome.NotUserHomeHomeView
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -52,11 +53,14 @@ class MainActivity : ComponentActivity() {
             val startDestination = if(mainState.isLoggedIn)
                 DefaultRoutes.DefaultHome
             else
-                GeneralRoutes.Login
+                GeneralRoutes.NotUserHome
 
             SocialStoreTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     NavHost(navController = navController, startDestination = startDestination){
+                        composable<GeneralRoutes.NotUserHome>{
+                            NotUserHomeHomeView(modifier = Modifier, navController = navController, userRole = mainState.userRole)
+                        }
                         composable<GeneralRoutes.Login>{
                             LoginView(modifier = Modifier.padding(innerPadding),
                                 navController = navController, userRole = mainState.userRole)
@@ -78,6 +82,7 @@ class MainActivity : ComponentActivity() {
                         composable<DefaultRoutes.DefaultHome>{
                             DefaultHomeView(modifier = Modifier.padding(innerPadding),
                                 navController = navController, userRole = mainState.userRole)
+                            //PublicHomeScreenMockup()
                         }
                         composable<GeneralRoutes.ResetPassword>{
                             ResetPasswordView(modifier = Modifier.padding(innerPadding),

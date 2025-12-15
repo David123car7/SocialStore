@@ -10,4 +10,7 @@ sealed class GeneralRoutes {
     object Register : GeneralRoutes()
     @Serializable
     object ResetPassword : GeneralRoutes()
+
+    @Serializable
+    object NotUserHome : GeneralRoutes()
 }
