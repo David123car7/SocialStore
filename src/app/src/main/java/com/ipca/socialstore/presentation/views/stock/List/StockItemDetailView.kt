@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -16,6 +17,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.ipca.socialstore.data.models.ItemModel
 
 import com.ipca.socialstore.presentation.models.StockReceiverModel
 import com.ipca.socialstore.presentation.ui.theme.SocialStoreTheme
@@ -55,45 +57,46 @@ fun StockItemDetail(
     onClickEdit : () -> Unit,
 
     ){
-    Column(
-        modifier = Modifier.fillMaxSize()
+    Scaffold(
+        topBar = {}
     ) {
-        Row(
-            Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Start
-        ) {
-            Text(text = "Nome : ${uiState.item.name}")
-            Text(text = "Tipo Item : ${uiState.item.itemType}")
-            Text(text = "Quantidade Total: ${uiState.totalQuantity}")
-        }
-        LazyColumn(
-            modifier = Modifier.fillMaxSize()
-                .padding(8.dp)
-        ) {
-            item {
-                Text(text = "Datas de Validade:", fontWeight = FontWeight.Bold)
-            }
-            items(uiState.quantityMap.toList()){ (date, quantity) ->
-                Text(text = " - Quantidade: $quantity | Validade: $date")
-            }
 
-            item {
-                Button(
-                    modifier = Modifier.padding(8.dp),
-                    onClick = {onClickEdit()}
-                ) {
-                    Text("Editar")
-                }
-            }
-        }
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, name = "Stock Item Detail Preview")
 @Composable
-fun StockItemDetailPreview() {
-    SocialStoreTheme {
+fun PreviewStockItemDetail() {
+    // 1. Mock ItemData
+    val mockItemData = ItemModel(
+        name = "Caixa de Maçãs Gala",
+        itemType = "Fruta"
+    )
 
+    // 2. Mock QuantityMap (Datas de Validade e Quantidades)
+    val mockQuantityMap = mutableMapOf(
+        "2025-12-25" to 50,
+        "2026-01-10" to 120,
+        "2026-01-30" to 30
+    )
+
+    // 3. Mock StockReceiverModel
+    val mockSelectedItem = StockReceiverModel(
+        item = mockItemData,
+        stockId = 101,
+        totalQuantity = 200, // 50 + 120 + 30
+        quantityMap = mockQuantityMap
+    )
+
+    // A função de edição será apenas simulada
+    val mockOnClickEdit: () -> Unit = { println("Botão Editar Clicado!") }
+
+    SocialStoreTheme {
+        StockItemDetail(
+            modifier = Modifier.fillMaxSize(),
+            uiState = mockSelectedItem,
+            onClickEdit = mockOnClickEdit
+        )
     }
 }
 

@@ -3,6 +3,8 @@ package com.ipca.socialstore.presentation.views.stock.List
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
@@ -17,16 +19,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.ipca.socialstore.data.models.ItemModel
-import com.ipca.socialstore.presentation.Componentes.SearchBarContent
+import com.ipca.socialstore.presentation.ui.components.SearchBarContent
 import com.ipca.socialstore.presentation.models.StockReceiverModel
 import com.ipca.socialstore.presentation.routes.AdminRoutes
 import com.ipca.socialstore.presentation.utils.ErrorText
 import kotlin.collections.mutableMapOf
 
 import com.ipca.socialstore.presentation.ui.theme.SocialStoreTheme
+import dagger.assisted.Assisted
 
 @Composable
 fun GetAllStockView(modifier: Modifier, navController: NavController, viewModel: ListAllStockViewModel){
@@ -40,12 +44,9 @@ fun GetAllStockView(modifier: Modifier, navController: NavController, viewModel:
         navController,
         onItemClick = { value -> viewModel.selectStock(value) },
         onSearchItem = {value -> viewModel.updateSearchList(value)},
+        onSearchType = {value -> viewModel.updateSearchListType(value)},
     )
 }
-
-// =================================================================
-// 1. REFACTOR: GetAllStockViewContent (Chamada Corrigida para StockList)
-// =================================================================
 
 @Composable
 fun GetAllStockViewContent(
@@ -54,8 +55,8 @@ fun GetAllStockViewContent(
     navController : NavController,
     onItemClick :(StockReceiverModel) -> Unit,
     onSearchItem: (value: String) -> Unit,
+    onSearchType : (value : String) -> Unit
 ) {
-    // Apenas passamos o listToDisplay para dentro do StockList
     val listToDisplay = uiState.searchResult ?: uiState.items
 
     Column(
@@ -64,70 +65,122 @@ fun GetAllStockViewContent(
             .padding(horizontal = 12.dp)
     ) {
         when {
-            uiState.isLoading -> LoadingIndicator() // Ocupa a tela inteira
-            uiState.error != null -> ErrorMessage(error = uiState.error) // Ocupa a tela inteira
-
-            // SE HOUVER CARREGAMENTO OU ERRO, SÓ EXIBIMOS ISSO.
+            uiState.isLoading -> LoadingIndicator()
+            uiState.error != null -> ErrorMessage(error = uiState.error)
 
             else -> StockList(
-                // Passamos a lista (que pode ser nula/vazia)
                 items = listToDisplay,
                 navController = navController,
+                uiState = uiState,
                 onItemClick = onItemClick,
                 onSearchItem = onSearchItem,
-                // Passamos o estado de pesquisa falhada para mostrar a mensagem correta
-                isSearchExecuted = uiState.searchResult != null
+                isSearchExecuted = uiState.searchResult != null,
+                onSearchType = onSearchType,
             )
         }
     }
 }
 
-// =================================================================
-// 2. REFACTOR: StockList (Assinatura Corrigida)
-// =================================================================
 
 @Composable
 private fun StockList(
-    items: List<StockReceiverModel>?, // Aceita nulo ou lista vazia
+    items: List<StockReceiverModel>?,
     navController: NavController,
+    uiState: GetStockState,
     onItemClick: (StockReceiverModel) -> Unit,
     onSearchItem: (value : String) -> Unit,
-    isSearchExecuted: Boolean // Novo parâmetro para saber se a pesquisa foi feita
+    onSearchType : (value : String) -> Unit,
+    isSearchExecuted: Boolean
 ) {
+    val selectedType = remember { mutableStateOf<String?>(null) }
 
+    val itemTypes = remember (items){
+        items
+            ?.map { it.item.itemType }
+            ?.filter { it.isNotBlank() }
+            ?.distinct()
+            ?: emptyList()
+    }
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(vertical = 8.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
-        // --- 1. BARRA DE PESQUISA (Bloco Fixo) ---
         item {
-           SearchBarContent {newValue -> onSearchItem(newValue)}
+            SearchBarContent {newValue -> onSearchItem(newValue)}
 
             Divider(modifier = Modifier.padding(bottom = 8.dp))
         }
+        item{
+            Row(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                LazyRow(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 8.dp, top = 4.dp),
+                    contentPadding = PaddingValues(horizontal = 4.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    // Chip para limpar o filtro
+                    item {
+                        AssistChip(
+                            onClick = {
+                                selectedType.value = null
+                                onSearchType("") // Limpa o filtro de tipo
+                            },
+                            label = { Text("Todos") },
+                            leadingIcon = {
+                                if (selectedType.value == null) {
+                                    Icon(Icons.Filled.Search, contentDescription = null)
+                                }
+                            },
+                            colors = AssistChipDefaults.assistChipColors(
+                                containerColor = if (selectedType.value == null) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant
+                            )
+                        )
+                    }
 
-        // --- 2. LÓGICA CONDICIONAL PARA O CONTEÚDO (Lista ou Mensagem) ---
+                    // Chips para cada tipo de item
+                    items(itemTypes) { type ->
+                        val isSelected = selectedType.value == type
+                        FilterChip(
+                            selected = isSelected,
+                            onClick = {
+                                val newType = if (isSelected) null else type
+                                selectedType.value = newType
+                                onSearchType(newType ?: "")
+                            },
+                            label = { Text(type) },
+                        )
+                    }
+                }
+            }
+        }
 
+        // CORREÇÃO: Contagem de itens
+        item {
+            Text("${items?.size ?: 0} produtos", style = MaterialTheme.typography.titleSmall)
+        }
+
+        // --- 3. CONTEÚDO DA LISTA ---
         if (items.isNullOrEmpty()) {
             item {
-                // Centralizar a mensagem na tela visível remanescente
                 Box(
                     modifier = Modifier
-                        .fillParentMaxSize() // Ocupa o restante da tela
-                        .padding(top = 50.dp), // Ajuste vertical
-                    contentAlignment = Alignment.TopCenter
+                        .fillParentMaxSize()
+                        .padding(top = 50.dp),
+                    contentAlignment = Alignment.Center
                 ) {
                     if (isSearchExecuted) {
-                        EmptySearchResultMessage() // "Não existe item."
+                        EmptySearchResultMessage()
                     } else {
-                        EmptyListMessage() // "Nenhum item de stock disponível."
+                        EmptyListMessage()
                     }
                 }
             }
         } else {
-            // --- 3. LISTA DE ITENS ---
             itemsIndexed(items) { _, stockHelper ->
                 SingleItemStock(
                     onClick = {
@@ -140,7 +193,6 @@ private fun StockList(
         }
     }
 }
-
 
 @Composable
 fun SingleItemStock(
@@ -167,7 +219,7 @@ fun SingleItemStock(
         modifier = modifier
             .fillMaxWidth()
             .clickable(onClick = onClick),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp), // Elevação suave (Estilo Painel)
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         colors = CardDefaults.cardColors(containerColor = containerColor),
         shape = MaterialTheme.shapes.small
     ) {
@@ -178,7 +230,6 @@ fun SingleItemStock(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            // Coluna de Informação Principal
             Column(
                 modifier = Modifier.weight(1f)
             ) {
@@ -198,7 +249,6 @@ fun SingleItemStock(
                 )
             }
 
-            // Indicador de Quantidade (Badge de Estado)
             Text(
                 text = "${uiState.totalQuantity} UN",
                 style = MaterialTheme.typography.labelLarge,
@@ -211,7 +261,7 @@ fun SingleItemStock(
 }
 
 @Composable
-private fun LoadingIndicator() {
+fun LoadingIndicator() {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         CircularProgressIndicator()
     }
@@ -219,7 +269,7 @@ private fun LoadingIndicator() {
 
 // CORREÇÃO DE TIPAGEM: Receber ErrorText e usar asString()
 @Composable
-private fun ErrorMessage(error: ErrorText?) {
+fun ErrorMessage(error: ErrorText?) {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Text(
             // Usa a função asString() da sealed class ErrorText
@@ -232,7 +282,7 @@ private fun ErrorMessage(error: ErrorText?) {
 }
 
 @Composable
-private fun EmptyListMessage() {
+fun EmptyListMessage() {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Text(
             text = "Nenhum item de stock disponível.",
@@ -243,7 +293,7 @@ private fun EmptyListMessage() {
 }
 
 @Composable
-private fun EmptySearchResultMessage() {
+fun EmptySearchResultMessage() {
     Box(
         // Remova o fillMaxSize() aqui para que ele possa ser controlado pelo Box pai
         contentAlignment = Alignment.Center
@@ -321,6 +371,7 @@ fun PreviewGetAllStock(){
                 onItemClick = { /* No-op para Preview */ },
                 navController = rememberNavController(),
                 onSearchItem = {},
+                onSearchType = {}
             )
         }
     }
