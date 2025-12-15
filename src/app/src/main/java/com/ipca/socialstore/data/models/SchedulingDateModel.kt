@@ -9,5 +9,5 @@ data class SchedulingDateModel(
     val id : Int? = null,
 
     @SerialName("date")
-    val date : String? = null
+    val date : String
 )

@@ -54,7 +54,7 @@ fun CreateSchedulingViewContent(
             onValueChange = {value -> onUpdateSubject(value) }
         )
         TextField(
-            value = uiState.schedulingDate?.date ?: "",
+            value = uiState.schedulingDate.date,
             label = {Text("Data de agendamento")},
             modifier = Modifier.padding(8.dp),
             onValueChange = {value -> onUpdateDate(value) }

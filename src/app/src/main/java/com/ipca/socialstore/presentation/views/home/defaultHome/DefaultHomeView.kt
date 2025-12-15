@@ -49,7 +49,8 @@ fun DefaultHomeView(modifier: Modifier, navController: NavController, userRole: 
             )
         },
         onClickTest = { navController.navigate(AdminRoutes.GetStock)},
-        onClickTest2 = { navController.navigate(AdminRoutes.CreateScheduling)}
+        onClickTest2 = { navController.navigate(AdminRoutes.CreateScheduling)},
+        onClickTest3 = { navController.navigate(AdminRoutes.CreateDonation)}
     )
 }
 
@@ -61,7 +62,9 @@ fun DefaultHomeViewContent(
     onClickApplication : ()-> Unit,
     onClickCreateApplication : ()-> Unit,
     onClickTest : () -> Unit,
-    onClickTest2: () -> Unit){
+    onClickTest2: () -> Unit,
+    onClickTest3 : () -> Unit
+){
     Box(modifier = modifier.fillMaxSize()){
         Column(modifier = modifier) {
             Text(modifier = Modifier.padding(8.dp), text = "Home Page")
@@ -102,6 +105,12 @@ fun DefaultHomeViewContent(
             ) {
                 Text("Criar Agendamento")
             }
+            Button(
+                modifier = Modifier.padding(8.dp),
+                onClick = {onClickTest3()}
+            ) {
+                Text("Criar Doacao")
+            }
         }
     }
 }
@@ -110,6 +119,6 @@ fun DefaultHomeViewContent(
 @Composable
 fun HomePreview(){
     SocialStoreTheme() {
-        DefaultHomeViewContent(modifier = Modifier, onClickLogout = { Unit}, onClickCreate = { Unit}, onClickApplication = { Unit}, onClickCreateApplication = {},onClickTest = { Unit}, onClickTest2 = { Unit})
+        DefaultHomeViewContent(modifier = Modifier, onClickLogout = { Unit}, onClickCreate = { Unit}, onClickApplication = { Unit}, onClickCreateApplication = {},onClickTest = { Unit}, onClickTest2 = { Unit}, onClickTest3 = { Unit})
     }
 }
