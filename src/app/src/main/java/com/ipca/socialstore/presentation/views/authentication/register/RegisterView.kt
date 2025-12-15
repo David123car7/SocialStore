@@ -146,7 +146,7 @@ fun RegisterViewContent(
                 .padding(24.dp)
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically)
         ) {
             Icon(
                 imageVector = Icons.Default.Add,
@@ -154,8 +154,6 @@ fun RegisterViewContent(
                 modifier = Modifier.size(64.dp),
                 tint = MaterialTheme.colorScheme.primary
             )
-
-            Spacer(modifier = Modifier.height(24.dp))
 
             Text(
                 text = "Criar Conta",
@@ -169,8 +167,6 @@ fun RegisterViewContent(
                 color = Color.Gray
             )
 
-            Spacer(modifier = Modifier.height(32.dp))
-
             TextFieldValueComponent(
                 modifier = Modifier,
                 label = "Nome Completo",
@@ -178,8 +174,6 @@ fun RegisterViewContent(
                 icon = Icons.Default.Star,
                 onValueUpdate = onNameUpdate
             )
-
-            Spacer(modifier = Modifier.height(16.dp))
 
             TextFieldDateComponent(
                 modifier = Modifier,
@@ -189,8 +183,6 @@ fun RegisterViewContent(
                 onDatePickerUpdate = {showDatePicker = true}
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
-
             TextFieldValueComponent(
                 modifier = Modifier,
                 label = "Email",
@@ -199,15 +191,11 @@ fun RegisterViewContent(
                 onValueUpdate = onEmailUpdate
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
-
             TextFieldPasswordComponent(
                 modifier = Modifier,
                 password = uiState.password,
                 onPasswordUpdate = onPasswordUpdate
             )
-
-            Spacer(modifier = Modifier.height(32.dp))
 
             Button(
                 onClick = onRegister,
@@ -218,8 +206,6 @@ fun RegisterViewContent(
             ) {
                 Text("Registar", fontSize = 16.sp, fontWeight = FontWeight.Bold)
             }
-
-            Spacer(modifier = Modifier.height(24.dp))
 
             if (uiState.error != null) {
                 ErrorTextComponent(message = uiState.error!!.asString())

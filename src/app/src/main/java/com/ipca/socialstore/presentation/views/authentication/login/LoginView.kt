@@ -93,7 +93,7 @@ fun LoginViewContent(modifier: Modifier,
                 .padding(padding)
                 .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically)
         ) {
             Surface(
                 modifier = Modifier.size(80.dp),
@@ -110,8 +110,6 @@ fun LoginViewContent(modifier: Modifier,
                 )
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
-
             Text(
                 text = "Social Store",
                 style = MaterialTheme.typography.headlineMedium,
@@ -125,8 +123,6 @@ fun LoginViewContent(modifier: Modifier,
                 color = Color.Gray
             )
 
-            Spacer(modifier = Modifier.height(48.dp))
-
             TextFieldValueComponent(
                 modifier = Modifier,
                 label = "Email",
@@ -134,8 +130,6 @@ fun LoginViewContent(modifier: Modifier,
                 icon = Icons.Default.Email,
                 onValueUpdate = onEmailUpdate
             )
-
-            Spacer(modifier = Modifier.height(16.dp))
 
             TextFieldPasswordComponent(
                 modifier = Modifier,
@@ -149,8 +143,6 @@ fun LoginViewContent(modifier: Modifier,
                 }
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
-
             Button(
                 onClick = onLogin,
                 modifier = Modifier
@@ -160,8 +152,6 @@ fun LoginViewContent(modifier: Modifier,
             ) {
                 Text("Entrar", fontSize = 16.sp, fontWeight = FontWeight.Bold)
             }
-
-            Spacer(modifier = Modifier.weight(1f))
 
             if (uiState.error != null) {
                 ErrorTextComponent(message = uiState.error!!.asString())

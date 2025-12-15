@@ -109,7 +109,7 @@ fun ResetPasswordViewContent(
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically)
         ) {
             Icon(
                 imageVector = if (uiState.requestedReset) Icons.Default.Email else Icons.Default.Close,
@@ -123,13 +123,15 @@ fun ResetPasswordViewContent(
                 enter = fadeIn() + slideInVertically(),
                 exit = fadeOut()
             ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically)
+                ) {
                     Text(
                         "Esqueceu a palavra-passe?",
                         style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.Bold
                     )
-                    Spacer(Modifier.height(8.dp))
 
                     Text(
                         "Insira o seu email para receber o código de recuperação.",
@@ -145,8 +147,6 @@ fun ResetPasswordViewContent(
                         icon = Icons.Default.Star,
                         onValueUpdate = onEmailUpdate
                     )
-
-                    Spacer(Modifier.height(24.dp))
 
                     Button(
                         onClick = {
@@ -165,7 +165,8 @@ fun ResetPasswordViewContent(
                 enter = fadeIn() + slideInVertically(),
                 exit = fadeOut()
             ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
                         "Definir Nova Palavra-passe",
                         style = MaterialTheme.typography.headlineSmall,
@@ -232,7 +233,7 @@ fun ResetPasswordViewContent(
 @Composable
 fun ResetPasswordPreview(){
     SocialStoreTheme() {
-        val uiState = ResetState(email = "", error = null, isLoading = false)
+        val uiState = ResetState(email = "", error = null, isLoading = false, requestedReset = true)
 
         ResetPasswordViewContent(modifier = Modifier,
             onClickSendEmail = { Unit},

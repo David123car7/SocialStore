@@ -66,7 +66,7 @@ fun CreateCampaignViewContent(
 @Composable
 fun PreviewCreateCampaignViewContent(){
     SocialStoreTheme() {
-        val campaign = CampaignModel(name = "", date = "")
+        val campaign = CampaignModel(name = "", date = "", description = "", category = "")
         val uiState = CampaignState(campaign,false,null,false)
         CreateCampaignViewContent(
             modifier = Modifier,
