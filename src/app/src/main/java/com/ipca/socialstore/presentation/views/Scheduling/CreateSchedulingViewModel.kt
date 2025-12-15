@@ -2,7 +2,6 @@ package com.ipca.socialstore.presentation.views.Scheduling
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
@@ -13,10 +12,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
-import com.ipca.socialstore.ui.theme.SocialStoreTheme
+import com.ipca.socialstore.presentation.ui.theme.SocialStoreTheme
 
 @Composable
 fun CreateSchedulingView(
@@ -51,7 +48,7 @@ fun CreateSchedulingViewContent(
         modifier.fillMaxSize()
     ) {
         TextField(
-            value = uiState.notification.subject,
+            value = uiState.notification?.subject ?: "",
             label = {Text("Mensagem")},
             modifier = Modifier.padding(8.dp),
             onValueChange = {value -> onUpdateSubject(value) }

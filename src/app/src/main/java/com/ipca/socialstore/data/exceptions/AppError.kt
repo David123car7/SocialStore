@@ -3,6 +3,7 @@ package com.ipca.socialstore.data.exceptions
 sealed class AppError {
     // 1. Business Errors (user fault)
     object InvalidPassword : AppError()
+    object DifferentPassword: AppError()
     object UserNotFound : AppError()
     object DataNotFound: AppError()
     object DataNotCreated: AppError()
