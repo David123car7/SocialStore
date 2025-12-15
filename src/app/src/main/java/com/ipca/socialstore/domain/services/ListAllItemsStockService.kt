@@ -1,7 +1,7 @@
 package com.ipca.socialstore.domain.services
 
 import com.ipca.socialstore.data.exceptions.ExceptionMapper
-import com.ipca.socialstore.presentation.models.StockReveiverModel
+import com.ipca.socialstore.presentation.models.StockReceiverModel
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
 import com.ipca.socialstore.domain.item.GetItemsFromStockUseCase
 import com.ipca.socialstore.domain.stock.GetFullStockUseCase
@@ -13,7 +13,7 @@ class ListAllItemsStockService @Inject constructor(
     private val getFullStockUseCase: GetFullStockUseCase,
     private val getItemsFromStockUseCase: GetItemsFromStockUseCase
 ){
-    suspend operator fun invoke() : ResultWrapper<List<StockReveiverModel>>{
+    suspend operator fun invoke() : ResultWrapper<List<StockReceiverModel>>{
         return try {
             val stockResult = getFullStockUseCase()
             if(stockResult is ResultWrapper.Error) return ResultWrapper.Error(stockResult.error)
@@ -34,7 +34,7 @@ class ListAllItemsStockService @Inject constructor(
             // Group stock by ItemId
             val groupedStock = stockList.groupBy { it.itemId }
 
-            val stockReveiverList = mutableListOf<StockReveiverModel>()
+            val stockReveiverList = mutableListOf<StockReceiverModel>()
 
             // 5. Process each group
             for ((itemId, stocks) in groupedStock) {
@@ -50,7 +50,7 @@ class ListAllItemsStockService @Inject constructor(
                 }
 
                 stockReveiverList.add(
-                    StockReveiverModel(
+                    StockReceiverModel(
                         item = item,
                         totalQuantity = totalQty,
                         stockId = stocks.first().id ?: 0,

@@ -66,12 +66,6 @@ class MainActivity : ComponentActivity() {
                                 navController = navController, userRole = mainState.userRole
                             )
                         }
-                        composable<DefaultRoutes.CreateApplication> {
-                            CreateApplicationView(modifier = Modifier.padding(innerPadding))
-                        }
-                        composable<DefaultRoutes.Application> {
-                            ApplicationView(modifier = Modifier.padding(innerPadding))
-                        }
                         composable<DefaultRoutes.DefaultHome>{
                             DefaultHomeView(modifier = Modifier.padding(innerPadding),
                                 navController = navController, userRole = mainState.userRole)

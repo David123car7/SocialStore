@@ -57,7 +57,7 @@ fun CreateSchedulingViewContent(
             onValueChange = {value -> onUpdateSubject(value) }
         )
         TextField(
-            value = uiState.schedulingDate?.date ?: "",
+            value = uiState.schedulingDate.date,
             label = {Text("Data de agendamento")},
             modifier = Modifier.padding(8.dp),
             onValueChange = {value -> onUpdateDate(value) }
@@ -83,15 +83,6 @@ fun CreateSchedulingViewContent(
 @Composable
 fun Preview(){
     SocialStoreTheme() {
-        val uiState = CreateSchedulingState(null,null,null,false,null)
-        CreateSchedulingViewContent(
-            modifier = Modifier,
-            uiState = uiState,
-            onUpdateDate = {},
-            onUpdateSubject = {},
-            onUpdateBeneficiary = {},
-            onCreate = {},
-            onUpdateCreateAt = {}
-        )
+
     }
 }

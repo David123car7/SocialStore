@@ -3,7 +3,7 @@ package com.ipca.socialstore.presentation.views.stock.Edit
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ipca.socialstore.presentation.models.StockReveiverModel
+import com.ipca.socialstore.presentation.models.StockReceiverModel
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
 import com.ipca.socialstore.domain.stock.SetStockQuantityUseCase
 import com.ipca.socialstore.presentation.utils.ErrorText
@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class EditState(
-    val stock: StockReveiverModel? = null,
+    val stock: StockReceiverModel? = null,
     val quantity: String? = null,
     val error: ErrorText? = null,
     val isEditing : Boolean? = false,
