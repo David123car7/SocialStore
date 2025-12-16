@@ -1,4 +1,4 @@
-package com.ipca.socialstore.presentation.views.home.notUserHome
+package com.ipca.socialstore.presentation.views.home.defaultHomeView
 
 import androidx.compose.runtime.getValue
 import androidx.compose.foundation.background
@@ -29,11 +29,8 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -43,69 +40,54 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.compose.rememberNavController
 import com.ipca.socialstore.data.enums.UserRole
 import com.ipca.socialstore.data.models.CampaignModel
 import com.ipca.socialstore.presentation.objects.NavigationLogic
 import com.ipca.socialstore.presentation.routes.GeneralRoutes
 import com.ipca.socialstore.presentation.ui.theme.SocialStoreTheme
+import com.ipca.socialstore.presentation.ui.SocialStoreScaffold
 import kotlin.text.uppercase
 
 @Composable
-fun NotUserHomeHomeView(modifier: Modifier, navController: NavController, userRole: UserRole) {
-    val homeViewModel: NotUserHomeViewModel = viewModel()
+fun DefaultHomeView(modifier: Modifier = Modifier, navController: NavController, userRole: UserRole) {
+    val homeViewModel: DefaultHomeViewModel = hiltViewModel()
     val uiState by homeViewModel.uiState
 
-    NotUserHomeViewContent(
-        modifier = modifier,
-        uiState = uiState,
-        onClickLogin = {
-            NavigationLogic.navigateTo(
-                navController = navController, userRole = userRole, route = GeneralRoutes.Login
-            )
-        },
-        onCampaignClick = {}
-    )
+    // 1. O Scaffold dá-te 'innerPadding' (o espaço livre entre as barras)
+    SocialStoreScaffold(navController = navController, userRole = userRole, logout = { homeViewModel.logout() }) { innerPadding ->
+        DefaultHomeViewContent(
+            // 2. Tens de passar esse padding para o modifier!
+            modifier = modifier.padding(innerPadding),
+            uiState = uiState,
+            onClickLogin = {
+                NavigationLogic.navigateTo(
+                    navController = navController, userRole = userRole, route = GeneralRoutes.Login
+                )
+            },
+            onCampaignClick = {}
+        )
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NotUserHomeViewContent(
+fun DefaultHomeViewContent(
     modifier: Modifier,
-    uiState: NotUserHomeState,
+    uiState: DefaultHomeState,
     onClickLogin: () -> Unit,
     onCampaignClick: () -> Unit
 ) {
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                        Icon(Icons.Default.Star, null, tint = MaterialTheme.colorScheme.primary)
-                        Text("Social Store", fontWeight = FontWeight.Bold)
-                    }
-                },
-                actions = {
-                    TextButton(onClick = onClickLogin) {
-                        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                            Icon(Icons.Default.Star, null, modifier = Modifier.size(18.dp))
-                            Text("Entrar")
-                        }
-                    }
-                }
-            )
-        }
-    ) { padding ->
-
         Column(
-            modifier = Modifier
-                .padding(padding)
+            modifier = modifier
+                .padding(8.dp)
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.SpaceBetween
         ) {
-
             Column(modifier = Modifier.padding(horizontal = 20.dp, vertical = 10.dp)) {
                 Text(
                     "Ajudar nunca foi tão fácil.",
@@ -159,7 +141,7 @@ fun NotUserHomeViewContent(
                 Text("SAS IPCA - Serviços de Ação Social", style = MaterialTheme.typography.bodySmall, color = Color.Gray)
             }
         }
-    }
+
 }
 
 @Composable
@@ -352,7 +334,7 @@ fun StatItem(value: String, label: String) {
 
 @Preview(showBackground = true)
 @Composable
-fun NotUserHomePreview(){
+fun DefaultHomePreview(){
     SocialStoreTheme {
         val mockCampaigns = listOf(
             CampaignModel(
@@ -378,17 +360,18 @@ fun NotUserHomePreview(){
             )
         )
 
-        val uiState = NotUserHomeState(
+        val uiState = DefaultHomeState(
             error = null,
             campaignList = emptyList(),
             isLoading = false
         )
-
-        NotUserHomeViewContent(
-            modifier = Modifier,
-            uiState = uiState,
-            onCampaignClick = {},
-            onClickLogin = {}
-        )
+        SocialStoreScaffold(navController = rememberNavController(), userRole = UserRole.DEFAULT, logout = {}){
+            DefaultHomeViewContent(
+                modifier = Modifier,
+                uiState = uiState,
+                onCampaignClick = {},
+                onClickLogin = {}
+            )
+        }
     }
 }

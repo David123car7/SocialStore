@@ -27,6 +27,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -73,6 +74,16 @@ fun LoginView(modifier: Modifier, navController: NavController, userRole: UserRo
             route =  GeneralRoutes.ResetPassword
         )}
     )
+
+    LaunchedEffect(uiState.isLoggedIn) {
+        if(uiState.isLoggedIn){
+            NavigationLogic.navigateTo(
+                navController = navController,
+                userRole = userRole,
+                route = GeneralRoutes.Home
+            )
+        }
+    }
 }
 
 @Composable

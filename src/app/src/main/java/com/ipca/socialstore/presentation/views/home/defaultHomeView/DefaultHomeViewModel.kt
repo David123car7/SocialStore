@@ -1,13 +1,18 @@
-package com.ipca.socialstore.presentation.views.home.notUserHome
+package com.ipca.socialstore.presentation.views.home.defaultHomeView
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.ipca.socialstore.data.models.CampaignModel
+import com.ipca.socialstore.data.resultwrappers.ResultWrapper
+import com.ipca.socialstore.domain.auth.LogoutUseCase
 import com.ipca.socialstore.presentation.utils.ErrorText
-import com.ipca.socialstore.presentation.views.home.defaultHome.DefaultHomeState
+import com.ipca.socialstore.presentation.utils.asUiText
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-data class NotUserHomeState (
+data class DefaultHomeState (
     var error : ErrorText? = null,
     var campaignList: List<CampaignModel> = listOf(
         CampaignModel(
@@ -35,6 +40,26 @@ data class NotUserHomeState (
     var isLoading : Boolean = false,
 )
 
-class NotUserHomeViewModel : ViewModel() {
-    var uiState = mutableStateOf(NotUserHomeState())
+@HiltViewModel
+class DefaultHomeViewModel @Inject constructor(private val logoutUseCase: LogoutUseCase): ViewModel() {
+    var uiState = mutableStateOf(DefaultHomeState())
+
+    fun logout(){
+        viewModelScope.launch {
+            val result = logoutUseCase()
+            when(result){
+                is ResultWrapper.Success -> {
+                    uiState.value = uiState.value.copy(
+                        isLoading = false,
+                    )
+                }
+                is ResultWrapper.Error -> {
+                    uiState.value = uiState.value.copy(
+                        isLoading = false,
+                        error = result.error.asUiText()
+                    )
+                }
+            }
+        }
+    }
 }

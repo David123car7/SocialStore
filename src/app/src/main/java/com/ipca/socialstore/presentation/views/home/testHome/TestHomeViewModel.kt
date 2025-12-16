@@ -1,4 +1,4 @@
-package com.ipca.socialstore.presentation.views.home.defaultHome
+package com.ipca.socialstore.presentation.views.home.testHome
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -12,15 +12,15 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-data class DefaultHomeState (
+data class TestHomeState (
     var error : ErrorText? = null,
     var userRole: String = "",
     var isLoading : Boolean = false,
 )
 
 @HiltViewModel
-class DefaultHomeViewModel @Inject constructor(private val logoutUseCase: LogoutUseCase, private val getUserRoleUseCase: GetUserRoleUseCase): ViewModel() {
-    var uiState = mutableStateOf(DefaultHomeState())
+class TestHomeViewModel @Inject constructor(private val logoutUseCase: LogoutUseCase, private val getUserRoleUseCase: GetUserRoleUseCase): ViewModel() {
+    var uiState = mutableStateOf(TestHomeState())
 
     fun logout(){
         viewModelScope.launch {

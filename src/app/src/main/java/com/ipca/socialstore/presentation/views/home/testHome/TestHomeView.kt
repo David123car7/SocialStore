@@ -1,4 +1,4 @@
-package com.ipca.socialstore.presentation.views.home.defaultHome
+package com.ipca.socialstore.presentation.views.home.testHome
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,11 +20,11 @@ import com.ipca.socialstore.presentation.routes.DefaultRoutes
 import com.ipca.socialstore.presentation.ui.theme.SocialStoreTheme
 
 @Composable
-fun DefaultHomeView(modifier: Modifier, navController: NavController, userRole: UserRole) {
-    val homeViewModel: DefaultHomeViewModel = hiltViewModel()
+fun TestHomeView(modifier: Modifier, navController: NavController, userRole: UserRole) {
+    val homeViewModel: TestHomeViewModel = hiltViewModel()
     val uiState by homeViewModel.uiState
 
-    DefaultHomeViewContent(
+    TestViewContent(
         modifier = modifier,
         onClickLogout = {homeViewModel.logout()},
         onClickCreate = {
@@ -54,7 +54,7 @@ fun DefaultHomeView(modifier: Modifier, navController: NavController, userRole: 
 }
 
 @Composable
-fun DefaultHomeViewContent(
+fun TestViewContent(
     modifier: Modifier,
     onClickLogout:()->Unit,
     onClickCreate : ()-> Unit,
@@ -110,6 +110,6 @@ fun DefaultHomeViewContent(
 @Composable
 fun HomePreview(){
     SocialStoreTheme() {
-        DefaultHomeViewContent(modifier = Modifier, onClickLogout = { Unit}, onClickCreate = { Unit}, onClickApplication = { Unit}, onClickCreateApplication = {},onClickTest = { Unit}, onClickTest2 = { Unit})
+        TestViewContent(modifier = Modifier, onClickLogout = { Unit}, onClickCreate = { Unit}, onClickApplication = { Unit}, onClickCreateApplication = {},onClickTest = { Unit}, onClickTest2 = { Unit})
     }
 }

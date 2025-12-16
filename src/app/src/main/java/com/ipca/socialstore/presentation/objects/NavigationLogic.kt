@@ -11,7 +11,10 @@ object NavigationLogic {
     fun navigateTo(navController: NavController, userRole: UserRole, route: Any){
         when(route){
             is GeneralRoutes -> {
-                navController.navigate(route = route)
+                if(route is GeneralRoutes.ResetView)
+                    resetNavigation(navController = navController, userRole = userRole)
+                else
+                    navController.navigate(route = route)
             }
             is BeneficiaryRoutes -> {
                 if(userRole == UserRole.BENEFICIARY)
@@ -39,9 +42,7 @@ object NavigationLogic {
             navController.navigate(AdminRoutes.AdminHome)
         else if(userRole == UserRole.BENEFICIARY)
             navController.navigate(BeneficiaryRoutes.BeneficiaryHome)
-        else if (userRole == UserRole.DEFAULT)
-            navController.navigate(DefaultRoutes.DefaultHome)
         else
-            navController.navigate(GeneralRoutes.Login)
+            navController.navigate(DefaultRoutes.DefaultHome)
     }
 }
