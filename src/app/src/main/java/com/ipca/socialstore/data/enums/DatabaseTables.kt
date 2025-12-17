@@ -13,6 +13,8 @@ enum class DatabaseTables(val tableName: String) {
     APPLICATION_STATE("application_state"),
     ACADEMIC("academic"),
     DOCUMENT("document"),
+
+    DOCUMENT_STATE("document_state"),
     SCHEDULING ("Scheduling"),
 
     BENEFICIARY("Beneficiary"),

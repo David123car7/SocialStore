@@ -1,6 +1,5 @@
-package com.ipca.socialstore.domain.services
+package com.ipca.socialstore.domain.services.document
 
-import com.ipca.socialstore.data.enums.UserRole
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
 import com.ipca.socialstore.domain.document.RemoveDocumentUseCase
 import com.ipca.socialstore.domain.storage.document.RemoveDocumentStorageUseCase

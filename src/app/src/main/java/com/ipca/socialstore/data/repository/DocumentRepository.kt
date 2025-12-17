@@ -40,7 +40,6 @@ class DocumentRepository @Inject constructor(private val supabase: SupabaseClien
                     eq("id", documentId)
                 }
             }
-            // If no error was thrown, the delete request was sent successfully
             ResultWrapper.Success(Unit)
         } catch (e: Exception) {
             return ResultWrapper.Error(exceptionMapper.map(e))

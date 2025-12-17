@@ -1,8 +1,6 @@
-package com.ipca.socialstore.presentation.views.application.applicationData
+package com.ipca.socialstore.presentation.views.application.applicationState
 
 import android.content.Context
-
-
 import android.net.Uri
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -18,15 +16,16 @@ import com.ipca.socialstore.domain.application.GetUserApplicationUseCase
 import com.ipca.socialstore.domain.applicationState.GetUserApplicationState
 import com.ipca.socialstore.domain.document.GetAllDocumentsUseCase
 import com.ipca.socialstore.domain.services.document.DeleteDocumentService
+import com.ipca.socialstore.domain.services.document.GetAllDocumentsService
 import com.ipca.socialstore.domain.services.document.UploadDocumentsService
+import com.ipca.socialstore.presentation.models.DocumentReceiverModel
 import com.ipca.socialstore.presentation.utils.ErrorText
 import com.ipca.socialstore.presentation.utils.asUiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlin.collections.plus
 
-data class ApplicationState2(
+data class ApplicationState(
     val isLoading: Boolean = false,
     val error: ErrorText? = null,
     val isData: Boolean = true,
@@ -35,30 +34,30 @@ data class ApplicationState2(
     val applicationState: ApplicationStateModel? = null,
     val academicData: AcademicModel? = null,
 
-    //Files ()
+    //Files selected localy
     val selectedBankStatements: List<Uri> = emptyList(),
     val selectedIncomeProof: List<Uri> = emptyList(),
     val selectedOtherIncome: List<Uri> = emptyList(),
     val selectedPermanentExpenses: List<Uri> = emptyList(),
     val selectedInternationalSupport: List<Uri> = emptyList(),
 
-    //Documents
-    val documentsBankStatements: List<DocumentModel> = emptyList(),
-    val documentsIncomeProof: List<DocumentModel> = emptyList(),
-    val documentsOtherIncome: List<DocumentModel> = emptyList(),
-    val documentsPermanentExpenses: List<DocumentModel> = emptyList(),
-    val documentsInternationalSupport: List<DocumentModel> = emptyList()
+    //Files fetched from the db
+    val documentsBankStatements: List<DocumentReceiverModel> = emptyList(),
+    val documentsIncomeProof: List<DocumentReceiverModel> = emptyList(),
+    val documentsOtherIncome: List<DocumentReceiverModel> = emptyList(),
+    val documentsPermanentExpenses: List<DocumentReceiverModel> = emptyList(),
+    val documentsInternationalSupport: List<DocumentReceiverModel> = emptyList()
 )
 
 @HiltViewModel
-class ApplicationViewModel @Inject constructor(
+class ApplicationStateViewModel @Inject constructor(
     private val getUserApplicationUseCase: GetUserApplicationUseCase,
-    private val uploadDocumentsService: UploadDocumentsService,
     private val getAcademicDataUseCase: GetAcademicDataUseCase,
     private val getUserApplicationState: GetUserApplicationState,
-    private val getAllDocumentsUseCase: GetAllDocumentsUseCase,
-    private val deleteDocumentService: DeleteDocumentService): ViewModel() {
-    var uiState = mutableStateOf(ApplicationState2())
+    private val uploadDocumentsService: UploadDocumentsService,
+    private val getAllDocumentsService: GetAllDocumentsService,
+    private val deleteDocumentService: DeleteDocumentService) : ViewModel(){
+    var uiState = mutableStateOf(ApplicationState())
 
     init {
         if(uiState.value.application == null){
@@ -119,7 +118,7 @@ class ApplicationViewModel @Inject constructor(
     suspend fun getAllDocuments() {
         if(uiState.value.application!= null){
             uiState.value = uiState.value.copy(isLoading = true)
-            val documentsResult = getAllDocumentsUseCase(applicationId = uiState.value.application?.id!!)
+            val documentsResult = getAllDocumentsService(applicationId = uiState.value.application?.id!!)
             when(documentsResult){
                 is ResultWrapper.Success -> {
                     uiState.value = uiState.value.copy(
@@ -137,7 +136,7 @@ class ApplicationViewModel @Inject constructor(
         }
     }
 
-    private fun filterDocuments(documentsList: List<DocumentModel>){
+    private fun filterDocuments(documentsList: List<DocumentReceiverModel>){
         uiState.value = uiState.value.copy(
             documentsBankStatements = documentsList.filter { doc ->
                 doc.folderName == DocumentType.BANK_STATEMENTS.folderName
@@ -231,7 +230,7 @@ class ApplicationViewModel @Inject constructor(
         }
     }
 
-    fun removeDocument(document: DocumentModel, folderName: String) {
+    fun removeDocument(document: DocumentReceiverModel, folderName: String) {
         val currentState = uiState.value
 
         uiState.value = when (folderName) {
@@ -264,7 +263,7 @@ class ApplicationViewModel @Inject constructor(
         }
     }
 
-    fun removeSubmittedDocument(document: DocumentModel) {
+    fun removeSubmittedDocument(document: DocumentReceiverModel) {
         viewModelScope.launch {
             uiState.value = uiState.value.copy(isLoading = true, error = null)
             val result = deleteDocumentService(filePath = document.path, documentId = document.id!!)
@@ -316,73 +315,6 @@ class ApplicationViewModel @Inject constructor(
             }
 
             uiState.value = uiState.value.copy(isLoading = false)
-        }
-    }
-
-    fun updateIsData(){
-        val data = !uiState.value.isData
-        uiState.value = uiState.value.copy(isData = data)
-    }
-
-    fun updateSchoolYear(value: String){
-        val year = value.toIntOrNull() ?: return
-
-        uiState.value = uiState.value.copy(
-            application = uiState.value.application?.copy(schoolYear = year)
-        )
-    }
-
-    fun updateName(value: String) {
-        uiState.value = uiState.value.copy(
-            application = uiState.value.application?.copy(name = value)
-        )
-    }
-
-    fun updateBirthDate(value: String) {
-        uiState.value = uiState.value.copy(
-            application = uiState.value.application?.copy(birthDate = value)
-        )
-    }
-
-    fun updateCc(value: String) {
-        uiState.value = uiState.value.copy(
-            application = uiState.value.application?.copy(cc = value)
-        )
-    }
-
-    fun updatePhoneNumber(value: String) {
-        uiState.value = uiState.value.copy(
-            application = uiState.value.application?.copy(phoneNumber = value)
-        )
-    }
-
-    fun updateRequestType(value: String) {
-        uiState.value = uiState.value.copy(
-            application = uiState.value.application?.copy(requestType = value)
-        )
-    }
-
-    fun updateTypeCourse(value: String) {
-        if(uiState.value.academicData != null) {
-            uiState.value = uiState.value.copy(
-                academicData = uiState.value.academicData?.copy(typeCourse = value)
-            )
-        }
-    }
-
-    fun updateCourse(value: String) {
-        if(uiState.value.academicData != null){
-            uiState.value = uiState.value.copy(
-                academicData = uiState.value.academicData?.copy(course = value)
-            )
-        }
-    }
-
-    fun updateStudentNumber(value: String) {
-        if(uiState.value.academicData != null) {
-            uiState.value = uiState.value.copy(
-                academicData = uiState.value.academicData!!.copy(studenNumber = value)
-            )
         }
     }
 }

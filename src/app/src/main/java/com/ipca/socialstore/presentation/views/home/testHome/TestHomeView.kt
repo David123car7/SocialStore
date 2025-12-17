@@ -14,7 +14,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.ipca.socialstore.data.enums.UserRole
-import com.ipca.socialstore.presentation.objects.NavigationLogic
+import com.ipca.socialstore.presentation.utils.NavigationLogic
 import com.ipca.socialstore.presentation.routes.AdminRoutes
 import com.ipca.socialstore.presentation.routes.DefaultRoutes
 import com.ipca.socialstore.presentation.ui.theme.SocialStoreTheme
@@ -45,7 +45,7 @@ fun TestHomeView(modifier: Modifier, navController: NavController, userRole: Use
             NavigationLogic.navigateTo(
                 navController = navController,
                 userRole = userRole,
-                route = DefaultRoutes.Application
+                route = DefaultRoutes.ApplicationInfo
             )
         },
         onClickTest = { navController.navigate(AdminRoutes.GetStock)},

@@ -40,37 +40,35 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import com.ipca.socialstore.data.enums.UserRole
 import com.ipca.socialstore.data.models.CampaignModel
-import com.ipca.socialstore.presentation.objects.NavigationLogic
+import com.ipca.socialstore.presentation.routes.DefaultRoutes
+import com.ipca.socialstore.presentation.utils.NavigationLogic
 import com.ipca.socialstore.presentation.routes.GeneralRoutes
 import com.ipca.socialstore.presentation.ui.theme.SocialStoreTheme
 import com.ipca.socialstore.presentation.ui.SocialStoreScaffold
+import com.ipca.socialstore.presentation.ui.SocialStoreScaffoldContent
 import kotlin.text.uppercase
 
 @Composable
 fun DefaultHomeView(modifier: Modifier = Modifier, navController: NavController, userRole: UserRole) {
-    val homeViewModel: DefaultHomeViewModel = hiltViewModel()
+    val homeViewModel: DefaultHomeViewModel = viewModel()
     val uiState by homeViewModel.uiState
 
-    // 1. O Scaffold dá-te 'innerPadding' (o espaço livre entre as barras)
-    SocialStoreScaffold(navController = navController, userRole = userRole, logout = { homeViewModel.logout() }) { innerPadding ->
-        DefaultHomeViewContent(
-            // 2. Tens de passar esse padding para o modifier!
-            modifier = modifier.padding(innerPadding),
-            uiState = uiState,
-            onClickLogin = {
-                NavigationLogic.navigateTo(
-                    navController = navController, userRole = userRole, route = GeneralRoutes.Login
-                )
-            },
-            onCampaignClick = {}
-        )
-    }
+    DefaultHomeViewContent(
+        modifier = modifier,
+        uiState = uiState,
+        onClickApplication = {
+            NavigationLogic.navigateTo(
+                navController = navController, userRole = userRole, route = DefaultRoutes.ApplicationInfo
+            )
+        },
+        onCampaignClick = {}
+    )
+
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -78,7 +76,7 @@ fun DefaultHomeView(modifier: Modifier = Modifier, navController: NavController,
 fun DefaultHomeViewContent(
     modifier: Modifier,
     uiState: DefaultHomeState,
-    onClickLogin: () -> Unit,
+    onClickApplication: () -> Unit,
     onCampaignClick: () -> Unit
 ) {
         Column(
@@ -86,7 +84,10 @@ fun DefaultHomeViewContent(
                 .padding(8.dp)
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.SpaceBetween
+            verticalArrangement = Arrangement.spacedBy(
+                space = 20.dp,
+                alignment = Alignment.CenterVertically
+            )
         ) {
             Column(modifier = Modifier.padding(horizontal = 20.dp, vertical = 10.dp)) {
                 Text(
@@ -127,7 +128,7 @@ fun DefaultHomeViewContent(
             }
 
             Box(modifier = Modifier.padding(horizontal = 20.dp)) {
-                NeedHelpBanner(onClick = onClickLogin)
+                NeedHelpBanner(onClick = onClickApplication)
             }
 
             Column(
@@ -332,46 +333,64 @@ fun StatItem(value: String, label: String) {
     }
 }
 
+private val mockCampaigns = listOf(
+    CampaignModel(
+        id = 1,
+        name = "Natal Solidário",
+        description = "Ajude-nos a compor 500 cabazes para as famílias mais carenciadas da comunidade académica.",
+        category = "Alimentar",
+        date = "2025-12-25"
+    ),
+    CampaignModel(
+        id = 2,
+        name = "Kit Escolar 2026",
+        description = "Recolha de cadernos, canetas e calculadoras para o segundo semestre.",
+        category = "Educação",
+        date = "2026-02-10"
+    ),
+    CampaignModel(
+        id = 3,
+        name = "Inverno Quente",
+        description = "Estamos a recolher casacos e mantas em bom estado.",
+        category = "Vestuário",
+        date = "2025-11-30"
+    )
+)
+
 @Preview(showBackground = true)
 @Composable
-fun DefaultHomePreview(){
+fun DefaultHomePreviewWithBars(){
     SocialStoreTheme {
-        val mockCampaigns = listOf(
-            CampaignModel(
-                id = 1,
-                name = "Natal Solidário",
-                description = "Ajude-nos a compor 500 cabazes para as famílias mais carenciadas da comunidade académica.",
-                category = "Alimentar",
-                date = "2025-12-25"
-            ),
-            CampaignModel(
-                id = 2,
-                name = "Kit Escolar 2026",
-                description = "Recolha de cadernos, canetas e calculadoras para o segundo semestre.",
-                category = "Educação",
-                date = "2026-02-10"
-            ),
-            CampaignModel(
-                id = 3,
-                name = "Inverno Quente",
-                description = "Estamos a recolher casacos e mantas em bom estado.",
-                category = "Vestuário",
-                date = "2025-11-30"
-            )
-        )
-
         val uiState = DefaultHomeState(
             error = null,
             campaignList = emptyList(),
             isLoading = false
         )
-        SocialStoreScaffold(navController = rememberNavController(), userRole = UserRole.DEFAULT, logout = {}){
+        SocialStoreScaffoldContent(navController = rememberNavController(), userRole = UserRole.DEFAULT, logout = {}) {
             DefaultHomeViewContent(
                 modifier = Modifier,
                 uiState = uiState,
                 onCampaignClick = {},
-                onClickLogin = {}
+                onClickApplication = {}
             )
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun DefaultHomePreview(){
+    SocialStoreTheme {
+        val uiState = DefaultHomeState(
+            error = null,
+            campaignList = emptyList(),
+            isLoading = false
+        )
+        DefaultHomeViewContent(
+            modifier = Modifier,
+            uiState = uiState,
+            onCampaignClick = {},
+            onClickApplication = {}
+        )
     }
 }

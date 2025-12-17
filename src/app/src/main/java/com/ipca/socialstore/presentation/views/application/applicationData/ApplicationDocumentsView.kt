@@ -36,7 +36,7 @@ import com.ipca.socialstore.presentation.ui.theme.SocialStoreTheme
 @Composable
 fun ApplicationDocumentsViewContent(
     modifier: Modifier = Modifier,
-    uiState: ApplicationState,
+    uiState: ApplicationState2,
     onIsDataUpdate: () -> Unit,
 
     onAddFiles: (List<Uri>) -> Unit,
@@ -199,7 +199,7 @@ fun FileRowItem(uri: Uri, onRemoveFile:(uri: Uri?)->Unit) {
 @Composable
 fun ApplicationDocumentsPreview() {
     SocialStoreTheme {
-        val uiState = ApplicationState(
+        val uiState = ApplicationState2(
             isLoading = false,
             error = null,
             application = ApplicationModel(

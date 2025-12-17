@@ -45,7 +45,7 @@ fun ApplicationView(modifier: Modifier){
 @Composable
 fun ApplicationViewContent(
     modifier: Modifier = Modifier,
-    uiState: ApplicationState,
+    uiState: ApplicationState2,
     onIsDataUpdate: () -> Unit,
     onNameUpdate: (String) -> Unit,
     onYearUpdate: (String) -> Unit,
@@ -97,7 +97,7 @@ fun ApplicationViewContent(
 @Composable
 fun ApplicationPreview() {
     SocialStoreTheme {
-        val uiState = ApplicationState(
+        val uiState = ApplicationState2(
             isLoading = false,
             error = null,
             application = ApplicationModel(

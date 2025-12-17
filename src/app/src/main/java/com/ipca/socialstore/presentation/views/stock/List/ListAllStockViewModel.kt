@@ -7,7 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.ipca.socialstore.presentation.models.StockReveiverModel
 import com.ipca.socialstore.data.models.StockModel
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
-import com.ipca.socialstore.domain.services.ListAllItemsStockService
+import com.ipca.socialstore.domain.services.stock.ListAllItemsStockService
 import com.ipca.socialstore.presentation.utils.ErrorText
 import com.ipca.socialstore.presentation.utils.asUiText
 import dagger.hilt.android.lifecycle.HiltViewModel

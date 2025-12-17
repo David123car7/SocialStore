@@ -2,6 +2,7 @@ package com.ipca.socialstore.domain.application
 
 import com.ipca.socialstore.R
 import com.ipca.socialstore.data.enums.ApplicationStatus
+import com.ipca.socialstore.data.enums.UserRole
 import com.ipca.socialstore.data.exceptions.AppError
 import com.ipca.socialstore.data.models.AcademicModel
 import com.ipca.socialstore.data.models.ApplicationModel
@@ -14,13 +15,13 @@ import com.ipca.socialstore.data.repository.UserRepository
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
 import javax.inject.Inject
 
-class CreateApplicationUseCase @Inject constructor(
+class CreateApplicationService @Inject constructor(
     private val applicationRepository: ApplicationRepository,
     private val academicRepository: AcademicRepository,
     private val authRepository: AuthRepository,
     private val userRepository: UserRepository,
     private val applicationStateRepository: ApplicationStateRepository) {
-    suspend operator fun invoke(applicationModel: ApplicationModel, academicModel: AcademicModel?): ResultWrapper<String> {
+    suspend operator fun invoke(applicationModel: ApplicationModel, academicModel: AcademicModel?): ResultWrapper<Int> {
         val emailResult = authRepository.getUserEmail()
         if (emailResult is ResultWrapper.Error) return ResultWrapper.Error(emailResult.error)
 
@@ -83,6 +84,12 @@ class CreateApplicationUseCase @Inject constructor(
         if(applicationResult is ResultWrapper.Error) return ResultWrapper.Error(applicationResult.error)
         val applicationId = (applicationResult as ResultWrapper.Success).data
 
-        return userRepository.setUserApplicationId(uid = uid, id = applicationId)
+        val setUserAppIdResult = userRepository.setUserApplicationId(uid = uid, id = applicationId)
+        if(setUserAppIdResult is ResultWrapper.Error) return ResultWrapper.Error(setUserAppIdResult.error)
+
+        val setUserRoleResult = userRepository.setUserRole(uid = uid, role = UserRole.CANDIDATE.value)
+        if(setUserRoleResult is ResultWrapper.Error) return ResultWrapper.Error(setUserRoleResult.error)
+
+        return applicationResult
     }
 }

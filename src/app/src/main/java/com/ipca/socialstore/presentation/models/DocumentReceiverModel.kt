@@ -1,10 +1,8 @@
-package com.ipca.socialstore.data.models
+package com.ipca.socialstore.presentation.models
 
 import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 
-@Serializable
-data class DocumentModel (
+class DocumentReceiverModel(
     val id: Int? = null,
 
     @SerialName("path")
@@ -17,11 +15,17 @@ data class DocumentModel (
     val folderName: String,
 
     @SerialName("created_at")
-    val createdAt: String,
+    val created_at: String,
 
     @SerialName("state_id")
     val stateId: Int,
 
     @SerialName("application_id")
     val applicationId: Int,
+
+    @SerialName("state")
+    val state: String,
+
+    @SerialName("description")
+    val description: String,
 )

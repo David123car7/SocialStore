@@ -25,7 +25,7 @@ import com.ipca.socialstore.presentation.ui.theme.SocialStoreTheme
 @Composable
 fun ApplicationViewDataContent(
     modifier: Modifier = Modifier,
-    uiState: ApplicationState,
+    uiState: ApplicationState2,
     onIsDataUpdate: () -> Unit,
     onNameUpdate: (String) -> Unit,
     onYearUpdate: (String) -> Unit,
@@ -157,7 +157,7 @@ fun ApplicationViewDataContent(
 @Composable
 fun ApplicationViewDataPreview() {
     SocialStoreTheme {
-        val uiState = ApplicationState(
+        val uiState = ApplicationState2(
             isLoading = false,
             error = null,
             application = ApplicationModel(

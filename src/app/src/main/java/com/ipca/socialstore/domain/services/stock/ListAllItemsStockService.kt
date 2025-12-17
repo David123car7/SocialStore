@@ -1,10 +1,10 @@
-package com.ipca.socialstore.domain.services
+package com.ipca.socialstore.domain.services.stock
 
 import com.ipca.socialstore.data.exceptions.ExceptionMapper
-import com.ipca.socialstore.presentation.models.StockReveiverModel
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
 import com.ipca.socialstore.domain.item.GetItemsFromStockUseCase
 import com.ipca.socialstore.domain.stock.GetFullStockUseCase
+import com.ipca.socialstore.presentation.models.StockReveiverModel
 import javax.inject.Inject
 import kotlin.collections.iterator
 
@@ -13,7 +13,7 @@ class ListAllItemsStockService @Inject constructor(
     private val getFullStockUseCase: GetFullStockUseCase,
     private val getItemsFromStockUseCase: GetItemsFromStockUseCase
 ){
-    suspend operator fun invoke() : ResultWrapper<List<StockReveiverModel>>{
+    suspend operator fun invoke() : ResultWrapper<List<StockReveiverModel>> {
         return try {
             val stockResult = getFullStockUseCase()
             if(stockResult is ResultWrapper.Error) return ResultWrapper.Error(stockResult.error)

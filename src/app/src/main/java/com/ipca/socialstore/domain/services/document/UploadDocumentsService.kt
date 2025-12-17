@@ -1,18 +1,23 @@
-package com.ipca.socialstore.domain.storage.document
+package com.ipca.socialstore.domain.services.document
 
 import android.content.Context
 import android.net.Uri
+import com.ipca.socialstore.data.enums.DocumentStatus
 import com.ipca.socialstore.data.exceptions.AppError
 import com.ipca.socialstore.data.models.DocumentModel
+import com.ipca.socialstore.data.models.DocumentStateModel
 import com.ipca.socialstore.data.repository.AuthRepository
 import com.ipca.socialstore.data.repository.DocumentRepository
+import com.ipca.socialstore.data.repository.DocumentStateRepository
 import com.ipca.socialstore.data.repository.StorageRepository
 import com.ipca.socialstore.data.repository.UserRepository
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
+import java.time.LocalDate
 import javax.inject.Inject
 
-class UploadDocumentsUseCase @Inject constructor(
+class UploadDocumentsService @Inject constructor(
     private val documentRepository: DocumentRepository,
+    private val documentStateRepository: DocumentStateRepository,
     private  val storageRepository: StorageRepository,
     private val userRepository: UserRepository,
     private val authRepository: AuthRepository){
@@ -30,10 +35,18 @@ class UploadDocumentsUseCase @Inject constructor(
             return ResultWrapper.Error(uploadResult.error)
         val paths = (uploadResult as ResultWrapper.Success).data
 
+        val documentState = DocumentStateModel(state = DocumentStatus.TO_REVIEW.status, description = "")
+
         val documentsList = mutableListOf<DocumentModel>()
         for(path in paths){
             val pathArrayList = path.split("/")
-            val document = DocumentModel(path = path, name = pathArrayList[2], status = "To Review", folderName = folderName,applicationId = applicationId)
+
+            val documentStateResult = documentStateRepository.createDocumentState(documentState)
+            if(documentStateResult is ResultWrapper.Error)
+                return ResultWrapper.Error(documentStateResult.error)
+            val documentStateId = (documentStateResult as ResultWrapper.Success).data
+
+            val document = DocumentModel(path = path, name = pathArrayList[2], folderName = folderName, stateId = documentStateId, createdAt = LocalDate.now().toString(),applicationId = applicationId)
             documentsList.add(document)
         }
 

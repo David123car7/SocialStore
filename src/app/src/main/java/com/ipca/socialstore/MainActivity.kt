@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -25,13 +26,21 @@ import com.ipca.socialstore.presentation.views.campaign.listAll.ListAllCampaigns
 import com.ipca.socialstore.presentation.views.donation.create.CreateDonationView
 import com.ipca.socialstore.presentation.views.item.CreateItemView
 import com.ipca.socialstore.presentation.routes.AdminRoutes
+import com.ipca.socialstore.presentation.routes.CandidateRoutes
 import com.ipca.socialstore.presentation.routes.DefaultRoutes
 import com.ipca.socialstore.presentation.routes.GeneralRoutes
+import com.ipca.socialstore.presentation.ui.SocialStoreScaffold
 import com.ipca.socialstore.presentation.views.Scheduling.CreateSchedulingView
 import com.ipca.socialstore.presentation.views.stock.List.GetAllStockView
 import com.ipca.socialstore.presentation.views.stock.List.ListAllStockViewModel
 import com.ipca.socialstore.presentation.views.stock.List.StockItemDetailView
 import com.ipca.socialstore.presentation.ui.theme.SocialStoreTheme
+import com.ipca.socialstore.presentation.utils.NavigationLogic
+import com.ipca.socialstore.presentation.views.application.applicationData.ApplicationDocumentsViewContent
+import com.ipca.socialstore.presentation.views.application.applicationData.ApplicationView
+import com.ipca.socialstore.presentation.views.application.applicationInfo.ApplicationInfoView
+import com.ipca.socialstore.presentation.views.application.applicationState.ApplicationStateView
+import com.ipca.socialstore.presentation.views.application.createApplication.CreateApplicationView
 import com.ipca.socialstore.presentation.views.authentication.resetPassword.ResetPasswordView
 import com.ipca.socialstore.presentation.views.home.defaultHomeView.DefaultHomeView
 import com.ipca.socialstore.presentation.views.home.testHome.TestHomeView
@@ -50,17 +59,23 @@ class MainActivity : ComponentActivity() {
             val navController = rememberNavController()
             val mainState by mainViewModel.sessionState
 
-            val startDestination = GeneralRoutes.Home
-
             SocialStoreTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    NavHost(navController = navController, startDestination = startDestination){
+                SocialStoreScaffold(navController = navController, userRole = mainState.userRole) { innerPadding ->
+                    NavHost(navController = navController, startDestination = GeneralRoutes.Home){
                         composable<GeneralRoutes.Home>{
-                            DefaultHomeView(modifier = Modifier, navController = navController, userRole = mainState.userRole)
+                            DefaultHomeView(
+                                modifier = Modifier.padding(innerPadding),
+                                navController = navController,
+                                userRole = mainState.userRole
+                            )
                         }
                         composable<GeneralRoutes.TestHome>{
                             TestHomeView(modifier = Modifier.padding(innerPadding),
-                                navController = navController, userRole = mainState.userRole)                        }
+                                navController = navController, userRole = mainState.userRole)
+                        }
+                        composable<GeneralRoutes.TestHome>{
+                            ApplicationView(modifier = Modifier.padding(innerPadding))
+                        }
                         composable<GeneralRoutes.Login>{
                             LoginView(modifier = Modifier.padding(innerPadding),
                                 navController = navController, userRole = mainState.userRole)
@@ -68,19 +83,22 @@ class MainActivity : ComponentActivity() {
                         composable<GeneralRoutes.Register>{
                             RegisterView(
                                 modifier = Modifier.padding(innerPadding),
-                                navController = navController, userRole = mainState.userRole
+                                navController = navController,
+                                userRole = mainState.userRole
+                            )
+                        }
+                        composable<DefaultRoutes.ApplicationInfo> {
+                            ApplicationInfoView(
+                                modifier = Modifier.padding(innerPadding),
+                                navController = navController,
+                                userRole = mainState.userRole
                             )
                         }
                         composable<DefaultRoutes.CreateApplication> {
-                            //CreateApplicationView(modifier = Modifier.padding(innerPadding))
-                            ApplicationFormScreenMockup()
+                            CreateApplicationView(modifier = Modifier.padding(innerPadding))
                         }
-                        composable<DefaultRoutes.Application> {
-                            AdminDashboardMockup()
-                        }
-                        composable<DefaultRoutes.DefaultHome>{
-                            TestHomeView(modifier = Modifier.padding(innerPadding),
-                                navController = navController, userRole = mainState.userRole)
+                        composable<CandidateRoutes.ApplicationState> {
+                            ApplicationStateView(modifier = Modifier.padding(innerPadding), navController = navController, userRole = mainState.userRole)
                         }
                         composable<GeneralRoutes.ResetPassword>{
                             ResetPasswordView(modifier = Modifier.padding(innerPadding),
@@ -110,6 +128,13 @@ class MainActivity : ComponentActivity() {
                         composable <AdminRoutes.CreateScheduling>{
                             CreateSchedulingView(modifier = Modifier.padding(innerPadding), navController = navController)
                         }
+                    }
+                    LaunchedEffect(mainState.isLoggedIn) {
+                        NavigationLogic.navigateTo(
+                            navController = navController,
+                            userRole = mainState.userRole,
+                            route = GeneralRoutes.Home
+                        )
                     }
                 }
             }

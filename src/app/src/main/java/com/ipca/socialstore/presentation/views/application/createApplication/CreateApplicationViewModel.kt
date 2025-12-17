@@ -7,7 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.ipca.socialstore.data.models.AcademicModel
 import com.ipca.socialstore.data.models.ApplicationModel
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
-import com.ipca.socialstore.domain.application.CreateApplicationUseCase
+import com.ipca.socialstore.domain.application.CreateApplicationService
 import com.ipca.socialstore.presentation.utils.ErrorText
 import com.ipca.socialstore.presentation.utils.asUiText
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -26,7 +26,7 @@ data class CreateApplicationState(
 
 @HiltViewModel
 class CreateApplicationViewModel @Inject constructor(
-    private val createApplicationUseCase: CreateApplicationUseCase): ViewModel() {
+    private val createApplicationService: CreateApplicationService): ViewModel() {
     var uiState = mutableStateOf(CreateApplicationState())
 
     fun updateIsStudent(state: Boolean){
@@ -105,7 +105,7 @@ class CreateApplicationViewModel @Inject constructor(
         viewModelScope.launch {
             uiState.value = uiState.value.copy(isLoading = true)
 
-            val result = createApplicationUseCase(uiState.value.application, uiState.value.academicData)
+            val result = createApplicationService(uiState.value.application, uiState.value.academicData)
             when(result){
                 is ResultWrapper.Success -> {
                     uiState.value = uiState.value.copy(

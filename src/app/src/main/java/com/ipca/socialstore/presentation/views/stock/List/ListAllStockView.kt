@@ -58,7 +58,7 @@ fun GetAllStockViewContent(
                     modifier = Modifier,
                     onClick = {onItemClick(stockHelper)
                                navController.navigate(AdminRoutes.SelectStock)
-                        },
+                              },
                     uiState = stockHelper,
                 )
             }

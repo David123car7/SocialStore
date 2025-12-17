@@ -40,26 +40,6 @@ data class DefaultHomeState (
     var isLoading : Boolean = false,
 )
 
-@HiltViewModel
-class DefaultHomeViewModel @Inject constructor(private val logoutUseCase: LogoutUseCase): ViewModel() {
+class DefaultHomeViewModel: ViewModel() {
     var uiState = mutableStateOf(DefaultHomeState())
-
-    fun logout(){
-        viewModelScope.launch {
-            val result = logoutUseCase()
-            when(result){
-                is ResultWrapper.Success -> {
-                    uiState.value = uiState.value.copy(
-                        isLoading = false,
-                    )
-                }
-                is ResultWrapper.Error -> {
-                    uiState.value = uiState.value.copy(
-                        isLoading = false,
-                        error = result.error.asUiText()
-                    )
-                }
-            }
-        }
-    }
 }

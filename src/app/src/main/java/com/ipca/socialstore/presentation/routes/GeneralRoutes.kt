@@ -18,5 +18,8 @@ sealed class GeneralRoutes {
     object TestHome : GeneralRoutes()
 
     @Serializable
+    object TestDocuments : GeneralRoutes()
+
+    @Serializable
     object ResetView : GeneralRoutes()
 }

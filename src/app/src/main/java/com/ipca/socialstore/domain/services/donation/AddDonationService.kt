@@ -1,13 +1,13 @@
-package com.ipca.socialstore.domain.services
+package com.ipca.socialstore.domain.services.donation
 
 import com.ipca.socialstore.data.exceptions.ExceptionMapper
 import com.ipca.socialstore.data.models.DonationItemModel
 import com.ipca.socialstore.data.models.DonationModel
 import com.ipca.socialstore.data.models.ItemModel
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
-import com.ipca.socialstore.domain.donation_item.AddItemToDonationUseCase
 import com.ipca.socialstore.domain.donation.CreateDonationUseCase
 import com.ipca.socialstore.domain.donation.GetDonationByIdUseCase
+import com.ipca.socialstore.domain.donation_item.AddItemToDonationUseCase
 import com.ipca.socialstore.domain.item.CreateItemUseCase
 import com.ipca.socialstore.domain.item.GetItemByIdUseCase
 import com.ipca.socialstore.domain.stock.AddItemStockUseCase
@@ -23,7 +23,7 @@ class AddDonationService @Inject constructor(
     private val exceptionMapper: ExceptionMapper
 
 ){
-    suspend operator fun invoke(item: ItemModel,  donation: DonationModel, expirationDate: String, quantity: Int): ResultWrapper<Int> {
+    suspend operator fun invoke(item: ItemModel, donation: DonationModel, expirationDate: String, quantity: Int): ResultWrapper<Int> {
 
         return try {
             //Creates Item
@@ -58,7 +58,8 @@ class AddDonationService @Inject constructor(
 
 
             // Relacionar cada Item á sua doacao (Rever isto)
-            var currentDonationItem : DonationItemModel = DonationItemModel(itemId = 0, donationId = 0)
+            var currentDonationItem : DonationItemModel =
+                DonationItemModel(itemId = 0, donationId = 0)
             if (item.id != null && donation.id != null){
                 val donationItem = DonationItemModel(
                     itemId = itemId,
@@ -77,5 +78,3 @@ class AddDonationService @Inject constructor(
 
     }
 }
-
-

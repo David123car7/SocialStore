@@ -13,38 +13,48 @@ import com.ipca.socialstore.data.enums.UserRole
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Warning
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.compose.rememberNavController
-import com.ipca.socialstore.presentation.objects.NavigationLogic
+import com.ipca.socialstore.presentation.routes.CandidateRoutes
+import com.ipca.socialstore.presentation.utils.NavigationLogic
+import com.ipca.socialstore.presentation.routes.DefaultRoutes
 import com.ipca.socialstore.presentation.routes.GeneralRoutes
 import com.ipca.socialstore.presentation.ui.theme.SocialStoreTheme
 
-sealed class BottomNavItem(val route: Any, val icon: ImageVector, val label: String) {
-    object Home : BottomNavItem(GeneralRoutes.ResetView, Icons.Default.Home, "Início")
+@Composable
+fun SocialStoreScaffold(navController: NavController, userRole: UserRole, content: @Composable (PaddingValues) -> Unit){
+    val viewModel: SocialStoreScaffoldViewModel = hiltViewModel()
+    val uiState by viewModel.uiState
+
+    SocialStoreScaffoldContent(
+        navController = navController,
+        userRole = userRole,
+        logout = {viewModel.logout()},
+        content = content
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SocialStoreScaffold(
+fun SocialStoreScaffoldContent(
     navController: NavController,
     userRole: UserRole,
     logout:() -> Unit,
     content: @Composable (PaddingValues) -> Unit
 ) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = navBackStackEntry?.destination?.route
-
-    val bottomItems = listOf(
-        BottomNavItem.Home,
-    )
+    val currentRoute = navBackStackEntry?.destination
 
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
                 navigationIcon = {
-                    if (userRole != UserRole.NOROLE) {
+                    if (userRole != UserRole.GUEST) {
                         TextButton(onClick = {
                             logout()
                         }) {
@@ -60,17 +70,17 @@ fun SocialStoreScaffold(
                     )
                 },
                 actions = {
-                    if (userRole == UserRole.NOROLE) {
+                    if (userRole == UserRole.GUEST) {
                         TextButton(onClick = {
                             NavigationLogic.navigateTo(
                                 navController = navController,
                                 userRole = userRole,
                                 route = GeneralRoutes.Login
-                            )}
-                        ) { Text("Entrar", fontWeight = FontWeight.Bold)}
+                            )
+                        }) { Text("Entrar", fontWeight = FontWeight.Bold)}
                     }
                     else {
-                        IconButton(onClick = { /* Navegar para Perfil */ }) {
+                        IconButton(onClick = {}) {
                             Icon(
                                 imageVector = Icons.Default.Person,
                                 contentDescription = "Perfil",
@@ -83,20 +93,48 @@ fun SocialStoreScaffold(
         },
 
         bottomBar = {
-            NavigationBar {
-                bottomItems.forEach { item ->
+            if(userRole != UserRole.GUEST){
+                NavigationBar() {
                     NavigationBarItem(
-                        icon = { Icon(item.icon, contentDescription = item.label) },
-                        label = { Text(item.label) },
-                        selected = currentRoute == item.route,
+                        icon = { Icon(Icons.Default.Home, contentDescription = "") },
+                        label = { Text("Home") },
+                        selected = currentRoute == GeneralRoutes.Home,
                         onClick = {
                             NavigationLogic.navigateTo(
                                 navController = navController,
                                 userRole = userRole,
-                                route = item.route
+                                route = GeneralRoutes.Home
                             )
                         }
                     )
+                    if(userRole == UserRole.DEFAULT){
+                        NavigationBarItem(
+                            icon = { Icon( imageVector = Icons.Default.Warning, contentDescription = "") },
+                            label = { Text("Candidatura") },
+                            selected = currentRoute == DefaultRoutes.ApplicationInfo,
+                            onClick = {
+                                NavigationLogic.navigateTo(
+                                    navController = navController,
+                                    userRole = userRole,
+                                    route = DefaultRoutes.ApplicationInfo
+                                )
+                            }
+                        )
+                    }
+                    else if(userRole == UserRole.CANDIDATE){
+                        NavigationBarItem(
+                            icon = { Icon( imageVector = Icons.Default.Warning, contentDescription = "") },
+                            label = { Text("Candidatura") },
+                            selected = currentRoute == DefaultRoutes.ApplicationInfo,
+                            onClick = {
+                                NavigationLogic.navigateTo(
+                                    navController = navController,
+                                    userRole = userRole,
+                                    route = CandidateRoutes.ApplicationState
+                                )
+                            }
+                        )
+                    }
                 }
             }
         }
@@ -109,7 +147,7 @@ fun SocialStoreScaffold(
 @Composable
 fun SocialStoreScaffoldGuestPreview() {
     SocialStoreTheme {
-        SocialStoreScaffold(
+        SocialStoreScaffoldContent(
             navController = rememberNavController(),
             userRole = UserRole.DEFAULT,
             logout = {}
