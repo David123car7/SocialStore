@@ -18,9 +18,7 @@ if (localPropertiesFile.exists()) {
 
 android {
     namespace = "com.ipca.socialstore"
-    compileSdk {
-        version = release(36)
-    }
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.ipca.socialstore"
@@ -44,10 +42,12 @@ android {
             )
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+
     buildFeatures {
         buildConfig = true
         compose = true
@@ -55,6 +55,10 @@ android {
 }
 
 dependencies {
+    implementation(libs.androidx.hilt.work)
+    val work_version = "2.11.0"
+
+    // AndroidX & Compose
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -63,10 +67,12 @@ dependencies {
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
-    implementation(libs.androidx.ui)
-    implementation(libs.androidx.compose.foundation)
-    implementation(libs.androidx.material3)
     implementation(libs.androidx.foundation.layout)
+    implementation("androidx.compose.material:material-icons-extended")
+    implementation(libs.androidx.compose.foundation)
+    implementation(libs.androidx.material3) // ícones
+
+    // Testing
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -75,21 +81,31 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 
-    //Dagger - Hilt
+    // Dagger - Hilt
     implementation("com.google.dagger:hilt-android:2.57.2")
     ksp("com.google.dagger:hilt-android-compiler:2.57.2")
     implementation("androidx.hilt:hilt-navigation-compose:1.3.0")
 
-    //Supabase
+    // Supabase 3.x
     implementation(platform("io.github.jan-tennert.supabase:bom:3.2.6"))
-    implementation("io.github.jan-tennert.supabase:storage-kt")
+    implementation("io.github.jan-tennert.supabase:auth-kt")
     implementation("io.github.jan-tennert.supabase:postgrest-kt")
-    implementation("io.ktor:ktor-client-android:3.3.2")
+    implementation("io.github.jan-tennert.supabase:storage-kt")
+    implementation("io.github.jan-tennert.supabase:realtime-kt")
+
+    // Ktor 3.x (compatível com Supabase)
     implementation("io.ktor:ktor-client-core:3.3.2")
+    implementation("io.ktor:ktor-client-android:3.3.2") // para Android
+    implementation("io.ktor:ktor-client-okhttp:3.3.2")   // motor HTTP alternativo
+    implementation("io.ktor:ktor-client-cio:3.3.2")      // motor CIO
+    implementation("io.ktor:ktor-client-websockets:3.3.2") // suporte WebSocket
     implementation("io.ktor:ktor-utils:3.3.2")
 
-    implementation("androidx.compose.material:material-icons-extended")
+    implementation("androidx.work:work-runtime-ktx:${work_version}")
+    implementation("androidx.hilt:hilt-work:1.2.0")
+    ksp("androidx.hilt:hilt-compiler:1.2.0")
 }
+
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
     compilerOptions {

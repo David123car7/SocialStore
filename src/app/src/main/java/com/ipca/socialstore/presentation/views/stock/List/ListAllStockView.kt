@@ -6,7 +6,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.* // Importações de Material3
 import androidx.compose.runtime.Composable
@@ -14,6 +17,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -30,6 +34,7 @@ import com.ipca.socialstore.presentation.utils.ErrorText
 import kotlin.collections.mutableMapOf
 
 import com.ipca.socialstore.presentation.ui.theme.SocialStoreTheme
+import com.ipca.socialstore.presentation.views.item.CreateItemView
 import dagger.assisted.Assisted
 
 @Composable
@@ -45,6 +50,7 @@ fun GetAllStockView(modifier: Modifier, navController: NavController, viewModel:
         onItemClick = { value -> viewModel.selectStock(value) },
         onSearchItem = {value -> viewModel.updateSearchList(value)},
         onSearchType = {value -> viewModel.updateSearchListType(value)},
+        onGetItemId = {value -> viewModel.updateItemId(value)}
     )
 }
 
@@ -55,20 +61,21 @@ fun GetAllStockViewContent(
     navController : NavController,
     onItemClick :(StockReceiverModel) -> Unit,
     onSearchItem: (value: String) -> Unit,
-    onSearchType : (value : String) -> Unit
+    onSearchType : (value : String) -> Unit,
+    onGetItemId : (value : String) -> Unit,
 ) {
     val listToDisplay = uiState.searchResult ?: uiState.items
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(horizontal = 12.dp)
-    ) {
-        when {
-            uiState.isLoading -> LoadingIndicator()
-            uiState.error != null -> ErrorMessage(error = uiState.error)
-
-            else -> StockList(
+    // Usamos um Box para garantir que o FloatingActionButton esteja sempre no topo
+    Box(modifier = modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 12.dp)
+        ) {
+            // A StockList agora contém a SearchBar e os Filtros, que devem estar sempre presentes
+            StockList(
+                modifier = Modifier.weight(1f),
                 items = listToDisplay,
                 navController = navController,
                 uiState = uiState,
@@ -76,124 +83,130 @@ fun GetAllStockViewContent(
                 onSearchItem = onSearchItem,
                 isSearchExecuted = uiState.searchResult != null,
                 onSearchType = onSearchType,
+                onGetItemId = onGetItemId,
             )
+        }
+
+        // Se houver um erro ou carregamento, mostramos uma sobreposição sem esconder o FAB
+        if (uiState.isLoading) {
+            LoadingIndicator()
+        } else if (uiState.error != null) {
+            // O erro agora aparece sobre a lista, mas permite ver o resto da UI
+            ErrorMessage(error = uiState.error)
         }
     }
 }
 
-
 @Composable
 private fun StockList(
+    modifier: Modifier,
     items: List<StockReceiverModel>?,
     navController: NavController,
     uiState: GetStockState,
     onItemClick: (StockReceiverModel) -> Unit,
     onSearchItem: (value : String) -> Unit,
     onSearchType : (value : String) -> Unit,
-    isSearchExecuted: Boolean
+    isSearchExecuted: Boolean,
+    onGetItemId : (value : String) -> Unit,
 ) {
     val selectedType = remember { mutableStateOf<String?>(null) }
 
-    val itemTypes = remember (items){
-        items
-            ?.map { it.item.itemType }
-            ?.filter { it.isNotBlank() }
-            ?.distinct()
-            ?: emptyList()
+    val itemTypes = remember(items) {
+        items?.map { it.item.itemType }?.filter { it.isNotBlank() }?.distinct() ?: emptyList()
     }
 
-    LazyColumn(
-        modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(vertical = 8.dp),
-        verticalArrangement = Arrangement.spacedBy(4.dp)
-    ) {
-        item {
-            SearchBarContent {newValue -> onSearchItem(newValue)}
+    // Box principal para garantir que o FAB fique por cima de tudo
+    Box(modifier = modifier.fillMaxSize()) {
+        Column(modifier = Modifier.fillMaxSize()) {
 
-            Divider(modifier = Modifier.padding(bottom = 8.dp))
-        }
-        item{
-            Row(
-                modifier = Modifier.fillMaxWidth()
+            // 1. BARRA DE PESQUISA E FILTROS SEMPRE FORA DA LÓGICA DE VAZIO
+            SearchBarContent { newValue -> onSearchItem(newValue) }
+            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+
+            LazyRow(
+                modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                LazyRow(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 8.dp, top = 4.dp),
-                    contentPadding = PaddingValues(horizontal = 4.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    // Chip para limpar o filtro
-                    item {
-                        AssistChip(
-                            onClick = {
-                                selectedType.value = null
-                                onSearchType("") // Limpa o filtro de tipo
-                            },
-                            label = { Text("Todos") },
-                            leadingIcon = {
-                                if (selectedType.value == null) {
-                                    Icon(Icons.Filled.Search, contentDescription = null)
-                                }
-                            },
-                            colors = AssistChipDefaults.assistChipColors(
-                                containerColor = if (selectedType.value == null) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant
-                            )
+                item {
+                    AssistChip(
+                        onClick = {
+                            selectedType.value = null
+                            onSearchType("")
+                        },
+                        label = { Text("Todos") },
+                        colors = AssistChipDefaults.assistChipColors(
+                            containerColor = if (selectedType.value == null)
+                                MaterialTheme.colorScheme.primaryContainer
+                            else MaterialTheme.colorScheme.surfaceVariant
                         )
-                    }
+                    )
+                }
 
-                    // Chips para cada tipo de item
-                    items(itemTypes) { type ->
-                        val isSelected = selectedType.value == type
-                        FilterChip(
-                            selected = isSelected,
-                            onClick = {
-                                val newType = if (isSelected) null else type
-                                selectedType.value = newType
-                                onSearchType(newType ?: "")
-                            },
-                            label = { Text(type) },
-                        )
-                    }
+                items(itemTypes) { type ->
+                    val isSelected = selectedType.value == type
+                    FilterChip(
+                        selected = isSelected,
+                        onClick = {
+                            val newType = if (isSelected) null else type
+                            selectedType.value = newType
+                            onSearchType(newType ?: "")
+                        },
+                        label = { Text(type) },
+                    )
                 }
             }
-        }
 
-        // CORREÇÃO: Contagem de itens
-        item {
-            Text("${items?.size ?: 0} produtos", style = MaterialTheme.typography.titleSmall)
-        }
+            Text(
+                text = "${items?.size ?: 0} produtos",
+                style = MaterialTheme.typography.titleSmall,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
 
-        // --- 3. CONTEÚDO DA LISTA ---
-        if (items.isNullOrEmpty()) {
-            item {
+            // 2. LÓGICA DA LISTA OU MENSAGEM DE VAZIO
+            if (items.isNullOrEmpty()) {
                 Box(
-                    modifier = Modifier
-                        .fillParentMaxSize()
-                        .padding(top = 50.dp),
+                    modifier = Modifier.weight(1f).fillMaxWidth(),
                     contentAlignment = Alignment.Center
                 ) {
-                    if (isSearchExecuted) {
-                        EmptySearchResultMessage()
-                    } else {
-                        EmptyListMessage()
+                    if (isSearchExecuted) EmptySearchResultMessage() else EmptyListMessage()
+                }
+            } else {
+                LazyColumn(
+                    modifier = Modifier.weight(1f),
+                    contentPadding = PaddingValues(bottom = 80.dp),
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    itemsIndexed(items) { _, stockHelper ->
+                        SingleItemStock(
+                            onClick = {
+                                onItemClick(stockHelper)
+                                onGetItemId(stockHelper.stockId.toString())
+                                navController.navigate(AdminRoutes.SelectStock)
+                            },
+                            uiState = stockHelper,
+                        )
                     }
                 }
             }
-        } else {
-            itemsIndexed(items) { _, stockHelper ->
-                SingleItemStock(
-                    onClick = {
-                        onItemClick(stockHelper)
-                        navController.navigate(AdminRoutes.SelectStock)
-                    },
-                    uiState = stockHelper,
-                )
-            }
+        }
+
+        // 3. FLOATING ACTION BUTTON FIXO NO CANTO INFERIOR
+        FloatingActionButton(
+            onClick = {
+                navController.navigate(AdminRoutes.CreateItem)
+            },
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(16.dp)
+                .navigationBarsPadding(),
+            containerColor = MaterialTheme.colorScheme.primary,
+            contentColor = MaterialTheme.colorScheme.onPrimary,
+            shape = CircleShape
+        ) {
+            Icon(Icons.Default.Add, contentDescription = "Adicionar Item")
         }
     }
 }
-
 @Composable
 fun SingleItemStock(
     modifier: Modifier = Modifier,
@@ -233,7 +246,6 @@ fun SingleItemStock(
             Column(
                 modifier = Modifier.weight(1f)
             ) {
-                // Nome do Item (Destaque Principal)
                 Text(
                     text = uiState.item.name,
                     style = MaterialTheme.typography.titleMedium,
@@ -241,7 +253,6 @@ fun SingleItemStock(
                     color = contentColor
                 )
                 Spacer(Modifier.height(4.dp))
-                // Tipo de Item (Detalhe Secundário)
                 Text(
                     text = "Tipo: ${uiState.item.itemType}",
                     style = MaterialTheme.typography.bodySmall,
@@ -267,12 +278,10 @@ fun LoadingIndicator() {
     }
 }
 
-// CORREÇÃO DE TIPAGEM: Receber ErrorText e usar asString()
 @Composable
 fun ErrorMessage(error: ErrorText?) {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Text(
-            // Usa a função asString() da sealed class ErrorText
             text = error?.asString() ?: "Erro ao carregar stock. Tente novamente.",
             color = MaterialTheme.colorScheme.error,
             style = MaterialTheme.typography.titleMedium,
@@ -295,7 +304,6 @@ fun EmptyListMessage() {
 @Composable
 fun EmptySearchResultMessage() {
     Box(
-        // Remova o fillMaxSize() aqui para que ele possa ser controlado pelo Box pai
         contentAlignment = Alignment.Center
     ) {
         Text(
@@ -305,73 +313,78 @@ fun EmptySearchResultMessage() {
         )
     }
 }
-@Preview(showBackground = true)
+@Preview(showBackground = true, name = "Estado de Sucesso")
 @Composable
-fun PreviewGetAllStock(){
+fun PreviewGetAllStockSuccess() {
+    // 1. Criar dados mockados para os itens
+    val mockItem1 = ItemModel(name = "Arroz Agulha 1kg", itemType = "Alimentação")
+    val mockItem2 = ItemModel(name = "Detergente Loiça", itemType = "Limpeza")
+    val mockItem3 = ItemModel(name = "T-Shirt Branca L", itemType = "Vestuário")
 
-    // É necessário ter o ItemModel (que é uma classe aninhada) disponível no seu projeto
-    // Assumindo que você tem uma definição de ItemModel semelhante a:
-    // data class ItemModel(val name: String, val itemType: String)
-
-    // Criação de Mocks de ItemModel usando a referência completa
-    val mockItemData1 = ItemModel(name = "Computador Portátil Pro", itemType = "Eletrónica")
-    val mockItemData2 = ItemModel(name = "Teclado Mecânico RGB", itemType = "Periféricos")
-    val mockItemData3 = ItemModel(name = "Webcam HD", itemType = "Periféricos")
-
-
-    // Criação de Mocks de StockReveiverModel
-    val mockStock1 = StockReceiverModel(
-        item = mockItemData1,
-        stockId = 101, // Usando stockId como definido no seu modelo
-        totalQuantity = 15, // Stock Alto
-        quantityMap = mutableMapOf("A1" to 10, "B2" to 5)
-    )
-    val mockStock2 = StockReceiverModel(
-        item = mockItemData2,
-        stockId = 102,
-        totalQuantity = 3, // Stock Baixo (para ver a cor de alerta)
-        quantityMap = mutableMapOf("C3" to 3)
-    )
-    val mockStock3 = StockReceiverModel(
-        item = mockItemData3,
-        stockId = 103,
-        totalQuantity = 0, // Stock Esgotado
-        quantityMap = mutableMapOf()
+    val mockStockList = listOf(
+        StockReceiverModel(item = mockItem1, stockId = 1, totalQuantity = 50, quantityMap = mutableMapOf()),
+        StockReceiverModel(item = mockItem2, stockId = 2, totalQuantity = 4, quantityMap = mutableMapOf()), // Stock Baixo
+        StockReceiverModel(item = mockItem3, stockId = 3, totalQuantity = 0, quantityMap = mutableMapOf())  // Esgotado
     )
 
-    // Simulação do GetStockState (estado de sucesso, com dados)
-    val uiStateSuccess = GetStockState(
-        items = listOf(mockStock1, mockStock2, mockStock3),
+    // 2. Simular o estado de UI
+    val uiState = GetStockState(
+        items = mockStockList,
+        isLoading = false,
         error = null,
-        isLoading = false,
-        selectedStock = null // Usando o campo 'selectedStock' introduzido anteriormente
+        searchResult = null
     )
 
-    // Simulação do GetStockState (estado de erro)
-    val uiStateError = GetStockState(
-        items = emptyList(),
-        // Assumindo que ErrorText tem um .toString() útil ou que é um tipo simples
-        error = ErrorText.DynamicString( "Erro 404: Não foi possível carregar os dados."),
-        isLoading = false,
-        selectedStock = null
-    )
-
-    SocialStoreTheme() {
-        Column {
-            // Preview 1: Lista de Stock (Sucesso)
-            Text(
-                text = "Lista de Stock (Sucesso)",
-                style = MaterialTheme.typography.headlineSmall,
-                modifier = Modifier.padding(16.dp)
-            )
-
+    SocialStoreTheme {
+        Surface(color = MaterialTheme.colorScheme.background) {
             GetAllStockViewContent(
-                modifier = Modifier.height(300.dp),
-                uiState = uiStateSuccess,
-                onItemClick = { /* No-op para Preview */ },
+                modifier = Modifier.fillMaxSize(),
+                uiState = uiState,
                 navController = rememberNavController(),
+                onItemClick = {},
                 onSearchItem = {},
-                onSearchType = {}
+                onSearchType = {},
+                onGetItemId = {}
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true, name = "Estado de Carregamento")
+@Composable
+fun PreviewGetAllStockLoading() {
+    val uiState = GetStockState(isLoading = true)
+
+    SocialStoreTheme {
+        Surface(color = MaterialTheme.colorScheme.background) {
+            GetAllStockViewContent(
+                modifier = Modifier.fillMaxSize(),
+                uiState = uiState,
+                navController = rememberNavController(),
+                onItemClick = {},
+                onSearchItem = {},
+                onSearchType = {},
+                onGetItemId = {}
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true, name = "Estado Vazio")
+@Composable
+fun PreviewGetAllStockEmpty() {
+    val uiState = GetStockState(items = emptyList(), isLoading = false)
+
+    SocialStoreTheme {
+        Surface(color = MaterialTheme.colorScheme.background) {
+            GetAllStockViewContent(
+                modifier = Modifier.fillMaxSize(),
+                uiState = uiState,
+                navController = rememberNavController(),
+                onItemClick = {},
+                onSearchItem = {},
+                onSearchType = {},
+                onGetItemId = {}
             )
         }
     }
