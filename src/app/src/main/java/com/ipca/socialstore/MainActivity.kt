@@ -36,8 +36,6 @@ import com.ipca.socialstore.presentation.views.stock.List.ListAllStockViewModel
 import com.ipca.socialstore.presentation.views.stock.List.StockItemDetailView
 import com.ipca.socialstore.presentation.ui.theme.SocialStoreTheme
 import com.ipca.socialstore.presentation.utils.NavigationLogic
-import com.ipca.socialstore.presentation.views.application.applicationData.ApplicationDocumentsViewContent
-import com.ipca.socialstore.presentation.views.application.applicationData.ApplicationView
 import com.ipca.socialstore.presentation.views.application.applicationInfo.ApplicationInfoView
 import com.ipca.socialstore.presentation.views.application.applicationState.ApplicationStateView
 import com.ipca.socialstore.presentation.views.application.createApplication.CreateApplicationView
@@ -72,9 +70,6 @@ class MainActivity : ComponentActivity() {
                         composable<GeneralRoutes.TestHome>{
                             TestHomeView(modifier = Modifier.padding(innerPadding),
                                 navController = navController, userRole = mainState.userRole)
-                        }
-                        composable<GeneralRoutes.TestHome>{
-                            ApplicationView(modifier = Modifier.padding(innerPadding))
                         }
                         composable<GeneralRoutes.Login>{
                             LoginView(modifier = Modifier.padding(innerPadding),

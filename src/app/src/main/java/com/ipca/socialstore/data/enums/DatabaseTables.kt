@@ -10,6 +10,8 @@ enum class DatabaseTables(val tableName: String) {
     ITEM("item"),
     STOCK("stock"),
     APPLICATION("application"),
+    APPLICATION_DOCUMENT_TYPE("application_document_type"),
+    APPLICATION_DOCUMENT("application_document"),
     APPLICATION_STATE("application_state"),
     ACADEMIC("academic"),
     DOCUMENT("document"),

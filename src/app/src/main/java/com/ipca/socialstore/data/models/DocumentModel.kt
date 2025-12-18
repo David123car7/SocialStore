@@ -18,10 +18,4 @@ data class DocumentModel (
 
     @SerialName("created_at")
     val createdAt: String,
-
-    @SerialName("state_id")
-    val stateId: Int,
-
-    @SerialName("application_id")
-    val applicationId: Int,
 )

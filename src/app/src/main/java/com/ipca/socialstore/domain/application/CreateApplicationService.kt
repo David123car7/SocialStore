@@ -1,10 +1,12 @@
 package com.ipca.socialstore.domain.application
 
 import com.ipca.socialstore.R
+import com.ipca.socialstore.data.enums.ApplicationDocumentTypeState
 import com.ipca.socialstore.data.enums.ApplicationStatus
 import com.ipca.socialstore.data.enums.UserRole
 import com.ipca.socialstore.data.exceptions.AppError
 import com.ipca.socialstore.data.models.AcademicModel
+import com.ipca.socialstore.data.models.ApplicationDocumentTypeModel
 import com.ipca.socialstore.data.models.ApplicationModel
 import com.ipca.socialstore.data.models.ApplicationStateModel
 import com.ipca.socialstore.data.repository.AcademicRepository
@@ -13,6 +15,7 @@ import com.ipca.socialstore.data.repository.ApplicationStateRepository
 import com.ipca.socialstore.data.repository.AuthRepository
 import com.ipca.socialstore.data.repository.UserRepository
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
+import com.ipca.socialstore.domain.appDocType.CreateAllAppDocTypesUseCase
 import javax.inject.Inject
 
 class CreateApplicationService @Inject constructor(
@@ -20,7 +23,8 @@ class CreateApplicationService @Inject constructor(
     private val academicRepository: AcademicRepository,
     private val authRepository: AuthRepository,
     private val userRepository: UserRepository,
-    private val applicationStateRepository: ApplicationStateRepository) {
+    private val applicationStateRepository: ApplicationStateRepository,
+    private val createAllAppDocTypesUseCase: CreateAllAppDocTypesUseCase) {
     suspend operator fun invoke(applicationModel: ApplicationModel, academicModel: AcademicModel?): ResultWrapper<Int> {
         val emailResult = authRepository.getUserEmail()
         if (emailResult is ResultWrapper.Error) return ResultWrapper.Error(emailResult.error)
@@ -89,6 +93,9 @@ class CreateApplicationService @Inject constructor(
 
         val setUserRoleResult = userRepository.setUserRole(uid = uid, role = UserRole.CANDIDATE.value)
         if(setUserRoleResult is ResultWrapper.Error) return ResultWrapper.Error(setUserRoleResult.error)
+
+        val docTypesResult = createAllAppDocTypesUseCase(applicationId = applicationId)
+        if(docTypesResult is ResultWrapper.Error) return ResultWrapper.Error(docTypesResult.error)
 
         return applicationResult
     }

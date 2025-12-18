@@ -4,6 +4,7 @@ import com.ipca.socialstore.data.enums.DatabaseTables
 import com.ipca.socialstore.data.exceptions.AppError
 import com.ipca.socialstore.data.exceptions.ExceptionMapper
 import com.ipca.socialstore.data.helpers.from
+import com.ipca.socialstore.data.models.DocumentModel
 import com.ipca.socialstore.data.models.DocumentStateModel
 import com.ipca.socialstore.data.models.TableIdModel
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
@@ -24,16 +25,6 @@ class DocumentStateRepository @Inject constructor(private val supabase: Supabase
         }
     }
 
-    //does this make sense?
-    suspend fun createDocumentsStates(documentStatesList: List<DocumentStateModel>): ResultWrapper<Unit> {
-        return try{
-            supabase.from(DatabaseTables.DOCUMENT_STATE).insert(documentStatesList)
-            ResultWrapper.Success(Unit)
-        }catch (e: Exception){
-            return ResultWrapper.Error(exceptionMapper.map(e))
-        }
-    }
-
     suspend fun deleteDocumentState(id: Int): ResultWrapper<Unit> {
         return try {
             supabase.from(DatabaseTables.DOCUMENT_STATE).delete {
@@ -43,6 +34,19 @@ class DocumentStateRepository @Inject constructor(private val supabase: Supabase
             }
             ResultWrapper.Success(Unit)
         } catch (e: Exception) {
+            return ResultWrapper.Error(exceptionMapper.map(e))
+        }
+    }
+
+    suspend fun getDocumentStates(ids: List<Int>): ResultWrapper<List<DocumentStateModel>>{
+        return try{
+            val documentStatesResult = supabase.from(DatabaseTables.DOCUMENT_STATE).select(){
+                filter {
+                    isIn("id", ids)
+                }
+            }.decodeList<DocumentStateModel>()
+            ResultWrapper.Success(documentStatesResult)
+        }catch (e: Exception){
             return ResultWrapper.Error(exceptionMapper.map(e))
         }
     }

@@ -95,7 +95,7 @@ fun ApplicationStatusViewContent(
             onExpandChange = { isDataExpanded = it }
         ) {
             // Caixa 1: Dados Pessoais
-            CategoryBox(title = "Dados Pessoais", icon = Icons.Outlined.Person) {
+            CategoryBox(title = "Dados Pessoais", icon = Icons.Outlined.Person, bgColor = Color.White) {
                 ReadOnlyField("Nome Completo", "João Pedro Silva Santos")
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     Box(Modifier.weight(1f)) { ReadOnlyField("NIF", "234567890") }
@@ -111,7 +111,7 @@ fun ApplicationStatusViewContent(
             Spacer(Modifier.height(16.dp))
 
             // Caixa 2: Dados Académicos
-            CategoryBox(title = "Dados Académicos", icon = Icons.Outlined.Star) {
+            CategoryBox(title = "Dados Académicos", icon = Icons.Outlined.Star, bgColor = Color.White) {
                 ReadOnlyField("Instituição", "IPCA - Barcelos")
                 ReadOnlyField("Curso", "Engenharia em Desenvolvimento de Jogos Digitais")
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -120,8 +120,6 @@ fun ApplicationStatusViewContent(
                 }
             }
         }
-
-
 
         // Botão Eliminar
         if (currentState != ApplicationState.DENIED && currentState != ApplicationState.ACCEPTED) {

@@ -5,22 +5,25 @@ import android.net.Uri
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ipca.socialstore.data.enums.ApplicationDocumentTypeState
 import com.ipca.socialstore.data.enums.DocumentType
+import com.ipca.socialstore.data.exceptions.AppError
 import com.ipca.socialstore.data.models.AcademicModel
+import com.ipca.socialstore.data.models.ApplicationDocumentTypeModel
 import com.ipca.socialstore.data.models.ApplicationModel
 import com.ipca.socialstore.data.models.ApplicationStateModel
-import com.ipca.socialstore.data.models.DocumentModel
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
 import com.ipca.socialstore.domain.academic.GetAcademicDataUseCase
+import com.ipca.socialstore.domain.appDocType.GetAppDocTypesUseCase
 import com.ipca.socialstore.domain.application.GetUserApplicationUseCase
 import com.ipca.socialstore.domain.applicationState.GetUserApplicationState
-import com.ipca.socialstore.domain.document.GetAllDocumentsUseCase
 import com.ipca.socialstore.domain.services.document.DeleteDocumentService
-import com.ipca.socialstore.domain.services.document.GetAllDocumentsService
-import com.ipca.socialstore.domain.services.document.UploadDocumentsService
+import com.ipca.socialstore.domain.services.document.GetApplicationDocumentsService
+import com.ipca.socialstore.domain.services.document.UploadApplicationDocumentsService
 import com.ipca.socialstore.presentation.models.DocumentReceiverModel
 import com.ipca.socialstore.presentation.utils.ErrorText
 import com.ipca.socialstore.presentation.utils.asUiText
+import com.ipca.socialstore.presentation.utils.getFileNameFromUri
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -34,7 +37,7 @@ data class ApplicationState(
     val applicationState: ApplicationStateModel? = null,
     val academicData: AcademicModel? = null,
 
-    //Files selected localy
+    //Files selected
     val selectedBankStatements: List<Uri> = emptyList(),
     val selectedIncomeProof: List<Uri> = emptyList(),
     val selectedOtherIncome: List<Uri> = emptyList(),
@@ -46,17 +49,24 @@ data class ApplicationState(
     val documentsIncomeProof: List<DocumentReceiverModel> = emptyList(),
     val documentsOtherIncome: List<DocumentReceiverModel> = emptyList(),
     val documentsPermanentExpenses: List<DocumentReceiverModel> = emptyList(),
-    val documentsInternationalSupport: List<DocumentReceiverModel> = emptyList()
-)
+    val documentsInternationalSupport: List<DocumentReceiverModel> = emptyList(),
+
+    val bankStatementDocsState: ApplicationDocumentTypeModel? = null,
+    val incomeProofDocsState: ApplicationDocumentTypeModel? = null,
+    val otherIncomeDocsState: ApplicationDocumentTypeModel? = null,
+    val permanentExpensesDocsState: ApplicationDocumentTypeModel? = null,
+    val internationalSupportDocsState: ApplicationDocumentTypeModel? = null,
+    )
 
 @HiltViewModel
 class ApplicationStateViewModel @Inject constructor(
     private val getUserApplicationUseCase: GetUserApplicationUseCase,
     private val getAcademicDataUseCase: GetAcademicDataUseCase,
     private val getUserApplicationState: GetUserApplicationState,
-    private val uploadDocumentsService: UploadDocumentsService,
-    private val getAllDocumentsService: GetAllDocumentsService,
-    private val deleteDocumentService: DeleteDocumentService) : ViewModel(){
+    private val uploadApplicationDocumentsService: UploadApplicationDocumentsService,
+    private val getApplicationDocumentsService: GetApplicationDocumentsService,
+    private val deleteDocumentService: DeleteDocumentService,
+    private val getAppDocTypesUseCase: GetAppDocTypesUseCase) : ViewModel(){
     var uiState = mutableStateOf(ApplicationState())
 
     init {
@@ -76,7 +86,38 @@ class ApplicationStateViewModel @Inject constructor(
                                     applicationState = applicationStateResult.data,
                                     isLoading = false,
                                 )
-                                getAllDocuments()
+                                val applicationId = applicationResult.data.id!!
+
+                                val docBankStatements = getDocuments(
+                                    applicationId = applicationId,
+                                    documentType = DocumentType.BANK_STATEMENTS.folderName
+                                )
+
+                                val docIncomeProof = getDocuments(
+                                    applicationId = applicationId,
+                                    documentType = DocumentType.INCOME_PROOF.folderName
+                                )
+                                val docOtherIncome = getDocuments(
+                                    applicationId = applicationId,
+                                    documentType = DocumentType.OTHER_INCOME.folderName
+                                )
+                                val docPermanentExpenses = getDocuments(
+                                    applicationId = applicationId,
+                                    documentType = DocumentType.PERMANENT_EXPENSES.folderName
+                                )
+                                val docInternationalSupport = getDocuments(
+                                    applicationId = applicationId,
+                                    documentType = DocumentType.INTERNATIONAL_SUPPORT.folderName
+                                )
+
+                                uiState.value = uiState.value.copy(
+                                    documentsBankStatements = docBankStatements,
+                                    documentsOtherIncome = docOtherIncome,
+                                    documentsIncomeProof = docIncomeProof,
+                                    documentsInternationalSupport = docInternationalSupport,
+                                    documentsPermanentExpenses = docPermanentExpenses
+                                )
+                                getAppDocTypeStates(applicationId = applicationId)
                             }
                             is ResultWrapper.Error -> {
                                 uiState.value = uiState.value.copy(
@@ -115,87 +156,111 @@ class ApplicationStateViewModel @Inject constructor(
         }
     }
 
-    suspend fun getAllDocuments() {
-        if(uiState.value.application!= null){
-            uiState.value = uiState.value.copy(isLoading = true)
-            val documentsResult = getAllDocumentsService(applicationId = uiState.value.application?.id!!)
-            when(documentsResult){
-                is ResultWrapper.Success -> {
-                    uiState.value = uiState.value.copy(
-                        isLoading = false,
-                    )
-                    filterDocuments(documentsResult.data)
-                }
-                is ResultWrapper.Error -> {
-                    uiState.value = uiState.value.copy(
-                        isLoading = false,
-                        error = documentsResult.error.asUiText()
-                    )
-                }
+    suspend fun getDocuments(applicationId: Int,documentType: String): List<DocumentReceiverModel> {
+        uiState.value = uiState.value.copy(isLoading = true)
+        val documentsResult = getApplicationDocumentsService(applicationId = applicationId, documentType = documentType)
+        when(documentsResult){
+            is ResultWrapper.Success -> {
+                uiState.value = uiState.value.copy(
+                    isLoading = false,
+                )
+                return documentsResult.data
+            }
+            is ResultWrapper.Error -> {
+                uiState.value = uiState.value.copy(
+                    isLoading = false,
+                    error = documentsResult.error.asUiText()
+                )
+            }
+        }
+        return emptyList()
+    }
+
+    suspend fun getAppDocTypeStates(applicationId: Int) {
+        uiState.value = uiState.value.copy(isLoading = true)
+        when(val appDocTypesResult = getAppDocTypesUseCase(applicationId = applicationId)){
+            is ResultWrapper.Success -> {
+                val typesList = appDocTypesResult.data
+                uiState.value = uiState.value.copy(
+                    isLoading = false,
+                    permanentExpensesDocsState = typesList.find { it.type == DocumentType.PERMANENT_EXPENSES.folderName },
+                    incomeProofDocsState = typesList.find { it.type == DocumentType.INCOME_PROOF.folderName },
+                    bankStatementDocsState = typesList.find { it.type == DocumentType.BANK_STATEMENTS.folderName },
+                    otherIncomeDocsState = typesList.find { it.type == DocumentType.OTHER_INCOME.folderName },
+                    internationalSupportDocsState = typesList.find { it.type == DocumentType.INTERNATIONAL_SUPPORT.folderName }
+                )
+            }
+            is ResultWrapper.Error -> {
+                uiState.value = uiState.value.copy(
+                    isLoading = false,
+                    error = appDocTypesResult.error.asUiText()
+                )
             }
         }
     }
 
-    private fun filterDocuments(documentsList: List<DocumentReceiverModel>){
-        uiState.value = uiState.value.copy(
-            documentsBankStatements = documentsList.filter { doc ->
-                doc.folderName == DocumentType.BANK_STATEMENTS.folderName
-            },
+    fun addFiles(uri: Uri?, folderName: String, context: Context) {
+        if (uri == null) return
 
-            documentsIncomeProof = documentsList.filter { doc ->
-                doc.folderName == DocumentType.INCOME_PROOF.folderName
-            },
+        val fileExists = selectedFileExists(
+          fileName = getFileNameFromUri(
+                context = context,
+                uri = uri),
+                folderName = folderName,
+                context = context
+          )
 
-            documentsOtherIncome = documentsList.filter { doc ->
-                doc.folderName == DocumentType.OTHER_INCOME.folderName
-            },
-
-            documentsPermanentExpenses = documentsList.filter { doc ->
-                doc.folderName == DocumentType.PERMANENT_EXPENSES.folderName
-            },
-
-            documentsInternationalSupport = documentsList.filter { doc ->
-                doc.folderName == DocumentType.INTERNATIONAL_SUPPORT.folderName
-            }
-        )
-    }
-
-    fun addFiles(uris: List<Uri>, folderName: String) {
-        if (uris.isEmpty()) return
+        if(fileExists){
+            uiState.value = uiState.value.copy(
+                isLoading = false,
+                error = AppError.UnknownError("O ficheiro ja existe").asUiText()
+            )
+            return
+        }
 
         val currentState = uiState.value
 
         uiState.value = when (folderName) {
             DocumentType.BANK_STATEMENTS.folderName -> {
                 currentState.copy(
-                    selectedBankStatements = currentState.selectedBankStatements + uris
+                    selectedBankStatements = currentState.selectedBankStatements + uri
                 )
             }
             DocumentType.INCOME_PROOF.folderName -> {
                 currentState.copy(
-                    selectedIncomeProof = currentState.selectedIncomeProof + uris
+                    selectedIncomeProof = currentState.selectedIncomeProof + uri
                 )
             }
             DocumentType.OTHER_INCOME.folderName -> {
                 currentState.copy(
-                    selectedOtherIncome = currentState.selectedOtherIncome + uris
+                    selectedOtherIncome = currentState.selectedOtherIncome + uri
                 )
             }
             DocumentType.PERMANENT_EXPENSES.folderName -> {
                 currentState.copy(
-                    selectedPermanentExpenses = currentState.selectedPermanentExpenses + uris
+                    selectedPermanentExpenses = currentState.selectedPermanentExpenses + uri
                 )
             }
             DocumentType.INTERNATIONAL_SUPPORT.folderName -> {
                 currentState.copy(
-                    selectedInternationalSupport = currentState.selectedInternationalSupport + uris
+                    selectedInternationalSupport = currentState.selectedInternationalSupport + uri
                 )
             }
             else -> currentState
         }
     }
 
-    fun removeSelectedFile(uri: Uri?, folderName: String) {
+    fun removeFile(uri: Uri?, document: DocumentReceiverModel?, folderName: String){
+        if(uri != null){
+            removeUri(uri = uri, folderName = folderName)
+        }
+        if(document != null){
+            removeSubmittedDocument(document = document)
+            removeDocument(document = document, folderName = folderName)
+        }
+    }
+
+    private fun removeUri(uri: Uri?, folderName: String) {
         if (uri == null) return
 
         val currentState = uiState.value
@@ -230,7 +295,7 @@ class ApplicationStateViewModel @Inject constructor(
         }
     }
 
-    fun removeDocument(document: DocumentReceiverModel, folderName: String) {
+    private fun removeDocument(document: DocumentReceiverModel, folderName: String) {
         val currentState = uiState.value
 
         uiState.value = when (folderName) {
@@ -263,10 +328,15 @@ class ApplicationStateViewModel @Inject constructor(
         }
     }
 
-    fun removeSubmittedDocument(document: DocumentReceiverModel) {
+    private fun removeSubmittedDocument(document: DocumentReceiverModel) {
         viewModelScope.launch {
             uiState.value = uiState.value.copy(isLoading = true, error = null)
-            val result = deleteDocumentService(filePath = document.path, documentId = document.id!!)
+            val result = deleteDocumentService(
+                filePath = document.path,
+                documentId = document.id!!,
+                stateId = document.stateId,
+                appDocId = document.appDocId,
+            )
             when(result){
                 is ResultWrapper.Success -> {
                     uiState.value = uiState.value.copy(
@@ -298,7 +368,7 @@ class ApplicationStateViewModel @Inject constructor(
             }
 
             if (filesToUpload.isNotEmpty()) {
-                val result = uploadDocumentsService(filesList = filesToUpload, folderName = folderName, context = context)
+                val result = uploadApplicationDocumentsService(filesList = filesToUpload, folderName = folderName, context = context)
                 when(result){
                     is ResultWrapper.Success -> {
                         uiState.value = uiState.value.copy(
@@ -316,5 +386,25 @@ class ApplicationStateViewModel @Inject constructor(
 
             uiState.value = uiState.value.copy(isLoading = false)
         }
+    }
+
+    fun clearError(){
+        uiState.value = uiState.value.copy(error = null)
+    }
+
+    private fun selectedFileExists(fileName: String, folderName: String, context: Context): Boolean{
+        if(folderName == DocumentType.BANK_STATEMENTS.folderName){
+            for(doc in uiState.value.documentsBankStatements){
+                if(doc.name == fileName){
+                    return true
+                }
+            }
+            for(uri in uiState.value.selectedBankStatements){
+                if(getFileNameFromUri(context = context, uri = uri) == fileName){
+                    return true
+                }
+            }
+        }
+        return false
     }
 }
