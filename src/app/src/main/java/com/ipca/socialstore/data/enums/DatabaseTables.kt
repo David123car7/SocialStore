@@ -15,15 +15,11 @@ enum class DatabaseTables(val tableName: String) {
     APPLICATION_STATE("application_state"),
     ACADEMIC("academic"),
     DOCUMENT("document"),
-
     DOCUMENT_STATE("document_state"),
-    SCHEDULING ("Scheduling"),
-
-    BENEFICIARY("Beneficiary"),
-
-    SCHEDULING_DATE("Scheduling_date"),
-
-    SCHEDULING_NOTIFICATION("Scheduling_Notification");
-
+    SCHEDULING ("scheduling"),
+    BENEFICIARY("beneficiary"),
+    SCHEDULING_DATE("scheduling_date"),
+    SCHEDULING_NOTIFICATION("notification_scheduling");
+	
     override fun toString() = tableName
 }

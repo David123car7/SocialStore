@@ -4,7 +4,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ipca.socialstore.presentation.models.StockReveiverModel
+import com.ipca.socialstore.presentation.models.StockReceiverModel
 import com.ipca.socialstore.data.models.StockModel
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
 import com.ipca.socialstore.domain.services.stock.ListAllItemsStockService
@@ -16,11 +16,12 @@ import javax.inject.Inject
 
 data class GetStockState(
     val stock : List<StockModel>? = null,
-    val items : List<StockReveiverModel>? = null,
+    val items : List<StockReceiverModel>? = null,
     val isLoading : Boolean = false,
     val error: ErrorText? = null,
     val isEditing : Boolean? = false,
-
+    val selectedStock : StockReceiverModel? = null,
+    val searchResult : List<StockReceiverModel>? = null
     )
 
 @HiltViewModel
@@ -28,13 +29,30 @@ class ListAllStockViewModel @Inject constructor(private val listAllItemsStockSer
 
     val uiState = mutableStateOf(GetStockState())
 
-    private val stockDetail = mutableStateOf<StockReveiverModel?>(null)
-    val detail : State<StockReveiverModel?> = stockDetail
-
-    fun selectStock(item : StockReveiverModel){
-        stockDetail.value = item
-        println("FuncaoModel:${stockDetail.value}")
+    fun selectStock(item : StockReceiverModel){
+        uiState.value = uiState.value.copy(selectedStock = item)
     }
+
+    fun updateSearchList(name : String){
+        val allItems = uiState.value.items
+
+        if (name.isEmpty() || allItems.isNullOrEmpty()) {
+            uiState.value = uiState.value.copy(
+                searchResult = null,
+            )
+            return
+        }
+        val normalizedSearch = name.trim().lowercase()
+
+        val filteredList = allItems.filter { item ->
+            item.item.name.lowercase().contains(normalizedSearch)
+        }
+
+        uiState.value = uiState.value.copy(
+            searchResult = filteredList,
+        )
+    }
+
     fun getAllStock(){
         uiState.value = uiState.value.copy(
             isLoading = true,

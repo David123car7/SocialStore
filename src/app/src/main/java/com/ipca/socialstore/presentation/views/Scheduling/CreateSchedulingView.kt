@@ -12,12 +12,16 @@ import com.ipca.socialstore.presentation.utils.ErrorText
 import com.ipca.socialstore.presentation.utils.asUiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import java.util.TimeZone
 import javax.inject.Inject
 
 
 data class CreateSchedulingState(
     val schedulingDate : SchedulingDateModel = SchedulingDateModel(null,"",),
-    val notification : NotificationSchedulingModel? = NotificationSchedulingModel(null,"",""),
+    val notification : NotificationSchedulingModel = NotificationSchedulingModel(null,"",""),
     val beneficiaryId : String? = null,
     val isLoading : Boolean? = false,
     val error : ErrorText? = null
@@ -28,6 +32,7 @@ class CreateSchedulingView @Inject constructor(private val createSchedulingUseCa
     val uiState = mutableStateOf(CreateSchedulingState())
 
     fun updateDate(value : String){
+        println(value)
         val date = uiState.value.schedulingDate.copy(date = value)
 
         uiState.value = uiState.value.copy(
@@ -35,10 +40,16 @@ class CreateSchedulingView @Inject constructor(private val createSchedulingUseCa
         )
     }
 
-    fun updateCreateAt(){
+    fun updateCreateAt() {
         val currentTimeMillis = System.currentTimeMillis()
-        val date = currentTimeMillis.toString()
-        val create = uiState.value.notification?.copy(createdAt = date)
+
+        val formatter = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.ENGLISH)
+
+        formatter.timeZone = TimeZone.getTimeZone("UTC")
+
+        val iso8601DateString = formatter.format(Date(currentTimeMillis))
+
+        val create = uiState.value.notification.copy(createdAt = iso8601DateString)
 
         uiState.value = uiState.value.copy(
             notification = create
@@ -46,7 +57,7 @@ class CreateSchedulingView @Inject constructor(private val createSchedulingUseCa
     }
 
     fun updateSubject(value : String){
-        val notification = uiState.value.notification?.copy(subject = value)
+        val notification = uiState.value.notification.copy(subject = value)
 
         uiState.value = uiState.value.copy(
             notification = notification
