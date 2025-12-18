@@ -40,19 +40,17 @@ class DocumentRepository @Inject constructor(private val supabase: SupabaseClien
                     eq("id", documentId)
                 }
             }
-            // If no error was thrown, the delete request was sent successfully
             ResultWrapper.Success(Unit)
         } catch (e: Exception) {
             return ResultWrapper.Error(exceptionMapper.map(e))
         }
     }
 
-    suspend fun getDocuments(applicationId: Int, folderName: String): ResultWrapper<List<DocumentModel>>{
+    suspend fun getDocuments(ids: List<Int>): ResultWrapper<List<DocumentModel>>{
         return try{
             val documentResult = supabase.from(DatabaseTables.DOCUMENT).select(){
                 filter {
-                    eq("application_id",applicationId)
-                    eq("folder_name", folderName)
+                    isIn("id", ids)
                 }
             }.decodeList<DocumentModel>()
             ResultWrapper.Success(documentResult)
@@ -61,18 +59,6 @@ class DocumentRepository @Inject constructor(private val supabase: SupabaseClien
         }
     }
 
-    suspend fun getAllDocuments(applicationId: Int) : ResultWrapper<List<DocumentModel>>{
-        return try{
-            val documentResult = supabase.from(DatabaseTables.DOCUMENT).select(){
-                filter {
-                    eq("application_id",applicationId)
-                }
-            }.decodeList<DocumentModel>()
-            ResultWrapper.Success(documentResult)
-        }catch (e: Exception){
-            return ResultWrapper.Error(exceptionMapper.map(e))
-        }
-    }
 
     private suspend fun getDocument(id: Int): ResultWrapper<DocumentModel> {
         return try{

@@ -10,16 +10,16 @@ enum class DatabaseTables(val tableName: String) {
     ITEM("item"),
     STOCK("stock"),
     APPLICATION("application"),
+    APPLICATION_DOCUMENT_TYPE("application_document_type"),
+    APPLICATION_DOCUMENT("application_document"),
     APPLICATION_STATE("application_state"),
     ACADEMIC("academic"),
     DOCUMENT("document"),
+    DOCUMENT_STATE("document_state"),
     SCHEDULING ("scheduling"),
-
     BENEFICIARY("beneficiary"),
-
     SCHEDULING_DATE("scheduling_date"),
-
     SCHEDULING_NOTIFICATION("notification_scheduling");
-
+	
     override fun toString() = tableName
 }

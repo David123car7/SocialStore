@@ -6,6 +6,7 @@ import com.ipca.socialstore.data.enums.UserRole
 import com.ipca.socialstore.data.exceptions.AppError
 import com.ipca.socialstore.data.exceptions.ExceptionMapper
 import com.ipca.socialstore.data.helpers.from
+import com.ipca.socialstore.data.models.ApplicationModel
 import com.ipca.socialstore.data.models.TableIdModel
 import com.ipca.socialstore.data.models.UserModel
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
@@ -60,8 +61,22 @@ class UserRepository @Inject constructor(private val supabase: SupabaseClient, p
     suspend fun getUserApplicationId(uid: String): ResultWrapper<Int>{
         return try {
             val user = getUser(uid = uid) ?: return ResultWrapper.Error(AppError.UserNotFound)
-            user.applicationId ?: return ResultWrapper.Error(AppError.UnknownError(UnknownError.NULL_ID.errorMessage))
+            user.applicationId ?: return ResultWrapper.Error(AppError.ApplicationDontExists)
             ResultWrapper.Success(user.applicationId)
+        }
+        catch (e: Exception) {
+            ResultWrapper.Error(exceptionMapper.map(e))
+        }
+    }
+
+    suspend fun setUserRole(uid: String, role: String): ResultWrapper<String>{
+        return try {
+            val user = getUser(uid = uid) ?: return ResultWrapper.Error(AppError.UserNotFound)
+            val newUser = user.copy(role = role)
+            supabase.from(DatabaseTables.USER).update(newUser) {
+                filter { eq("id", uid) }
+            }
+            ResultWrapper.Success(uid)
         }
         catch (e: Exception) {
             ResultWrapper.Error(exceptionMapper.map(e))

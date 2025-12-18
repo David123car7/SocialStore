@@ -41,10 +41,10 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.ipca.socialstore.data.enums.UserRole
-import com.ipca.socialstore.presentation.objects.NavigationLogic
+import com.ipca.socialstore.presentation.utils.NavigationLogic
 import com.ipca.socialstore.presentation.ui.components.ErrorTextComponent
 import com.ipca.socialstore.presentation.ui.components.TextFieldPasswordComponent
-import com.ipca.socialstore.presentation.ui.components.TextFieldValueComponent
+import com.ipca.socialstore.presentation.ui.components.TextFieldStringComponent
 import com.ipca.socialstore.presentation.ui.theme.SocialStoreTheme
 
 @Composable
@@ -140,7 +140,7 @@ fun ResetPasswordViewContent(
                         modifier = Modifier.padding(bottom = 24.dp)
                     )
 
-                    TextFieldValueComponent(
+                    TextFieldStringComponent(
                         modifier = Modifier,
                         label = "Email",
                         value = uiState.email,
@@ -182,7 +182,7 @@ fun ResetPasswordViewContent(
                         modifier = Modifier.padding(bottom = 24.dp)
                     )
 
-                    TextFieldValueComponent(
+                    TextFieldStringComponent(
                         modifier = Modifier,
                         label = "Token",
                         value = uiState.token,

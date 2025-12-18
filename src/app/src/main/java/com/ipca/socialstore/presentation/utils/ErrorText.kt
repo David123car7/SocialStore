@@ -1,5 +1,6 @@
 package com.ipca.socialstore.presentation.utils
 
+import android.content.Context
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
@@ -24,6 +25,23 @@ sealed class ErrorText {
                     }
                 }.toTypedArray()
                 stringResource(resId, *resolvedArgs)
+            }
+        }
+    }
+
+    fun asString(context: Context): String {
+        return when (this) {
+            is DynamicString -> value
+            is StringResource -> {
+                val resolvedArgs = args.map { arg ->
+                    if (arg is ErrorText) {
+                        arg.asString(context)
+                    } else {
+                        arg
+                    }
+                }.toTypedArray()
+
+                context.getString(resId, *resolvedArgs)
             }
         }
     }

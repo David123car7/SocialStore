@@ -18,7 +18,7 @@ class GetUserApplicationUseCase @Inject constructor(
         val uid = (uidResult as ResultWrapper.Success).data
 
         val applicationIdResult = userRepository.getUserApplicationId(uid = uid)
-        if (applicationIdResult is ResultWrapper.Error) return ResultWrapper.Error(AppError.ApplicationDontExists)
+        if (applicationIdResult is ResultWrapper.Error) return ResultWrapper.Error(applicationIdResult.error)
         val applicationId = (applicationIdResult as ResultWrapper.Success).data
 
         return applicationRepository.getApplication(id = applicationId)

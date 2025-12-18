@@ -7,8 +7,13 @@ import kotlinx.serialization.Serializable
 enum class ApplicationStatus(val status: String) {
     @SerialName("pending")
     PENDING("pending"),
+
+    @SerialName("correction")
+    CORRECTION("correction"),
+
     @SerialName("approved")
     APPROVED("approved"),
+
     @SerialName("rejected")
     REJECTED("rejected"),
 
