@@ -16,9 +16,6 @@ data class DocumentModel (
     @SerialName("folder_name")
     val folderName: String,
 
-    @SerialName("status")
-    val status: String,
-
-    @SerialName("application_id")
-    val applicationId: Int,
+    @SerialName("created_at")
+    val createdAt: String,
 )

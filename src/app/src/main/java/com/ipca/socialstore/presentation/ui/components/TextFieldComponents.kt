@@ -9,8 +9,11 @@ import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -28,15 +31,30 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import com.ipca.socialstore.data.enums.RequestType
 
 @Composable
-fun TextFieldValueComponent(modifier: Modifier, label: String,value: String, icon: ImageVector,onValueUpdate:(newValue: String)->Unit) {
+fun TextFieldStringComponent(modifier: Modifier, label: String, value: String, icon: ImageVector, onValueUpdate:(newValue: String)->Unit) {
     OutlinedTextField(
         value = value,
         onValueChange = onValueUpdate,
         label = { Text(label) },
         leadingIcon = { Icon(icon, null) },
         modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(12.dp),
+        singleLine = true
+    )
+}
+
+@Composable
+fun TextFieldValueComponent(modifier: Modifier, label: String, value: String, icon: ImageVector, onValueUpdate:(newValue: String)->Unit) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = onValueUpdate,
+        label = { Text(label) },
+        leadingIcon = { Icon(icon, null) },
+        modifier = modifier.fillMaxWidth(),
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
         shape = RoundedCornerShape(12.dp),
         singleLine = true
     )
@@ -85,4 +103,51 @@ fun TextFieldPasswordComponent(modifier: Modifier, password: String, onPasswordU
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
         singleLine = true
     )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun <T> SocialStoreDropdown(
+    modifier: Modifier = Modifier,
+    expanded: Boolean,
+    onExpandedChange: (Boolean) -> Unit,
+    selectedOption: T?,
+    onOptionSelected: (T) -> Unit,
+    options: List<T>,           // Nova: A lista de opções
+    label: String,              // Nova: O texto "Tipo de Pedido"
+    getLabel: (T) -> String     // Nova: Como extrair o texto de cada opção
+) {
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = onExpandedChange,
+        modifier = modifier.fillMaxWidth()
+    ) {
+        OutlinedTextField(
+            value = if (selectedOption != null) getLabel(selectedOption) else "",
+            onValueChange = {},
+            readOnly = true,
+            label = { Text(label) },
+            leadingIcon = { Icon(Icons.Default.Star, contentDescription = null) },
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+            colors = OutlinedTextFieldDefaults.colors(),
+            modifier = Modifier
+                .menuAnchor()
+                .fillMaxWidth()
+        )
+
+        ExposedDropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { onExpandedChange(false) }
+        ) {
+            options.forEach { item ->
+                DropdownMenuItem(
+                    text = { Text(getLabel(item)) },
+                    onClick = {
+                        onOptionSelected(item)
+                        onExpandedChange(false)
+                    }
+                )
+            }
+        }
+    }
 }

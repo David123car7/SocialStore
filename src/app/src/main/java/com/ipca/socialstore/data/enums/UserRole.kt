@@ -13,6 +13,10 @@ enum class UserRole(val value: String) {
 
     @SerialName("default")
     DEFAULT("default"),
+
+    @SerialName("candidate")
+    CANDIDATE("candidate"),
+
     @SerialName("norole")
-    NOROLE("norole"),
+    GUEST("norole"),
 }

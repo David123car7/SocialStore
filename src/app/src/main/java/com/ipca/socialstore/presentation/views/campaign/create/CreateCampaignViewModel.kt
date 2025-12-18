@@ -14,7 +14,7 @@ import javax.inject.Inject
 
 
 data class CampaignState(
-    val campaign : CampaignModel = CampaignModel(name = "", date = ""),
+    val campaign : CampaignModel = CampaignModel(name = "", date = "", description = "", category = ""),
     val isLoading : Boolean = false,
     val error: ErrorText? = null,
     val isCreated : Boolean  = false

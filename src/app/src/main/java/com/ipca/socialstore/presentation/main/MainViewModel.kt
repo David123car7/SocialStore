@@ -19,7 +19,7 @@ import javax.inject.Inject
 data class SessionState(
     val isLoading: Boolean = true,
     val isLoggedIn: Boolean = false,
-    var userRole: UserRole = UserRole.NOROLE,
+    var userRole: UserRole = UserRole.GUEST,
     var userId: String? = null,
     val error: ErrorText? = null
 )
@@ -92,7 +92,7 @@ class MainViewModel @Inject constructor(
                         getUserId()
                     }
                     else{
-                        sessionState.value = sessionState.value.copy(userRole = UserRole.NOROLE)
+                        sessionState.value = sessionState.value.copy(userRole = UserRole.GUEST)
                     }
                     Log.d("App Debug", "The user ROLE is: ${sessionState.value.userRole}")
                     Log.d("App Debug", "The user STATE is: ${sessionState.value.isLoggedIn}")

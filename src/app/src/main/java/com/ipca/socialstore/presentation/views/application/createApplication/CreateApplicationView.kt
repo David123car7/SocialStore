@@ -6,33 +6,57 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.ipca.socialstore.data.enums.RequestType
+import com.ipca.socialstore.data.enums.TypeCourse
 import com.ipca.socialstore.data.models.AcademicModel
 import com.ipca.socialstore.data.models.ApplicationModel
+import com.ipca.socialstore.presentation.ui.components.SocialStoreDropdown
+import com.ipca.socialstore.presentation.ui.components.TextFieldDateComponent
+import com.ipca.socialstore.presentation.ui.components.TextFieldStringComponent
+import com.ipca.socialstore.presentation.ui.components.TextFieldValueComponent
 import com.ipca.socialstore.presentation.utils.getFileNameFromUri
 import com.ipca.socialstore.presentation.ui.theme.SocialStoreTheme
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 @Composable
 fun CreateApplicationView(modifier: Modifier){
@@ -62,6 +86,7 @@ fun CreateApplicationView(modifier: Modifier){
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CreateApplicationViewContent(
     modifier: Modifier = Modifier,
@@ -83,128 +108,157 @@ fun CreateApplicationViewContent(
 
     onSubmitApplication: () -> Unit
 ) {
-    val scrollState = rememberScrollState()
+    val datePickerState = rememberDatePickerState()
+    var showDatePicker by remember { mutableStateOf(false) }
+
+    var requestTypeExpanded by remember { mutableStateOf(false) }
+    var courseTypeExpanded by remember { mutableStateOf(false) }
+
+
+    if (showDatePicker) {
+        DatePickerDialog(
+            onDismissRequest = { showDatePicker = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    datePickerState.selectedDateMillis?.let { millis ->
+                        val date = Date(millis)
+                        val format = SimpleDateFormat("yyyy/MM/dd", Locale.getDefault())
+                        onBirthDateUpdate(format.format(date))
+                    }
+                    showDatePicker = false
+                }) {
+                    Text("OK")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDatePicker = false }) {
+                    Text("Cancelar")
+                }
+            }
+        ) {
+            DatePicker(state = datePickerState)
+        }
+    }
 
     Column(
         modifier = modifier
-            .fillMaxSize()
             .padding(16.dp)
-            .verticalScroll(scrollState),
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState()),
+        verticalArrangement = Arrangement.spacedBy(20.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(
-            text = "Beneficiary Application",
-            style = MaterialTheme.typography.headlineMedium,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(bottom = 16.dp)
-        )
-
-        TextField(
+        TextFieldStringComponent(
+            modifier = Modifier,
+            label = "Email",
             value = uiState.application.name,
-            label = { Text("Full Name") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 4.dp),
-            onValueChange = onNameUpdate
+            icon = Icons.Default.Star,
+            onValueUpdate = onNameUpdate
         )
 
-        TextField(
-            value = uiState.application.birthDate,
-            label = { Text("Birth Date (YYYY-MM-DD)") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 4.dp),
-            onValueChange = onBirthDateUpdate
+        TextFieldDateComponent(
+            modifier = Modifier,
+            label = "Data de Nascimento",
+            uiState.application.birthDate,
+            onDateUpdate = onBirthDateUpdate,
+            onDatePickerUpdate = {showDatePicker = true}
         )
 
-        TextField(
+        TextFieldValueComponent(
+            modifier = Modifier,
+            label = "CC",
             value = uiState.application.cc,
-            label = { Text("Citizen Card (CC)") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 4.dp),
-            onValueChange = onCcUpdate
+            icon = Icons.Default.Star,
+            onValueUpdate = onCcUpdate
         )
 
-        TextField(
+        TextFieldValueComponent(
+            modifier = Modifier,
+            label = "Telemovel",
             value = uiState.application.phoneNumber,
-            label = { Text("Phone Number") },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 4.dp),
-            onValueChange = onPhoneUpdate
+            icon = Icons.Default.Star,
+            onValueUpdate = onPhoneUpdate
         )
 
-        TextField(
+        TextFieldValueComponent(
+            modifier = Modifier,
+            label = "Ano Letivo",
             value = if ((uiState.application.schoolYear) == 0) "" else uiState.application.schoolYear.toString(),
-            label = { Text("School Year") },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 4.dp),
-            onValueChange = onYearUpdate
+            icon = Icons.Default.Star,
+            onValueUpdate = onYearUpdate
         )
 
-        TextField(
-            value = uiState.application.requestType,
-            label = { Text("Request Type (e.g. Food, Housing)") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 4.dp),
-            onValueChange = onRequestTypeUpdate
+        SocialStoreDropdown<RequestType>(
+            expanded = requestTypeExpanded,
+            onExpandedChange = { requestTypeExpanded = it },
+            selectedOption = RequestType.entries.find{it.label == uiState.application.requestType},
+            onOptionSelected = { newEnum ->
+                onRequestTypeUpdate(newEnum.label)
+            },
+            options = RequestType.entries,
+            label = "Tipo de Pedido",
+            getLabel = { it.label }
         )
+
+        HorizontalDivider(thickness = 2.dp)
 
         Row(
+            modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth()
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Checkbox(
+            Column {
+                Text("É estudante atualmente?", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                Text("Habilita o preenchimento dos dados escolares", style = MaterialTheme.typography.bodySmall, color = Color.Gray)
+            }
+            Switch(
                 checked = uiState.isStudent,
                 onCheckedChange = onIsStudentUpdate
             )
-            Text("I am currently a Student")
         }
 
         if (uiState.isStudent) {
             Column(modifier = Modifier.padding(8.dp)) {
                 Text("Academic Information", style = MaterialTheme.typography.labelLarge)
 
-                TextField(
-                    value = uiState.academicData?.typeCourse ?: "",
-                    label = { Text("Type of Course (e.g. CTeSP, Degree)") },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 4.dp),
-                    onValueChange = onTypeCourseUpdate
+                SocialStoreDropdown<TypeCourse>(
+                    expanded = courseTypeExpanded,
+                    onExpandedChange = { courseTypeExpanded = it },
+                    selectedOption = TypeCourse.entries.find{it.label == uiState.academicData?.typeCourse!!},
+                    onOptionSelected = { newEnum ->
+                        onTypeCourseUpdate(newEnum.label)
+                    },
+                    options = TypeCourse.entries,
+                    label = "Curso",
+                    getLabel = { it.label }
                 )
 
-                TextField(
-                    value = uiState.academicData?.course ?: "",
-                    label = { Text("Course Name") },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 4.dp),
-                    onValueChange = onCourseUpdate
+                TextFieldStringComponent(
+                    modifier = Modifier,
+                    label = "Nome do Curso",
+                    value = uiState.academicData?.course!!,
+                    icon = Icons.Default.Star,
+                    onValueUpdate = onCourseUpdate
                 )
 
-                TextField(
-                    value = uiState.academicData?.studenNumber ?: "",
-                    label = { Text("Student Number") },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 4.dp),
-                    onValueChange = onStudentNumberUpdate
+                TextFieldValueComponent(
+                    modifier = Modifier,
+                    label = "Numero de Estudante",
+                    value = uiState.academicData.studenNumber,
+                    icon = Icons.Default.Star,
+                    onValueUpdate = onStudentNumberUpdate
                 )
             }
         }
 
         Button(
-            onClick = {
-                onSubmitApplication()
-            }
-        ){
-            Text("Submit")
+            onClick = onSubmitApplication,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(50.dp),
+            shape = RoundedCornerShape(12.dp)
+        ) {
+            Text("Continuar", fontWeight = FontWeight.Bold)
         }
 
         if (uiState.error != null) {

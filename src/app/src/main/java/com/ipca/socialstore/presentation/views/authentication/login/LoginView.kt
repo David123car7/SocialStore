@@ -4,29 +4,24 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.ShoppingCart
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,20 +30,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.ipca.socialstore.data.enums.UserRole
-import com.ipca.socialstore.presentation.objects.NavigationLogic
+import com.ipca.socialstore.presentation.utils.NavigationLogic
 import com.ipca.socialstore.presentation.routes.GeneralRoutes
 import com.ipca.socialstore.presentation.ui.components.ErrorTextComponent
 import com.ipca.socialstore.presentation.ui.components.TextFieldPasswordComponent
-import com.ipca.socialstore.presentation.ui.components.TextFieldValueComponent
+import com.ipca.socialstore.presentation.ui.components.TextFieldStringComponent
 import com.ipca.socialstore.presentation.ui.theme.SocialStoreTheme
 
 @Composable
@@ -73,6 +65,16 @@ fun LoginView(modifier: Modifier, navController: NavController, userRole: UserRo
             route =  GeneralRoutes.ResetPassword
         )}
     )
+
+    LaunchedEffect(uiState.isLoggedIn) {
+        if(uiState.isLoggedIn){
+            NavigationLogic.navigateTo(
+                navController = navController,
+                userRole = userRole,
+                route = GeneralRoutes.Home
+            )
+        }
+    }
 }
 
 @Composable
@@ -93,7 +95,7 @@ fun LoginViewContent(modifier: Modifier,
                 .padding(padding)
                 .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically)
         ) {
             Surface(
                 modifier = Modifier.size(80.dp),
@@ -110,8 +112,6 @@ fun LoginViewContent(modifier: Modifier,
                 )
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
-
             Text(
                 text = "Social Store",
                 style = MaterialTheme.typography.headlineMedium,
@@ -125,17 +125,13 @@ fun LoginViewContent(modifier: Modifier,
                 color = Color.Gray
             )
 
-            Spacer(modifier = Modifier.height(48.dp))
-
-            TextFieldValueComponent(
+            TextFieldStringComponent(
                 modifier = Modifier,
                 label = "Email",
                 value = uiState.email,
                 icon = Icons.Default.Email,
                 onValueUpdate = onEmailUpdate
             )
-
-            Spacer(modifier = Modifier.height(16.dp))
 
             TextFieldPasswordComponent(
                 modifier = Modifier,
@@ -149,8 +145,6 @@ fun LoginViewContent(modifier: Modifier,
                 }
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
-
             Button(
                 onClick = onLogin,
                 modifier = Modifier
@@ -160,8 +154,6 @@ fun LoginViewContent(modifier: Modifier,
             ) {
                 Text("Entrar", fontSize = 16.sp, fontWeight = FontWeight.Bold)
             }
-
-            Spacer(modifier = Modifier.weight(1f))
 
             if (uiState.error != null) {
                 ErrorTextComponent(message = uiState.error!!.asString())
