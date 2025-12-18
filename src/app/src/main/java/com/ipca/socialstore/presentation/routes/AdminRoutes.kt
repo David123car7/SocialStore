@@ -38,4 +38,6 @@ sealed class AdminRoutes {
 
     @Serializable
     object CreateScheduling : AdminRoutes()
+
+
 }

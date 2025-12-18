@@ -6,5 +6,5 @@ data class StockReceiverModel(
     val item : ItemModel,
     val stockId : Int,
     var totalQuantity : Int,
-    val quantityMap : MutableMap<String, Int> //maps the quantity with the expiration date
+    val quantityMap: Map<String, Int>
 )

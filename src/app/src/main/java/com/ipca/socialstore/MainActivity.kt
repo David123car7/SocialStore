@@ -18,6 +18,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.ipca.socialstore.Work.StockWorkManager
 import com.ipca.socialstore.presentation.views.authentication.login.LoginView
 import com.ipca.socialstore.presentation.main.MainViewModel
 import com.ipca.socialstore.presentation.views.authentication.register.RegisterView
@@ -49,6 +50,7 @@ class MainActivity : ComponentActivity() {
 
     private val mainViewModel: MainViewModel by viewModels()
     private val stockViewModel: ListAllStockViewModel by viewModels()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
