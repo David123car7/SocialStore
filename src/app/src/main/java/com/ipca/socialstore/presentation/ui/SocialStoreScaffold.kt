@@ -180,12 +180,12 @@ fun SocialStoreScaffoldContent(
                     )
                     NavigationBarItem(
                         icon = {Icon(imageVector = Icons.Default.Notifications, contentDescription = "")},
-                        selected = currentRoute == AdminRoutes.GetStock,
+                        selected = currentRoute == AdminRoutes.NotificationHistory,
                         onClick = {
                             NavigationLogic.navigateTo(
                                 navController = navController,
                                 userRole = UserRole.ADMIN,
-                                route = AdminRoutes.GetStock
+                                route = AdminRoutes.NotificationHistory
                             )
                         }
                     )

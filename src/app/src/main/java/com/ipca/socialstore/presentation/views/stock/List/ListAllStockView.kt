@@ -112,7 +112,7 @@ private fun StockList(
     val selectedType = remember { mutableStateOf<String?>(null) }
 
     val itemTypes = remember(items) {
-        items?.map { it.item.itemType }?.filter { it.isNotBlank() }?.distinct() ?: emptyList()
+        items?.map { it.item.itemType }?.filter { it!!.isNotBlank() }?.distinct() ?: emptyList()
     }
 
     // Box principal para garantir que o FAB fique por cima de tudo
@@ -151,7 +151,7 @@ private fun StockList(
                             selectedType.value = newType
                             onSearchType(newType ?: "")
                         },
-                        label = { Text(type) },
+                        label = { Text(type!!) },
                     )
                 }
             }

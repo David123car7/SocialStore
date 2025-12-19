@@ -64,7 +64,7 @@ fun CreateDonationViewContent(
                 onValueChange = { value -> onUpdateName(value) })
 
             TextField(
-                value = uiState.item.itemType,
+                value = uiState.item.itemType!!,
                 label = { Text("Tipo Item") },
                 modifier = Modifier.padding(8.dp),
                 onValueChange = { value -> onUpdateItemType(value) })
