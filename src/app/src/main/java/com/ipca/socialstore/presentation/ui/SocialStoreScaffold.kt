@@ -11,8 +11,11 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.ipca.socialstore.data.enums.UserRole
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.FileOpen
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Storage
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -20,11 +23,13 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.compose.rememberNavController
+import com.ipca.socialstore.presentation.routes.AdminRoutes
 import com.ipca.socialstore.presentation.routes.CandidateRoutes
 import com.ipca.socialstore.presentation.utils.NavigationLogic
 import com.ipca.socialstore.presentation.routes.DefaultRoutes
 import com.ipca.socialstore.presentation.routes.GeneralRoutes
 import com.ipca.socialstore.presentation.ui.theme.SocialStoreTheme
+import kotlinx.coroutines.selects.select
 
 @Composable
 fun SocialStoreScaffold(navController: NavController, userRole: UserRole, content: @Composable (PaddingValues) -> Unit){
@@ -137,6 +142,56 @@ fun SocialStoreScaffoldContent(
                     }
                 }
             }
+            if (userRole == UserRole.ADMIN){
+                NavigationBar()
+                {
+                    NavigationBarItem(
+                        icon = {Icon(imageVector = Icons.Default.Home, contentDescription = "")},
+                        selected = currentRoute == GeneralRoutes.Home,
+                        onClick = {
+                            NavigationLogic.navigateTo(
+                                navController = navController,
+                                userRole = userRole,
+                                route = GeneralRoutes.Home
+                            )
+                        }
+                    )
+                    NavigationBarItem(
+                        icon = {Icon(imageVector = Icons.Default.FileOpen, contentDescription = "")},
+                        selected = currentRoute == {/**/} ,
+                        onClick = {
+                            NavigationLogic.navigateTo(
+                                navController = navController,
+                                userRole = UserRole.ADMIN,
+                                route = {/**/}
+                            )
+                        }
+                    )
+                    NavigationBarItem(
+                        icon = {Icon(imageVector = Icons.Default.Storage, contentDescription = "")},
+                        selected = currentRoute == AdminRoutes.GetStock,
+                        onClick = {
+                            NavigationLogic.navigateTo(
+                                navController = navController,
+                                userRole = UserRole.ADMIN,
+                                route = AdminRoutes.GetStock
+                            )
+                        }
+                    )
+                    NavigationBarItem(
+                        icon = {Icon(imageVector = Icons.Default.Notifications, contentDescription = "")},
+                        selected = currentRoute == AdminRoutes.GetStock,
+                        onClick = {
+                            NavigationLogic.navigateTo(
+                                navController = navController,
+                                userRole = UserRole.ADMIN,
+                                route = AdminRoutes.GetStock
+                            )
+                        }
+                    )
+                }
+
+            }
         }
     ) { paddingValues ->
         content(paddingValues)
@@ -149,7 +204,7 @@ fun SocialStoreScaffoldGuestPreview() {
     SocialStoreTheme {
         SocialStoreScaffoldContent(
             navController = rememberNavController(),
-            userRole = UserRole.DEFAULT,
+            userRole = UserRole.ADMIN,
             logout = {}
         ) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {

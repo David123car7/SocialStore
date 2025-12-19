@@ -62,6 +62,20 @@ class ItemRepository @Inject constructor(private val supabase : SupabaseClient, 
         }
     }
 
+    suspend fun getItemName(itemId : List<Int>) : ResultWrapper<List<String>>{
+        return try {
+            val result = supabase.from(DatabaseTables.ITEM)
+                .select(columns = Columns.list("name")){
+                    filter {
+                        isIn("id", itemId)
+                    }
+                }.decodeList<String>()
+            return ResultWrapper.Success(result)
+        }catch (e : Exception){
+            ResultWrapper.Error(exceptionMapper.map(e))
+        }
+    }
+
     suspend fun getListItemsById(listId: List<Int>): ResultWrapper<List<ItemModel>> {
         return try {
             if (listId.isEmpty()) return ResultWrapper.Success(emptyList())

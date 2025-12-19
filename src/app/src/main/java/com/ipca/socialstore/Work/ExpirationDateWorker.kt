@@ -22,8 +22,6 @@ class ExpirationDateWorker @AssistedInject constructor(
     private val workerExpirationDateUseCase: WorkerExpirationDateUseCase
 ) : CoroutineWorker(appContext, workerParams) {
 
-    private val CHANNEL_ID = "stock_notifications"
-
     override suspend fun doWork(): Result {
         Log.d("WORKER_TEST", "Worker arrancou!")
 
@@ -31,8 +29,10 @@ class ExpirationDateWorker @AssistedInject constructor(
             is ResultWrapper.Success -> {
                 val ids = result.data
                 if (ids.isNotEmpty()) {
-                    Log.d("WORKER_TEST", "Encontrados ${ids.size} itens a expirar: $ids")
-                    showNotification(ids.size)
+                    /*
+                    * Fazer service que recebe o stock ID, e procura o item, a data de validade, e quantidade
+                    * Chamar view com texto estatico que apenas muda o item e a sua info
+                    * */
                 } else {
                     Log.d("WORKER_TEST", "Nenhum item expira nos próximos 20 dias.")
                 }
@@ -45,30 +45,4 @@ class ExpirationDateWorker @AssistedInject constructor(
         }
     }
 
-    private fun showNotification(count: Int) {
-        val notificationManager = applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-
-        // 1. Criar o Canal (Obrigatório para Android 8.0+)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                CHANNEL_ID,
-                "Alertas de Validade",
-                NotificationManager.IMPORTANCE_HIGH
-            ).apply {
-                description = "Notifica quando produtos estão prestes a expirar"
-            }
-            notificationManager.createNotificationChannel(channel)
-        }
-
-        // 2. Construir a Notificação
-        val builder = NotificationCompat.Builder(applicationContext, CHANNEL_ID)
-            .setSmallIcon(android.R.drawable.ic_dialog_alert) // Substitui pelo teu ícone
-            .setContentTitle("Atenção ao Stock!")
-            .setContentText("Tens $count produtos a expirar nos próximos 20 dias.")
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setAutoCancel(true)
-
-        // 3. Disparar
-        notificationManager.notify(1, builder.build())
-    }
 }
