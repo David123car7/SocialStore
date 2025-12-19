@@ -1,11 +1,10 @@
-package com.ipca.socialstore.domain.services
+package com.ipca.socialstore.domain.services.stock
 
 import com.ipca.socialstore.data.exceptions.ExceptionMapper
 import com.ipca.socialstore.data.models.ItemModel
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
 import com.ipca.socialstore.domain.item.CreateItemUseCase
 import com.ipca.socialstore.domain.item.GetItemByIdUseCase
-import com.ipca.socialstore.domain.stock.AddItemStockUseCase
 import com.ipca.socialstore.domain.stock.CreateItemStockUseCase
 import com.ipca.socialstore.presentation.views.item.ExpirationDate
 import javax.inject.Inject
@@ -16,7 +15,7 @@ class CreateItemStockService @Inject constructor(
     private val createItemStockUseCase: CreateItemStockUseCase,
     private val exceptionMapper: ExceptionMapper
 ) {
-    suspend operator fun invoke(item: ItemModel,list : List<ExpirationDate>) : ResultWrapper<Boolean> {
+    suspend operator fun invoke(item: ItemModel, list : List<ExpirationDate>) : ResultWrapper<Boolean> {
 
         return try {
             //Creates Item

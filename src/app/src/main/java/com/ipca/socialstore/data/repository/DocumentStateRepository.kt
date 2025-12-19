@@ -38,6 +38,19 @@ class DocumentStateRepository @Inject constructor(private val supabase: Supabase
         }
     }
 
+    suspend fun deleteDocumentStates(ids: List<Int>): ResultWrapper<Unit> {
+        return try {
+            supabase.from(DatabaseTables.DOCUMENT_STATE).delete {
+                filter {
+                    isIn("id", ids)
+                }
+            }
+            ResultWrapper.Success(Unit)
+        } catch (e: Exception) {
+            return ResultWrapper.Error(exceptionMapper.map(e))
+        }
+    }
+
     suspend fun getDocumentStates(ids: List<Int>): ResultWrapper<List<DocumentStateModel>>{
         return try{
             val documentStatesResult = supabase.from(DatabaseTables.DOCUMENT_STATE).select(){

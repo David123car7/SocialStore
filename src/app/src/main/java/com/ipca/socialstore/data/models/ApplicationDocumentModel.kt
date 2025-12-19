@@ -16,3 +16,9 @@ data class ApplicationDocumentModel(
     @SerialName("state_id")
     val stateId: Int,
 )
+
+@Serializable
+data class ApplicationDocumentStateOnly(@SerialName("state_id") val stateId: Int)
+
+@Serializable
+data class ApplicationDocumentDocOnly(@SerialName("document_id") val documentId: Int)

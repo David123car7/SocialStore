@@ -16,6 +16,7 @@ import com.ipca.socialstore.domain.academic.GetAcademicDataUseCase
 import com.ipca.socialstore.domain.appDocType.GetAppDocTypesUseCase
 import com.ipca.socialstore.domain.application.GetUserApplicationUseCase
 import com.ipca.socialstore.domain.applicationState.GetUserApplicationState
+import com.ipca.socialstore.domain.services.application.DeleteApplicationService
 import com.ipca.socialstore.domain.services.document.DeleteDocumentService
 import com.ipca.socialstore.domain.services.document.GetApplicationDocumentsService
 import com.ipca.socialstore.domain.services.document.UploadApplicationDocumentsService
@@ -64,7 +65,9 @@ class ApplicationStateViewModel @Inject constructor(
     private val uploadApplicationDocumentsService: UploadApplicationDocumentsService,
     private val getApplicationDocumentsService: GetApplicationDocumentsService,
     private val deleteDocumentService: DeleteDocumentService,
-    private val getAppDocTypesUseCase: GetAppDocTypesUseCase) : ViewModel(){
+    private val getAppDocTypesUseCase: GetAppDocTypesUseCase,
+    private val deleteApplicationService: DeleteApplicationService) : ViewModel(){
+
     var uiState = mutableStateOf(ApplicationState())
 
     init {
@@ -149,6 +152,34 @@ class ApplicationStateViewModel @Inject constructor(
                             error = applicationResult.error.asUiText()
                         )
                     }
+                }
+            }
+        }
+    }
+
+    fun deleteApplication(){
+        if (uiState.value.application == null)
+            return
+
+        viewModelScope.launch {
+            uiState.value = uiState.value.copy(isLoading = true)
+            val deleteAppResult =
+                deleteApplicationService(
+                    applicationId = uiState.value.application?.id!!,
+                    academicId = uiState.value.academicData?.id!!,
+                    applicationStateId = uiState.value.application?.stateId!!
+                )
+            when (deleteAppResult) {
+                is ResultWrapper.Success -> {
+                    uiState.value = uiState.value.copy(
+                        isLoading = false,
+                    )
+                }
+                is ResultWrapper.Error -> {
+                    uiState.value = uiState.value.copy(
+                        isLoading = false,
+                        error = deleteAppResult.error.asUiText()
+                    )
                 }
             }
         }

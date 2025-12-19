@@ -5,6 +5,7 @@ import com.ipca.socialstore.data.exceptions.AppError
 import com.ipca.socialstore.data.exceptions.ExceptionMapper
 import com.ipca.socialstore.data.helpers.from
 import com.ipca.socialstore.data.models.DocumentModel
+import com.ipca.socialstore.data.models.DocumentPathOnlyModel
 import com.ipca.socialstore.data.models.TableIdModel
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
 import io.github.jan.supabase.SupabaseClient
@@ -33,6 +34,19 @@ class DocumentRepository @Inject constructor(private val supabase: SupabaseClien
         }
     }
 
+    suspend fun deleteDocuments(ids: List<Int>): ResultWrapper<Unit> {
+        return try {
+            supabase.from(DatabaseTables.DOCUMENT).delete {
+                filter {
+                    isIn("id", ids)
+                }
+            }
+            ResultWrapper.Success(Unit)
+        } catch (e: Exception) {
+            return ResultWrapper.Error(exceptionMapper.map(e))
+        }
+    }
+
     suspend fun deleteDocument(documentId: Int): ResultWrapper<Unit> {
         return try {
             supabase.from(DatabaseTables.DOCUMENT).delete {
@@ -53,6 +67,20 @@ class DocumentRepository @Inject constructor(private val supabase: SupabaseClien
                     isIn("id", ids)
                 }
             }.decodeList<DocumentModel>()
+            ResultWrapper.Success(documentResult)
+        }catch (e: Exception){
+            return ResultWrapper.Error(exceptionMapper.map(e))
+        }
+    }
+
+    suspend fun getDocumentsPaths(ids: List<Int>): ResultWrapper<List<DocumentPathOnlyModel>>{
+        return try{
+            val documentResult = supabase.from(DatabaseTables.DOCUMENT)
+                .select(Columns.list("path")){
+                filter {
+                    isIn("id", ids)
+                }
+            }.decodeList<DocumentPathOnlyModel>()
             ResultWrapper.Success(documentResult)
         }catch (e: Exception){
             return ResultWrapper.Error(exceptionMapper.map(e))

@@ -40,6 +40,19 @@ class ApplicationDocumentTypeRepository @Inject constructor(
         }
     }
 
+    suspend fun deleteApplicationDocumentTypes(ids: List<Int>): ResultWrapper<Unit> {
+        return try {
+            supabaseClient.from(DatabaseTables.APPLICATION_DOCUMENT_TYPE).delete {
+                filter {
+                    isIn("id", ids)
+                }
+            }
+            ResultWrapper.Success(Unit)
+        } catch (e: Exception) {
+            return ResultWrapper.Error(exceptionMapper.map(e))
+        }
+    }
+
     suspend fun getApplicationDocumentType(applicationId: Int): ResultWrapper<List<ApplicationDocumentTypeModel>>{
         return try{
             val appDocTypeResult = supabaseClient.from(DatabaseTables.APPLICATION_DOCUMENT_TYPE).select {
@@ -47,6 +60,19 @@ class ApplicationDocumentTypeRepository @Inject constructor(
                     eq("application_id", applicationId)
                 }
             }.decodeList<ApplicationDocumentTypeModel>()
+            return ResultWrapper.Success(appDocTypeResult)
+        }catch (e : Exception){
+            ResultWrapper.Error(exceptionMapper.map(e))
+        }
+    }
+
+    suspend fun getApplicationDocumentTypeListIds(applicationId: Int): ResultWrapper<List<TableIdModel>>{
+        return try{
+            val appDocTypeResult = supabaseClient.from(DatabaseTables.APPLICATION_DOCUMENT_TYPE).select {
+                filter {
+                    eq("application_id", applicationId)
+                }
+            }.decodeList<TableIdModel>()
             return ResultWrapper.Success(appDocTypeResult)
         }catch (e : Exception){
             ResultWrapper.Error(exceptionMapper.map(e))
