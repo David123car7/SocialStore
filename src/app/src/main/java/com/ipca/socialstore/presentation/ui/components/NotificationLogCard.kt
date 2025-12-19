@@ -36,6 +36,7 @@ fun NotificationLogCardComponent(title: String, message: String, date: String, i
         colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(1.dp),
         shape = RoundedCornerShape(12.dp)
+
     ) {
         Row(
             modifier = Modifier.padding(12.dp),

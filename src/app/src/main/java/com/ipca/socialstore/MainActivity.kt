@@ -41,6 +41,7 @@ import com.ipca.socialstore.presentation.views.application.applicationInfo.Appli
 import com.ipca.socialstore.presentation.views.application.applicationState.ApplicationStateView
 import com.ipca.socialstore.presentation.views.application.createApplication.CreateApplicationView
 import com.ipca.socialstore.presentation.views.authentication.resetPassword.ResetPasswordView
+import com.ipca.socialstore.presentation.views.home.adminHome.AdminHomeView
 import com.ipca.socialstore.presentation.views.home.defaultHomeView.DefaultHomeView
 import com.ipca.socialstore.presentation.views.home.testHome.TestHomeView
 import com.ipca.socialstore.presentation.views.notification.NotificationHistoryView
@@ -102,6 +103,9 @@ class MainActivity : ComponentActivity() {
                             ResetPasswordView(modifier = Modifier.padding(innerPadding),
                                 navController = navController, userRole = mainState.userRole)
                         }
+                        composable<AdminRoutes.AdminHome>{
+                            AdminHomeView(modifier = Modifier.padding(innerPadding), navController = navController, userRole = mainState.userRole)
+                        }
                         composable<AdminRoutes.CreateCampaign>{
                             CreateCampaingView(modifier = Modifier.padding(innerPadding))
                         }
@@ -135,6 +139,13 @@ class MainActivity : ComponentActivity() {
                             navController = navController,
                             userRole = mainState.userRole,
                             route = GeneralRoutes.Home
+                        )
+                    }
+
+                    LaunchedEffect(mainState.userRole) {
+                        NavigationLogic.resetNavigation(
+                            navController = navController,
+                            userRole = mainState.userRole,
                         )
                     }
                 }
