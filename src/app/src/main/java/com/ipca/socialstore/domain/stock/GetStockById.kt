@@ -6,7 +6,7 @@ import com.ipca.socialstore.data.resultwrappers.ResultWrapper
 import javax.inject.Inject
 
 class GetStockById @Inject constructor(private val stockRepository: StockRepository) {
-    suspend operator fun invoke(stockId : Int) : ResultWrapper<List<StockModel>>{
+    suspend operator fun invoke(stockId : List<Int>) : ResultWrapper<List<StockModel>>{
         return stockRepository.getStockById(stockId)
     }
 }

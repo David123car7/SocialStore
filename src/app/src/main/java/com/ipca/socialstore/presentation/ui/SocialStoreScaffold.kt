@@ -29,7 +29,12 @@ import com.ipca.socialstore.presentation.utils.NavigationLogic
 import com.ipca.socialstore.presentation.routes.DefaultRoutes
 import com.ipca.socialstore.presentation.routes.GeneralRoutes
 import com.ipca.socialstore.presentation.ui.theme.SocialStoreTheme
-import kotlinx.coroutines.selects.select
+
+data class BottomNavItem(
+    val icon: ImageVector,
+    val route: Any,
+    val isVisible: Boolean
+)
 
 @Composable
 fun SocialStoreScaffold(navController: NavController, userRole: UserRole, content: @Composable (PaddingValues) -> Unit){
@@ -54,6 +59,34 @@ fun SocialStoreScaffoldContent(
 ) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination
+
+    val allNavItems = listOf(
+        BottomNavItem( //Home
+            icon = Icons.Default.Home,
+            route = GeneralRoutes.Home,
+            isVisible = userRole == UserRole.GUEST || userRole == UserRole.DEFAULT
+        ),
+        BottomNavItem( //AdminHome
+            icon = Icons.Default.Home,
+            route = AdminRoutes.AdminHome,
+            isVisible = userRole == UserRole.ADMIN
+        ),
+        BottomNavItem( //ApplicationInfo
+            icon = Icons.Default.FileOpen,
+            route = DefaultRoutes.ApplicationInfo,
+            isVisible = userRole == UserRole.DEFAULT
+        ),
+        BottomNavItem( //Admin Notifications
+            icon = Icons.Default.Notifications,
+            route = AdminRoutes.NotificationHistory,
+            isVisible = userRole == UserRole.ADMIN
+        ),
+        BottomNavItem( //stock
+            icon = Icons.Default.Storage,
+            route = AdminRoutes.GetStock,
+            isVisible = userRole == UserRole.ADMIN
+        ),
+    )
 
     Scaffold(
         topBar = {
@@ -100,97 +133,22 @@ fun SocialStoreScaffoldContent(
         bottomBar = {
             if(userRole != UserRole.GUEST){
                 NavigationBar() {
-                    NavigationBarItem(
-                        icon = { Icon(Icons.Default.Home, contentDescription = "") },
-                        label = { Text("Home") },
-                        selected = currentRoute == GeneralRoutes.Home,
-                        onClick = {
-                            NavigationLogic.navigateTo(
-                                navController = navController,
-                                userRole = userRole,
-                                route = GeneralRoutes.Home
+                    allNavItems.forEach { item ->
+                        if(item.isVisible){
+                            NavigationBarItem(
+                                icon = {Icon(imageVector = item.icon, contentDescription = "")},
+                                selected = currentRoute == GeneralRoutes.Home,
+                                onClick = {
+                                    NavigationLogic.navigateTo(
+                                        navController = navController,
+                                        userRole = userRole,
+                                        route = item.route
+                                    )
+                                }
                             )
                         }
-                    )
-                    if(userRole == UserRole.DEFAULT){
-                        NavigationBarItem(
-                            icon = { Icon( imageVector = Icons.Default.Warning, contentDescription = "") },
-                            label = { Text("Candidatura") },
-                            selected = currentRoute == DefaultRoutes.ApplicationInfo,
-                            onClick = {
-                                NavigationLogic.navigateTo(
-                                    navController = navController,
-                                    userRole = userRole,
-                                    route = DefaultRoutes.ApplicationInfo
-                                )
-                            }
-                        )
-                    }
-                    else if(userRole == UserRole.CANDIDATE){
-                        NavigationBarItem(
-                            icon = { Icon( imageVector = Icons.Default.Warning, contentDescription = "") },
-                            label = { Text("Candidatura") },
-                            selected = currentRoute == DefaultRoutes.ApplicationInfo,
-                            onClick = {
-                                NavigationLogic.navigateTo(
-                                    navController = navController,
-                                    userRole = userRole,
-                                    route = CandidateRoutes.ApplicationState
-                                )
-                            }
-                        )
                     }
                 }
-            }
-            if (userRole == UserRole.ADMIN){
-                NavigationBar()
-                {
-                    NavigationBarItem(
-                        icon = {Icon(imageVector = Icons.Default.Home, contentDescription = "")},
-                        selected = currentRoute == GeneralRoutes.Home,
-                        onClick = {
-                            NavigationLogic.navigateTo(
-                                navController = navController,
-                                userRole = userRole,
-                                route = GeneralRoutes.Home
-                            )
-                        }
-                    )
-                    NavigationBarItem(
-                        icon = {Icon(imageVector = Icons.Default.FileOpen, contentDescription = "")},
-                        selected = currentRoute == {/**/} ,
-                        onClick = {
-                            NavigationLogic.navigateTo(
-                                navController = navController,
-                                userRole = UserRole.ADMIN,
-                                route = {/**/}
-                            )
-                        }
-                    )
-                    NavigationBarItem(
-                        icon = {Icon(imageVector = Icons.Default.Storage, contentDescription = "")},
-                        selected = currentRoute == AdminRoutes.GetStock,
-                        onClick = {
-                            NavigationLogic.navigateTo(
-                                navController = navController,
-                                userRole = UserRole.ADMIN,
-                                route = AdminRoutes.GetStock
-                            )
-                        }
-                    )
-                    NavigationBarItem(
-                        icon = {Icon(imageVector = Icons.Default.Notifications, contentDescription = "")},
-                        selected = currentRoute == AdminRoutes.GetStock,
-                        onClick = {
-                            NavigationLogic.navigateTo(
-                                navController = navController,
-                                userRole = UserRole.ADMIN,
-                                route = AdminRoutes.GetStock
-                            )
-                        }
-                    )
-                }
-
             }
         }
     ) { paddingValues ->
@@ -204,7 +162,7 @@ fun SocialStoreScaffoldGuestPreview() {
     SocialStoreTheme {
         SocialStoreScaffoldContent(
             navController = rememberNavController(),
-            userRole = UserRole.ADMIN,
+            userRole = UserRole.DEFAULT,
             logout = {}
         ) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {

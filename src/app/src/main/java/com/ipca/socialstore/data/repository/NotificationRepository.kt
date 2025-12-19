@@ -20,4 +20,15 @@ class NotificationRepository @Inject constructor(private val supabase: SupabaseC
             ResultWrapper.Error(exceptionMapper.map(e))
         }
     }
+
+    suspend fun getAllNotifications(): ResultWrapper<List<NotificationScheduledModel>>{
+        return try {
+            val result = supabase.from(DatabaseTables.NOTIFICATION_SCHEDULED)
+                .select()
+                .decodeList<NotificationScheduledModel>()
+            ResultWrapper.Success(result)
+        }catch (e : Exception){
+            ResultWrapper.Error(exceptionMapper.map(e))
+        }
+    }
 }

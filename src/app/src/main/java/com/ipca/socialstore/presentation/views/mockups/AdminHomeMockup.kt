@@ -25,17 +25,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ipca.socialstore.presentation.ui.components.DashboardCard
+import com.ipca.socialstore.presentation.views.home.adminHome.DashboardMenuItem
 
 // --- MODELOS DE DADOS ---
 
-// Modelo para os botões do menu principal
-data class DashboardMenuItem(
-    val id: Int,
-    val title: String,
-    val icon: ImageVector,
-    val color: Color,
-    val alertCount: Int = 0
-)
+// Modelo para os botões do menu principa
 
 // Modelo para o Log de Atividades
 data class ActivityLog(
@@ -54,15 +48,7 @@ enum class ActivityType { SUBMISSION, CANCEL, STOCK, INFO }
 @Composable
 fun AdminDashboardMockup() {
 
-    // 1. Configuração dos Itens do Menu
-    val menuItems = listOf(
-        DashboardMenuItem(1, "Candidaturas", Icons.Default.Star, Color(0xFFE3F2FD), alertCount = 5),
-        DashboardMenuItem(2, "Gestão Stock", Icons.Default.Star, Color(0xFFFFF3E0), alertCount = 3),
-        DashboardMenuItem(3, "Agendamentos", Icons.Default.DateRange, Color(0xFFF3E5F5), alertCount = 1),
-        DashboardMenuItem(4, "Relatórios", Icons.Default.Star, Color(0xFFE8F5E9)),
-        DashboardMenuItem(5, "Beneficiários", Icons.Default.Star, Color(0xFFE0F7FA)),
-        DashboardMenuItem(6, "Definições", Icons.Default.Settings, Color(0xFFF5F5F5))
-    )
+
 
     // 2. Dados Fictícios das Últimas Atividades
     val activities = listOf(
@@ -118,19 +104,15 @@ fun AdminDashboardMockup() {
                 Text("Acesso Rápido", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
             }
 
-
-
             item(span = { GridItemSpan(2) }) {
                 Spacer(Modifier.height(16.dp))
                 Text("Últimas Atividades", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
             }
 
-            // --- LISTA DE ATIVIDADES (Cada item ocupa 2 colunas para ficar em lista) ---
             items(activities, span = { GridItemSpan(2) }) { activity ->
                 ActivityLogCard(activity)
             }
 
-            // Espaço extra no fundo
             item(span = { GridItemSpan(2) }) {
                 Spacer(Modifier.height(32.dp))
             }
@@ -140,10 +122,10 @@ fun AdminDashboardMockup() {
 @Composable
 fun ActivityLogCard(activity: ActivityLog) {
     val (icon, color) = when(activity.type) {
-        ActivityType.SUBMISSION -> Icons.Default.Star to Color(0xFF1976D2) // Azul
-        ActivityType.CANCEL -> Icons.Default.Star to Color(0xFFD32F2F)      // Vermelho
-        ActivityType.STOCK -> Icons.Default.Warning to Color(0xFFFFA000)      // Laranja
-        ActivityType.INFO -> Icons.Default.Info to Color.Gray                 // Cinza
+        ActivityType.SUBMISSION -> Icons.Default.Star to Color(0xFF1976D2)
+        ActivityType.CANCEL -> Icons.Default.Star to Color(0xFFD32F2F)
+        ActivityType.STOCK -> Icons.Default.Warning to Color(0xFFFFA000)
+        ActivityType.INFO -> Icons.Default.Info to Color.Gray
     }
 
     Card(

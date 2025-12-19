@@ -41,8 +41,10 @@ import com.ipca.socialstore.presentation.views.application.applicationInfo.Appli
 import com.ipca.socialstore.presentation.views.application.applicationState.ApplicationStateView
 import com.ipca.socialstore.presentation.views.application.createApplication.CreateApplicationView
 import com.ipca.socialstore.presentation.views.authentication.resetPassword.ResetPasswordView
+import com.ipca.socialstore.presentation.views.home.adminHome.AdminHomeView
 import com.ipca.socialstore.presentation.views.home.defaultHomeView.DefaultHomeView
 import com.ipca.socialstore.presentation.views.home.testHome.TestHomeView
+import com.ipca.socialstore.presentation.views.notification.NotificationHistoryView
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -101,6 +103,9 @@ class MainActivity : ComponentActivity() {
                             ResetPasswordView(modifier = Modifier.padding(innerPadding),
                                 navController = navController, userRole = mainState.userRole)
                         }
+                        composable<AdminRoutes.AdminHome>{
+                            AdminHomeView(modifier = Modifier.padding(innerPadding), navController = navController, userRole = mainState.userRole)
+                        }
                         composable<AdminRoutes.CreateCampaign>{
                             CreateCampaingView(modifier = Modifier.padding(innerPadding))
                         }
@@ -125,12 +130,22 @@ class MainActivity : ComponentActivity() {
                         composable <AdminRoutes.CreateScheduling>{
                             CreateSchedulingView(modifier = Modifier.padding(innerPadding), navController = navController)
                         }
+                        composable <AdminRoutes.NotificationHistory>{
+                            NotificationHistoryView(modifier = Modifier.padding(innerPadding), navController = navController)
+                        }
                     }
                     LaunchedEffect(mainState.isLoggedIn) {
                         NavigationLogic.navigateTo(
                             navController = navController,
                             userRole = mainState.userRole,
                             route = GeneralRoutes.Home
+                        )
+                    }
+
+                    LaunchedEffect(mainState.userRole) {
+                        NavigationLogic.resetNavigation(
+                            navController = navController,
+                            userRole = mainState.userRole,
                         )
                     }
                 }

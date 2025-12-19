@@ -58,7 +58,7 @@ fun EditStockContent(
                 modifier.fillMaxWidth(),
             ) {
                 TextField(
-                    value = uiState.stock.item.itemType,
+                    value = uiState.stock.item.itemType!!,
                     label = {Text("Tipo Item")},
                     modifier = Modifier.padding(8.dp)
                         .fillMaxWidth(),

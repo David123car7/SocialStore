@@ -13,6 +13,9 @@ data class NotificationScheduledModel (
     @SerialName("subject")
     val subject: String,
 
-    @SerialName("notification_time")
-    val notificationTime : String,
+    @SerialName("is_Read")
+    val isRead : Boolean,
+
+    @SerialName("title")
+    val title : String?
 )
