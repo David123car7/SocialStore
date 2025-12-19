@@ -28,6 +28,19 @@ class AcademicRepository @Inject constructor(
         }
     }
 
+    suspend fun deleteAcademic(id: Int): ResultWrapper<Unit> {
+        return try {
+            supabaseClient.from(DatabaseTables.ACADEMIC).delete {
+                filter {
+                    eq("id", id)
+                }
+            }
+            ResultWrapper.Success(Unit)
+        } catch (e: Exception) {
+            return ResultWrapper.Error(exceptionMapper.map(e))
+        }
+    }
+
     suspend fun getAcademic(id: Int): ResultWrapper<AcademicModel>{
         return try {
             val academicResult = supabaseClient.from(DatabaseTables.ACADEMIC).select {

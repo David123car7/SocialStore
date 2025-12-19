@@ -42,4 +42,17 @@ class ApplicationStateRepository @Inject constructor(
             ResultWrapper.Error(exceptionMapper.map(e))
         }
     }
+
+    suspend fun deleteApplicationState(id: Int): ResultWrapper<Unit> {
+        return try {
+            supabaseClient.from(DatabaseTables.APPLICATION_STATE).delete {
+                filter {
+                    eq("id", id)
+                }
+            }
+            ResultWrapper.Success(Unit)
+        } catch (e: Exception) {
+            return ResultWrapper.Error(exceptionMapper.map(e))
+        }
+    }
 }

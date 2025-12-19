@@ -19,3 +19,6 @@ data class DocumentModel (
     @SerialName("created_at")
     val createdAt: String,
 )
+
+@Serializable
+data class DocumentPathOnlyModel(val path: String)

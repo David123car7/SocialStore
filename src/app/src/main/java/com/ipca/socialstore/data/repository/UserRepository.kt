@@ -83,7 +83,7 @@ class UserRepository @Inject constructor(private val supabase: SupabaseClient, p
         }
     }
 
-    suspend fun setUserApplicationId(uid: String, id: Int): ResultWrapper<String>{
+    suspend fun setUserApplicationId(uid: String, id: Int?): ResultWrapper<String>{
         return try {
             val user = getUser(uid = uid) ?: return ResultWrapper.Error(AppError.UserNotFound)
             val newUser = user.copy(applicationId = id)

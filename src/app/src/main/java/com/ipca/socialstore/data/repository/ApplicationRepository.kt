@@ -40,6 +40,19 @@ class ApplicationRepository @Inject constructor(
         }
     }
 
+    suspend fun deleteApplication(id: Int): ResultWrapper<Unit> {
+        return try {
+            supabaseClient.from(DatabaseTables.APPLICATION).delete {
+                filter {
+                    eq("id", id)
+                }
+            }
+            ResultWrapper.Success(Unit)
+        } catch (e: Exception) {
+            return ResultWrapper.Error(exceptionMapper.map(e))
+        }
+    }
+
     suspend fun getApplication(id: Int): ResultWrapper<ApplicationModel>{
         return try {
             val applicationResult = supabaseClient.from(DatabaseTables.APPLICATION).select {

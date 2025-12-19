@@ -68,6 +68,7 @@ import com.ipca.socialstore.data.models.AcademicModel
 import com.ipca.socialstore.data.models.ApplicationModel
 import com.ipca.socialstore.presentation.models.DocumentReceiverModel
 import com.ipca.socialstore.presentation.ui.SocialStoreScaffoldContent
+import com.ipca.socialstore.presentation.ui.components.AlertComponent
 import com.ipca.socialstore.presentation.ui.components.ButtonTracedComponent
 import com.ipca.socialstore.presentation.ui.components.ExpandableSection
 import com.ipca.socialstore.presentation.ui.theme.SocialStoreTheme
@@ -96,7 +97,8 @@ fun ApplicationStateView(modifier: Modifier, navController: NavController, userR
         },
         onSubmitFile = {folderName -> applicationStateViewModel.submitFiles(folderName = folderName, context = context)},
         documentsCompletedColor = Color(0x120FFC0B),
-        documentsWrongColor = Color(0x1BFF0000)
+        documentsWrongColor = Color(0x1BFF0000),
+        onDeleteApplication = { applicationStateViewModel.deleteApplication() }
     )
 
     LaunchedEffect(uiState.error) {
@@ -115,10 +117,12 @@ fun ApplicationStateViewContent(
     documentsWrongColor: Color,
     onDeleteFile:(document: DocumentReceiverModel?, uri: Uri?, folderName: String) -> Unit,
     onAddSelectedFile:(folderName: String, uri: Uri?) -> Unit,
+    onDeleteApplication:() -> Unit,
     onSubmitFile:(folderName: String) -> Unit){
 
     var isDataExpanded by remember { mutableStateOf(false) }
     var isDocsExpanded by remember { mutableStateOf(false) }
+    var showAlertBox by remember { mutableStateOf(false) }
 
     val bankStatementsFilesPicker = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
@@ -153,14 +157,20 @@ fun ApplicationStateViewContent(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(Color(0xFFF5F7FA)) // Fundo cinza suave
+            .background(Color(0xFFF5F7FA))
             .verticalScroll(rememberScrollState())
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
         StatusTimelineHeader(state = uiState.applicationState?.state ?: "")
 
-        //AlertComponent(show = true, title = "Eliminar Ficheiro", message = "Kazzio", onConfirm = {}, onDismiss = {})
+        AlertComponent(
+            show = showAlertBox,
+            title = "Eliminar Candidatura",
+            message = "Tens a certeza que queres eliminar o ficheiro?",
+            onConfirm = {onDeleteApplication()},
+            onDismiss = {showAlertBox = false}
+        )
 
         ExpandableSection(
             title = "Meus Dados",
@@ -322,6 +332,17 @@ fun ApplicationStateViewContent(
                 filePicker = internationalSupportFilesPicker,
                 onDeleteFile = onDeleteFile,
                 onSubmitFile = onSubmitFile
+            )
+        }
+        Button(
+            onClick = {showAlertBox = true},
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(50.dp),
+            shape = RoundedCornerShape(6.dp),
+        ) {
+            Text(
+                text = "Eliminar Candidatura",
             )
         }
     }
@@ -694,7 +715,8 @@ fun ApplicationStatePreview(){
                 onDeleteFile = {folderName, uri, document -> {}},
                 onSubmitFile = {},
                 documentsCompletedColor = Color(0x120FFC0B),
-                documentsWrongColor = Color(0x1BFF0000)
+                documentsWrongColor = Color(0x1BFF0000),
+                onDeleteApplication = {}
             )
         }
     }

@@ -4,7 +4,10 @@ import com.ipca.socialstore.data.enums.DatabaseTables
 import com.ipca.socialstore.data.exceptions.AppError
 import com.ipca.socialstore.data.exceptions.ExceptionMapper
 import com.ipca.socialstore.data.helpers.from
+import com.ipca.socialstore.data.models.ApplicationDocumentDocOnly
 import com.ipca.socialstore.data.models.ApplicationDocumentModel
+import com.ipca.socialstore.data.models.ApplicationDocumentStateOnly
+import com.ipca.socialstore.data.models.DocumentModel
 import com.ipca.socialstore.data.models.TableIdModel
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
 import io.github.jan.supabase.SupabaseClient
@@ -50,6 +53,19 @@ class ApplicationDocumentRepository @Inject constructor(
         }
     }
 
+    suspend fun deleteApplicationDocuments(ids: List<Int>): ResultWrapper<Unit> {
+        return try {
+            supabaseClient.from(DatabaseTables.APPLICATION_DOCUMENT).delete {
+                filter {
+                    isIn("id", ids)
+                }
+            }
+            ResultWrapper.Success(Unit)
+        } catch (e: Exception) {
+            return ResultWrapper.Error(exceptionMapper.map(e))
+        }
+    }
+
     //counts the application documents related with one type of document
     suspend fun countApplicationDocumentsByType(appDocTypeId: Int): ResultWrapper<Int> {
         return try {
@@ -74,6 +90,48 @@ class ApplicationDocumentRepository @Inject constructor(
                     eq("app_doc_type_id", appDocTypeId)
                 }
             }.decodeList<ApplicationDocumentModel>()
+            ResultWrapper.Success(applicationDocumentsResult)
+        }catch (e: Exception){
+            return ResultWrapper.Error(exceptionMapper.map(e))
+        }
+    }
+
+    suspend fun getApplicationDocuments(appDocTypeIds: List<Int>): ResultWrapper<List<TableIdModel>>{
+        return try{
+            val applicationDocumentsResult = supabaseClient.from(DatabaseTables.APPLICATION_DOCUMENT)
+                .select(columns = Columns.list("id")) {
+                    filter {
+                        isIn("app_doc_type_id", appDocTypeIds)
+                    }
+                }.decodeList<TableIdModel>()
+            ResultWrapper.Success(applicationDocumentsResult)
+        }catch (e: Exception){
+            return ResultWrapper.Error(exceptionMapper.map(e))
+        }
+    }
+
+    suspend fun getDocumentsIds(appDocTypeIds: List<Int>): ResultWrapper<List<ApplicationDocumentDocOnly>>{
+        return try{
+            val applicationDocumentsResult = supabaseClient.from(DatabaseTables.APPLICATION_DOCUMENT)
+                .select(columns = Columns.list("document_id")) {
+                filter {
+                    isIn("app_doc_type_id", appDocTypeIds)
+                }
+            }.decodeList<ApplicationDocumentDocOnly>()
+            ResultWrapper.Success(applicationDocumentsResult)
+        }catch (e: Exception){
+            return ResultWrapper.Error(exceptionMapper.map(e))
+        }
+    }
+
+    suspend fun getDocumentStatesIds(appDocTypeIds: List<Int>): ResultWrapper<List<ApplicationDocumentStateOnly>>{
+        return try{
+            val applicationDocumentsResult = supabaseClient.from(DatabaseTables.APPLICATION_DOCUMENT)
+                .select(columns = Columns.list("state_id")) {
+                    filter {
+                        isIn("app_doc_type_id", appDocTypeIds)
+                    }
+                }.decodeList<ApplicationDocumentStateOnly>()
             ResultWrapper.Success(applicationDocumentsResult)
         }catch (e: Exception){
             return ResultWrapper.Error(exceptionMapper.map(e))

@@ -81,6 +81,16 @@ class StorageRepository @Inject constructor(
         }
     }
 
+    suspend fun removeDocuments(filePaths: List<String>): ResultWrapper<Unit> {
+        return try {
+            val bucket = supabaseClient.storage.from(StorageBucket.APPLICATION_DOCUMENTS.bucketName)
+            bucket.delete(filePaths)
+            ResultWrapper.Success(Unit)
+        } catch (e: Exception) {
+            ResultWrapper.Error(exceptionMapper.map(e))
+        }
+    }
+
     private fun getFileNameFromUri(context: Context, uri: Uri): String {
         var result: String? = null
         if (uri.scheme == "content") {
