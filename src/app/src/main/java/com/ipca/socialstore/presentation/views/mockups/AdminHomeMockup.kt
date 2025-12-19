@@ -24,6 +24,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.ipca.socialstore.presentation.ui.components.DashboardCard
 
 // --- MODELOS DE DADOS ---
 
@@ -112,34 +113,13 @@ fun AdminDashboardMockup() {
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
 
-            // --- BARRA DE PESQUISA (Ocupa 2 colunas) ---
-            item(span = { GridItemSpan(2) }) {
-                OutlinedTextField(
-                    value = "",
-                    onValueChange = {},
-                    placeholder = { Text("Pesquisar stock, utentes...") },
-                    leadingIcon = { Icon(Icons.Default.Search, null) },
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        unfocusedContainerColor = Color(0xFFF9F9F9),
-                        focusedContainerColor = Color.White
-                    )
-                )
-            }
-
-            // --- TÍTULO DO MENU ---
             item(span = { GridItemSpan(2) }) {
                 Spacer(Modifier.height(8.dp))
                 Text("Acesso Rápido", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
             }
 
-            // --- GRELHA DE BOTÕES (Menu) ---
-            items(menuItems) { item ->
-                DashboardCard(item)
-            }
 
-            // --- TÍTULO NOTIFICAÇÕES (Ocupa 2 colunas) ---
+
             item(span = { GridItemSpan(2) }) {
                 Spacer(Modifier.height(16.dp))
                 Text("Últimas Atividades", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
@@ -157,69 +137,8 @@ fun AdminDashboardMockup() {
         }
     }
 }
-
-// --- COMPONENTES AUXILIARES ---
-
-@Composable
-fun DashboardCard(item: DashboardMenuItem) {
-    Card(
-        modifier = Modifier
-            .height(130.dp)
-            .clickable { /* Navegar */ },
-        colors = CardDefaults.cardColors(containerColor = item.color),
-        shape = RoundedCornerShape(16.dp)
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.SpaceBetween,
-            horizontalAlignment = Alignment.Start
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Icon(
-                    imageVector = item.icon,
-                    contentDescription = null,
-                    modifier = Modifier.size(32.dp),
-                    tint = Color.Black.copy(alpha = 0.7f)
-                )
-
-                if (item.alertCount > 0) {
-                    Surface(
-                        color = Color.White,
-                        shape = RoundedCornerShape(50),
-                        modifier = Modifier.height(24.dp)
-                    ) {
-                        Row(
-                            modifier = Modifier.padding(horizontal = 8.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = "${item.alertCount}",
-                                style = MaterialTheme.typography.labelSmall,
-                                color = Color.Red,
-                                fontWeight = FontWeight.Bold
-                            )
-                        }
-                    }
-                }
-            }
-            Text(
-                text = item.title,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-                color = Color.Black.copy(alpha = 0.8f)
-            )
-        }
-    }
-}
-
 @Composable
 fun ActivityLogCard(activity: ActivityLog) {
-    // Definir ícone e cor baseado no tipo
     val (icon, color) = when(activity.type) {
         ActivityType.SUBMISSION -> Icons.Default.Star to Color(0xFF1976D2) // Azul
         ActivityType.CANCEL -> Icons.Default.Star to Color(0xFFD32F2F)      // Vermelho
@@ -251,7 +170,6 @@ fun ActivityLogCard(activity: ActivityLog) {
             Spacer(Modifier.width(12.dp))
 
             Column(modifier = Modifier.weight(1f)) {
-                // Texto Formatado (Nome a Negrito)
                 Text(
                     text = buildAnnotatedString {
                         withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {

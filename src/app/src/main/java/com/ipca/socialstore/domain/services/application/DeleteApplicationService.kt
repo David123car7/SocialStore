@@ -26,7 +26,7 @@ class DeleteApplicationService @Inject constructor(
     private val userRepository: UserRepository,
     private val authRepository: AuthRepository,
 ){
-    suspend operator fun invoke(applicationId: Int, applicationStateId: Int, academicId: Int): ResultWrapper<Unit> {
+    suspend operator fun invoke(applicationId: Int, applicationStateId: Int, academicId: Int?): ResultWrapper<Unit> {
         val uidResult = authRepository.getUserUid()
         if (uidResult is ResultWrapper.Error) return ResultWrapper.Error(uidResult.error)
         val uid = (uidResult as ResultWrapper.Success).data
@@ -92,9 +92,11 @@ class DeleteApplicationService @Inject constructor(
         if(removeApplicationStateResult is ResultWrapper.Error)
             return ResultWrapper.Error(error = removeApplicationStateResult.error)
 
-        val removeAcademicResult = academicRepository.deleteAcademic(id = applicationStateId)
-        if(removeAcademicResult is ResultWrapper.Error)
-            return ResultWrapper.Error(error = removeAcademicResult.error)
+        if(academicId != null){
+            val removeAcademicResult = academicRepository.deleteAcademic(id = academicId)
+            if(removeAcademicResult is ResultWrapper.Error)
+                return ResultWrapper.Error(error = removeAcademicResult.error)
+        }
 
         val changeUserRole = userRepository.setUserRole(uid = uid, role = UserRole.DEFAULT.value)
         if(changeUserRole is ResultWrapper.Error)

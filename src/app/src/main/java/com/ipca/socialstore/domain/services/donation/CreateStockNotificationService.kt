@@ -14,18 +14,4 @@ class CreateStockNotificationService @Inject constructor(
     private val getItemByIdUseCase: GetItemByIdUseCase
 ){
 
-    suspend operator fun invoke(stockId : Int) : Any {
-        return try {
-
-            val getStock = getStockById(stockId)
-            if(getStock is ResultWrapper.Error)
-                return ResultWrapper.Error(getStock.error)
-            val stock = (getStock as ResultWrapper.Success).data
-
-
-            val getItem = getItemByIdUseCase()
-        }catch (e : Exception){
-
-        }
-    }
 }
