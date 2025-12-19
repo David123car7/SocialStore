@@ -3,13 +3,10 @@ package com.ipca.socialstore.presentation.ui.components
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBars
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -24,7 +21,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.ipca.socialstore.presentation.ui.theme.Green
+import com.ipca.socialstore.presentation.ui.theme.GreenIPCA
 import com.ipca.socialstore.presentation.ui.theme.SocialStoreTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -38,7 +35,7 @@ fun ScaffoldComponent(
 
             TopAppBar(
                 colors = topAppBarColors(
-                    containerColor = Green,
+                    containerColor = GreenIPCA,
                     titleContentColor = Color.White,
 
                 ),

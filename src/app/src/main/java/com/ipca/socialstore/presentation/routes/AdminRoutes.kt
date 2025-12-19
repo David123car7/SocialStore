@@ -6,6 +6,9 @@ sealed class AdminRoutes {
     @Serializable
     object AdminHome : AdminRoutes()
 
+    @Serializable
+    object ListApplications: AdminRoutes()
+
     // --- Campaigns ---
     @Serializable
     object CreateCampaign : AdminRoutes()

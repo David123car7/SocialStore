@@ -1,6 +1,5 @@
 package com.ipca.socialstore.presentation.ui.components
 
-import DashboardMenuItem
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -26,11 +25,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun DashboardCard(title: String, icon: ImageVector, color: Color, alertCount: Int) {
+fun DashboardCard(title: String, icon: ImageVector, color: Color, alertCount: Int, onClick:() -> Unit) {
     Card(
         modifier = Modifier
             .height(120.dp)
-            .clickable { /* Navegar */ },
+            .clickable { onClick() },
         colors = CardDefaults.cardColors(containerColor = color),
         shape = RoundedCornerShape(16.dp)
     ) {
