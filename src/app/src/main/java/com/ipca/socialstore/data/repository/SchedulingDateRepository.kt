@@ -12,7 +12,6 @@ import io.github.jan.supabase.postgrest.query.Columns
 import javax.inject.Inject
 
 class SchedulingDateRepository @Inject constructor(private val supabase : SupabaseClient, private val exceptionMapper: ExceptionMapper) {
-
     suspend fun createSchedulingDate(schedulingDate : SchedulingDateModel) : ResultWrapper<Int>{
         return try {
             val createResult = supabase.from(DatabaseTables.SCHEDULING_DATE)

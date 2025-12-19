@@ -5,7 +5,6 @@ import android.net.Uri
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ipca.socialstore.data.enums.ApplicationDocumentTypeState
 import com.ipca.socialstore.data.enums.DocumentType
 import com.ipca.socialstore.data.exceptions.AppError
 import com.ipca.socialstore.data.models.AcademicModel
@@ -44,7 +43,6 @@ data class ApplicationState(
     val selectedPermanentExpenses: List<Uri> = emptyList(),
     val selectedInternationalSupport: List<Uri> = emptyList(),
 
-    //Files fetched from the db
     val documentsBankStatements: List<DocumentReceiverModel> = emptyList(),
     val documentsIncomeProof: List<DocumentReceiverModel> = emptyList(),
     val documentsOtherIncome: List<DocumentReceiverModel> = emptyList(),
@@ -311,7 +309,7 @@ class ApplicationStateViewModel @Inject constructor(
             }
             DocumentType.OTHER_INCOME.folderName -> {
                 currentState.copy(
-                    documentsIncomeProof = currentState.documentsOtherIncome - document
+                    documentsOtherIncome = currentState.documentsOtherIncome - document
                 )
             }
             DocumentType.PERMANENT_EXPENSES.folderName -> {

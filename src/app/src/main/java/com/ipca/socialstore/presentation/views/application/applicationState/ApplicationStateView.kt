@@ -94,7 +94,9 @@ fun ApplicationStateView(modifier: Modifier, navController: NavController, userR
         onDeleteFile = { doc, uri, folderName ->
             applicationStateViewModel.removeFile(uri = uri, document = doc, folderName = folderName)
         },
-        onSubmitFile = {folderName -> applicationStateViewModel.submitFiles(folderName = folderName, context = context)}
+        onSubmitFile = {folderName -> applicationStateViewModel.submitFiles(folderName = folderName, context = context)},
+        documentsCompletedColor = Color(0x120FFC0B),
+        documentsWrongColor = Color(0x1BFF0000)
     )
 
     LaunchedEffect(uiState.error) {
@@ -109,9 +111,12 @@ fun ApplicationStateView(modifier: Modifier, navController: NavController, userR
 fun ApplicationStateViewContent(
     modifier: Modifier,
     uiState: ApplicationState,
+    documentsCompletedColor: Color,
+    documentsWrongColor: Color,
     onDeleteFile:(document: DocumentReceiverModel?, uri: Uri?, folderName: String) -> Unit,
     onAddSelectedFile:(folderName: String, uri: Uri?) -> Unit,
     onSubmitFile:(folderName: String) -> Unit){
+
     var isDataExpanded by remember { mutableStateOf(false) }
     var isDocsExpanded by remember { mutableStateOf(false) }
 
@@ -154,7 +159,9 @@ fun ApplicationStateViewContent(
         verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
         StatusTimelineHeader(state = uiState.applicationState?.state ?: "")
+
         //AlertComponent(show = true, title = "Eliminar Ficheiro", message = "Kazzio", onConfirm = {}, onDismiss = {})
+
         ExpandableSection(
             title = "Meus Dados",
             icon = Icons.Outlined.Person,
@@ -197,15 +204,20 @@ fun ApplicationStateViewContent(
             var bankStatementsTittle = "Extratos Bancários"
             var addBankStatementButton = true
             if(uiState.bankStatementDocsState?.state == ApplicationDocumentTypeState.COMPLETED.state){
-                bankStatementsBgColor = Color(0x120FFC0B)
+                bankStatementsBgColor = documentsCompletedColor
                 bankStatementsTittle += " (Completo)"
                 addBankStatementButton = false
             }
+            else if(uiState.bankStatementDocsState?.state == ApplicationDocumentTypeState.SOMETHING_WRONG.state){
+                bankStatementsBgColor = documentsWrongColor
+            }
+
             DocumentsList(
                 documentsList = uiState.documentsBankStatements,
                 files = uiState.selectedBankStatements,
                 fileType = DocumentType.BANK_STATEMENTS.folderName,
                 tittle = bankStatementsTittle,
+                description = uiState.bankStatementDocsState?.description,
                 bgColor = bankStatementsBgColor,
                 showAddFileButton = addBankStatementButton,
                 filePicker = bankStatementsFilesPicker,
@@ -216,16 +228,21 @@ fun ApplicationStateViewContent(
             var incomeProofBgColor = Color.White
             var incomeProofTittle = "Comprovativos de Rendimento"
             var addIncomeProofButton = true
-            if(uiState.bankStatementDocsState?.state == ApplicationDocumentTypeState.COMPLETED.state){
-                incomeProofBgColor = Color(0x120FFC0B)
+            if(uiState.incomeProofDocsState?.state == ApplicationDocumentTypeState.COMPLETED.state){
+                incomeProofBgColor = documentsCompletedColor
                 incomeProofTittle += " (Completo)"
                 addIncomeProofButton = false
             }
+            else if(uiState.incomeProofDocsState?.state == ApplicationDocumentTypeState.SOMETHING_WRONG.state){
+                incomeProofBgColor = documentsWrongColor
+            }
+
             DocumentsList(
                 documentsList = uiState.documentsIncomeProof,
                 files = uiState.selectedIncomeProof,
                 fileType = DocumentType.INCOME_PROOF.folderName,
                 tittle = incomeProofTittle,
+                description = uiState.incomeProofDocsState?.description,
                 bgColor = incomeProofBgColor,
                 showAddFileButton = addIncomeProofButton,
                 filePicker = incomeProofFilesPicker,
@@ -236,15 +253,20 @@ fun ApplicationStateViewContent(
             var otherIncomeBgColor = Color.White
             var otherIncomeTittle = "Outros Rendimentos"
             var addOtherIncomeButton = true
-            if(uiState.bankStatementDocsState?.state == ApplicationDocumentTypeState.COMPLETED.state){
-                otherIncomeBgColor = Color(0x120FFC0B)
+            if(uiState.otherIncomeDocsState?.state == ApplicationDocumentTypeState.COMPLETED.state){
+                otherIncomeBgColor = documentsCompletedColor
                 otherIncomeTittle += " (Completo)"
                 addOtherIncomeButton = false
             }
+            else if(uiState.otherIncomeDocsState?.state == ApplicationDocumentTypeState.SOMETHING_WRONG.state){
+                otherIncomeBgColor = documentsWrongColor
+            }
+
             DocumentsList(
                 documentsList = uiState.documentsOtherIncome,
                 files = uiState.selectedOtherIncome,
                 tittle = otherIncomeTittle,
+                description = uiState.otherIncomeDocsState?.description,
                 fileType = DocumentType.OTHER_INCOME.folderName,
                 bgColor = otherIncomeBgColor,
                 showAddFileButton = addOtherIncomeButton,
@@ -256,15 +278,20 @@ fun ApplicationStateViewContent(
             var permanentExpensesBgColor = Color.White
             var permanentExpensesTittle = "Despesas Permanentes"
             var addPermanentExpensesButton = true
-            if(uiState.bankStatementDocsState?.state == ApplicationDocumentTypeState.COMPLETED.state){
-                permanentExpensesBgColor = Color(0x120FFC0B)
+            if(uiState.permanentExpensesDocsState?.state == ApplicationDocumentTypeState.COMPLETED.state){
+                permanentExpensesBgColor = documentsCompletedColor
                 permanentExpensesTittle += " (Completo)"
                 addPermanentExpensesButton = false
             }
+            else if(uiState.permanentExpensesDocsState?.state == ApplicationDocumentTypeState.SOMETHING_WRONG.state){
+                permanentExpensesBgColor = documentsWrongColor
+            }
+
             DocumentsList(
                 documentsList = uiState.documentsPermanentExpenses,
                 files = uiState.selectedPermanentExpenses,
                 tittle = permanentExpensesTittle,
+                description = uiState.permanentExpensesDocsState?.description,
                 fileType = DocumentType.PERMANENT_EXPENSES.folderName,
                 bgColor = permanentExpensesBgColor,
                 showAddFileButton = addPermanentExpensesButton,
@@ -275,15 +302,20 @@ fun ApplicationStateViewContent(
             var internationalSupportBgColor = Color.White
             var internationalSupportTittle = "Apoio Internacional"
             var addInternationalSupportButton = true
-            if(uiState.bankStatementDocsState?.state == ApplicationDocumentTypeState.COMPLETED.state){
-                internationalSupportBgColor = Color(0x120FFC0B)
+            if(uiState.internationalSupportDocsState?.state == ApplicationDocumentTypeState.COMPLETED.state){
+                internationalSupportBgColor = documentsCompletedColor
                 internationalSupportTittle += " (Completo)"
                 addInternationalSupportButton = false
             }
+            else if(uiState.internationalSupportDocsState?.state == ApplicationDocumentTypeState.SOMETHING_WRONG.state){
+                internationalSupportBgColor = documentsWrongColor
+            }
+
             DocumentsList(
                 documentsList = uiState.documentsInternationalSupport,
                 files = uiState.selectedInternationalSupport,
                 tittle = internationalSupportTittle,
+                description = uiState.internationalSupportDocsState?.description,
                 fileType = DocumentType.INTERNATIONAL_SUPPORT.folderName,
                 bgColor = internationalSupportBgColor,
                 showAddFileButton = addInternationalSupportButton,
@@ -301,13 +333,14 @@ fun DocumentsList(
     documentsList: List<DocumentReceiverModel>,
     files: List<Uri>,
     tittle: String,
+    description: String? = null,
     fileType: String,
     bgColor: Color,
     showAddFileButton: Boolean,
     filePicker: ManagedActivityResultLauncher<String, Uri?>,
     onDeleteFile:(document: DocumentReceiverModel?, uri: Uri?, folderName: String) -> Unit,
     onSubmitFile:(folderName: String) -> Unit){
-    CategoryBox(title = tittle, bgColor = bgColor) {
+    CategoryBox(title = tittle, bgColor = bgColor, description = description) {
         Column(
             modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(8.dp) // Espaço entre documentos
@@ -344,7 +377,7 @@ fun DocumentsList(
                         date = doc.createdAt,
                         imageVector = icon,
                         canDelete = canDelete,
-                        onDeleteFile = { onDeleteFile(doc, null, DocumentType.BANK_STATEMENTS.folderName) },
+                        onDeleteFile = { onDeleteFile(doc, null, fileType) },
                         errorMessage = doc.description,
                     )
                 }
@@ -358,7 +391,7 @@ fun DocumentsList(
                         statusColor = Color.Magenta,
                         bgColor = Color(0xFFF5F7FA),
                         canDelete = true,
-                        onDeleteFile = { onDeleteFile(null, file, DocumentType.BANK_STATEMENTS.folderName) },
+                        onDeleteFile = { onDeleteFile(null, file, fileType) },
                         imageVector = Icons.Default.Star,
                     )
                 }
@@ -476,7 +509,7 @@ fun TimelineStep(number: String, label: String, isActive: Boolean, isCompleted: 
 @Composable
 fun CategoryBox(
     title: String,
-    icon: ImageVector? = null,
+    description: String? = null,
     bgColor: Color,
     content: @Composable ColumnScope.() -> Unit
 ) {
@@ -488,10 +521,10 @@ fun CategoryBox(
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                //Icon(icon, null, tint = Color(0xFF455A64), modifier = Modifier.size(20.dp))
-                //Spacer(Modifier.width(8.dp))
                 Text(title, fontWeight = FontWeight.Bold, fontSize = 15.sp, color = Color(0xFF263238))
             }
+            if(description != null)
+                Text(description, fontWeight = FontWeight.Normal, fontSize = 12.sp, color = Color.Red)
             Divider(modifier = Modifier.padding(vertical = 12.dp), color = Color(0xFFEEEEEE))
             content()
         }
@@ -656,7 +689,13 @@ fun ApplicationStatePreview(){
         SocialStoreScaffoldContent(navController = rememberNavController(), userRole = UserRole.DEFAULT, logout = {}) { paddingValues ->
             ApplicationStateViewContent(
                 modifier = Modifier.padding(paddingValues = paddingValues),
-                uiState = uiState, onAddSelectedFile = { folderName, uri -> {}}, onDeleteFile = {folderName, uri, document -> {}}, onSubmitFile = {})
+                uiState = uiState,
+                onAddSelectedFile = { folderName, uri -> {}},
+                onDeleteFile = {folderName, uri, document -> {}},
+                onSubmitFile = {},
+                documentsCompletedColor = Color(0x120FFC0B),
+                documentsWrongColor = Color(0x1BFF0000)
+            )
         }
     }
 }
