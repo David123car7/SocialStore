@@ -18,7 +18,6 @@ import javax.inject.Inject
 data class RegisterState (
     var email : String = "",
     var password : String = "",
-    val profile: ProfileModel = ProfileModel(name = "", birthDate = ""),
     var error : ErrorText? = null,
     var isLoading : Boolean = false,
     var isRegistered : Boolean = false,
@@ -32,26 +31,13 @@ class RegisterViewModel @Inject constructor(private val registerUseCase: Registe
         uiState.value = uiState.value.copy(email = email)
     }
 
-    fun updateName(name: String) {
-        uiState.value = uiState.value.copy(
-            profile = uiState.value.profile.copy(name = name)
-        )
-    }
-
-    fun updateBirthDate(birthDate: String) {
-        uiState.value = uiState.value.copy(
-            profile = uiState.value.profile.copy(birthDate = birthDate)
-        )
-    }
-
     fun updatePassword(password : String) {
         uiState.value = uiState.value.copy(password = password)
     }
 
     fun register(){
         viewModelScope.launch {
-            val result = registerUseCase(uiState.value.email, uiState.value.password, uiState.value.profile)
-            when(result){
+            when(val result = registerUseCase(uiState.value.email, uiState.value.password)){
                 is ResultWrapper.Success -> {
                     uiState.value = uiState.value.copy(
                         isLoading = false,

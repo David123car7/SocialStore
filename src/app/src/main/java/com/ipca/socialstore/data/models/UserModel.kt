@@ -9,7 +9,7 @@ data class UserModel(
     val id: String?,
 
     @SerialName("profile_id")
-    val profileId: Int,
+    val profileId: Int?,
 
     @SerialName("role")
     val role: String,

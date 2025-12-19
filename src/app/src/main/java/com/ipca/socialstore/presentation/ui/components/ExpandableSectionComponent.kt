@@ -40,9 +40,9 @@ fun ExpandableSection(
     Card(
         colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(2.dp),
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth(),
     ) {
-        Column {
+        Column() {
             Row(
                 modifier = Modifier.fillMaxWidth().clickable { onExpandChange(!isExpanded) }.padding(16.dp),
                 verticalAlignment = Alignment.CenterVertically,
@@ -56,7 +56,9 @@ fun ExpandableSection(
                 Icon(Icons.Default.KeyboardArrowDown, "Expandir", modifier = Modifier.rotate(rotationState))
             }
             AnimatedVisibility(visible = isExpanded) {
-                Column(modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 16.dp)) {
+                Column(
+                    modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
+                    verticalArrangement = Arrangement.spacedBy(20.dp)) {
                     content()
                 }
             }

@@ -62,8 +62,6 @@ fun RegisterView(modifier: Modifier, navController: NavController, userRole: Use
         uiState = uiState,
         onEmailUpdate = {value -> registerViewModel.updateEmail(value)},
         onPasswordUpdate = {value -> registerViewModel.updatePassword(value)},
-        onNameUpdate = {value -> registerViewModel.updateName(value)},
-        onBirthDateUpdate = {value -> registerViewModel.updateBirthDate(value)},
         onLogin = {
             NavigationLogic.navigateTo(
                 navController = navController,
@@ -88,39 +86,9 @@ fun RegisterViewContent(
     modifier: Modifier,
     uiState: RegisterState,
     onEmailUpdate:(newValue: String)->Unit,
-    onNameUpdate:(newValue: String)->Unit,
-    onBirthDateUpdate:(newValue: String)->Unit,
     onPasswordUpdate:(newValue: String)->Unit,
     onLogin:() -> Unit,
     onRegister:()->Unit){
-
-    val datePickerState = rememberDatePickerState()
-    var showDatePicker by remember { mutableStateOf(false) }
-
-    if (showDatePicker) {
-        DatePickerDialog(
-            onDismissRequest = { showDatePicker = false },
-            confirmButton = {
-                TextButton(onClick = {
-                    datePickerState.selectedDateMillis?.let { millis ->
-                        val date = Date(millis)
-                        val format = SimpleDateFormat("yyyy/MM/dd", Locale.getDefault())
-                        onBirthDateUpdate(format.format(date))
-                    }
-                    showDatePicker = false
-                }) {
-                    Text("OK")
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showDatePicker = false }) {
-                    Text("Cancelar")
-                }
-            }
-        ) {
-            DatePicker(state = datePickerState)
-        }
-    }
 
     Scaffold { padding ->
         Column(
@@ -149,22 +117,6 @@ fun RegisterViewContent(
                 text = "Preencha os dados para se registar",
                 style = MaterialTheme.typography.bodyMedium,
                 color = Color.Gray
-            )
-
-            TextFieldStringComponent(
-                modifier = Modifier,
-                label = "Nome Completo",
-                value = uiState.profile.name,
-                icon = Icons.Default.Star,
-                onValueUpdate = onNameUpdate
-            )
-
-            TextFieldDateComponent(
-                modifier = Modifier,
-                label = "Data de Nascimento",
-                uiState.profile.birthDate,
-                onDateUpdate = {date -> onBirthDateUpdate(date)},
-                onDatePickerUpdate = {showDatePicker = true}
             )
 
             TextFieldStringComponent(
@@ -221,9 +173,7 @@ fun LoginPreview(){
             onEmailUpdate = { Unit},
             onPasswordUpdate = { Unit},
             onRegister = { Unit},
-            onNameUpdate = { Unit},
             onLogin = { Unit},
-            onBirthDateUpdate = { Unit}
         )
     }
 }
