@@ -24,7 +24,7 @@ class StockWorkManager(private val context: Context) {
     }
 
     fun notificationExpirationDate() {
-        // 1. Agendamento Periódico (24h) sem restrições
+
         val syncRequest = PeriodicWorkRequestBuilder<ExpirationDateWorker>(24, TimeUnit.HOURS)
             .addTag(TAG_SYNC)
             .build()
@@ -35,7 +35,6 @@ class StockWorkManager(private val context: Context) {
             syncRequest
         )
 
-        // 2. Agendamento de TESTE (Execução única) para rodar agora
         val testRequest = OneTimeWorkRequestBuilder<ExpirationDateWorker>()
             .addTag("TEST_NOW")
             .build()

@@ -84,7 +84,7 @@ fun CreateItemViewContent(
             modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
         )
         TextField(
-            value = uiState.item.itemType,
+            value = uiState.item.itemType!!,
             onValueChange = onItemTypeUpdate,
             label = { Text("Tipo de Item") },
             modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)

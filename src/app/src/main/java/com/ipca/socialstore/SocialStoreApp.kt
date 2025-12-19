@@ -11,12 +11,11 @@ import dagger.hilt.android.HiltAndroidApp
 import javax.inject.Inject
 
 @HiltAndroidApp
-class SocialStoreApp : Application(), Configuration.Provider { // 1. Implementa a interface
+class SocialStoreApp : Application(), Configuration.Provider {
 
     @Inject
     lateinit var workerFactory: HiltWorkerFactory
 
-    // 2. O Hilt/WorkManager chama esta propriedade automaticamente
     override val workManagerConfiguration: Configuration
         get() = Configuration.Builder()
             .setWorkerFactory(workerFactory)
@@ -26,7 +25,6 @@ class SocialStoreApp : Application(), Configuration.Provider { // 1. Implementa 
     override fun onCreate() {
         super.onCreate()
 
-        // 3. Agora o agendamento irá usar a factory injetada acima
         val stockWorkManager = StockWorkManager(this)
         stockWorkManager.notificationExpirationDate()
     }

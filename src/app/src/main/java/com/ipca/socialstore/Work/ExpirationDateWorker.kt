@@ -11,6 +11,7 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
 import com.ipca.socialstore.domain.notification.WorkerExpirationDateUseCase
+import com.ipca.socialstore.domain.services.donation.CreateStockNotificationService
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 
@@ -19,7 +20,8 @@ import dagger.assisted.AssistedInject
 class ExpirationDateWorker @AssistedInject constructor(
     @Assisted appContext: Context,
     @Assisted workerParams: WorkerParameters,
-    private val workerExpirationDateUseCase: WorkerExpirationDateUseCase
+    private val workerExpirationDateUseCase: WorkerExpirationDateUseCase,
+    private val createStockNotificationService: CreateStockNotificationService
 ) : CoroutineWorker(appContext, workerParams) {
 
     override suspend fun doWork(): Result {
@@ -29,10 +31,8 @@ class ExpirationDateWorker @AssistedInject constructor(
             is ResultWrapper.Success -> {
                 val ids = result.data
                 if (ids.isNotEmpty()) {
-                    /*
-                    * Fazer service que recebe o stock ID, e procura o item, a data de validade, e quantidade
-                    * Chamar view com texto estatico que apenas muda o item e a sua info
-                    * */
+                    println("Dentro do if")
+                    createStockNotificationService(ids)
                 } else {
                     Log.d("WORKER_TEST", "Nenhum item expira nos próximos 20 dias.")
                 }

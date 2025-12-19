@@ -43,6 +43,7 @@ import com.ipca.socialstore.presentation.views.application.createApplication.Cre
 import com.ipca.socialstore.presentation.views.authentication.resetPassword.ResetPasswordView
 import com.ipca.socialstore.presentation.views.home.defaultHomeView.DefaultHomeView
 import com.ipca.socialstore.presentation.views.home.testHome.TestHomeView
+import com.ipca.socialstore.presentation.views.notification.NotificationHistoryView
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -124,6 +125,9 @@ class MainActivity : ComponentActivity() {
                         }
                         composable <AdminRoutes.CreateScheduling>{
                             CreateSchedulingView(modifier = Modifier.padding(innerPadding), navController = navController)
+                        }
+                        composable <AdminRoutes.NotificationHistory>{
+                            NotificationHistoryView(modifier = Modifier.padding(innerPadding), navController = navController)
                         }
                     }
                     LaunchedEffect(mainState.isLoggedIn) {

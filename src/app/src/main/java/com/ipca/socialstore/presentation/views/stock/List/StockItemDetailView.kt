@@ -123,7 +123,7 @@ fun StockItemDetail(
                                 )
                             )
                             TextField(
-                                value = uiState.item.itemType,
+                                value = uiState.item.itemType!!,
                                 onValueChange = { value -> onUpdateType(value)},
                                 label = { Text("Tipo") },
                                 modifier = Modifier.fillMaxWidth(),
@@ -139,7 +139,7 @@ fun StockItemDetail(
                                 fontWeight = FontWeight.Bold
                             )
                             Text(
-                                text = uiState.item.itemType,
+                                text = uiState.item.itemType!!,
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )

@@ -10,8 +10,12 @@ import javax.inject.Inject
 import com.ipca.socialstore.data.exceptions.ExceptionMapper
 import com.ipca.socialstore.data.models.TableIdModel
 import io.github.jan.supabase.postgrest.query.Columns
+import kotlinx.serialization.Serializable
 
-
+@Serializable
+data class ItemNameModel(
+    val name : String
+)
 class ItemRepository @Inject constructor(private val supabase : SupabaseClient, private val exceptionMapper: ExceptionMapper){
 
     suspend fun createItem(item : ItemModel) : ResultWrapper<Int> {
@@ -69,8 +73,9 @@ class ItemRepository @Inject constructor(private val supabase : SupabaseClient, 
                     filter {
                         isIn("id", itemId)
                     }
-                }.decodeList<String>()
-            return ResultWrapper.Success(result)
+                }.decodeList<ItemNameModel>()
+            val names = result.map { it.name }
+            return ResultWrapper.Success(names)
         }catch (e : Exception){
             ResultWrapper.Error(exceptionMapper.map(e))
         }
