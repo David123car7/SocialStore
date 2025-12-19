@@ -250,5 +250,20 @@ class StockRepository @Inject constructor(private val supabase: SupabaseClient, 
             ResultWrapper.Error(exceptionMapper.map(e))
         }
     }
+
+    suspend fun getStockById(stockId : Int) : ResultWrapper<List<StockModel>> {
+        return try {
+            val result = supabase.from(DatabaseTables.STOCK)
+                .select {
+                    filter {
+                        eq("id", stockId)
+                    }
+                }.decodeList<StockModel>()
+
+            ResultWrapper.Success(result)
+        } catch (e: Exception) {
+            ResultWrapper.Error(exceptionMapper.map(e))
+        }
+    }
 }
 
