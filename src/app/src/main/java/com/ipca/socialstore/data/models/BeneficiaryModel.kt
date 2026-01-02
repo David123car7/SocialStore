@@ -5,7 +5,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class BeneficiaryModel(
-
     val id : Int? = null,
 
     @SerialName("createdAt")

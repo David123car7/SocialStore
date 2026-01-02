@@ -40,6 +40,22 @@ class ApplicationRepository @Inject constructor(
         }
     }
 
+    suspend fun updateApplication(application: ApplicationModel): ResultWrapper<Unit> {
+        if(application.id == null)
+            return ResultWrapper.Error(AppError.UnknownError("Appllication Id Null"))
+
+        return try {
+            supabaseClient.from(DatabaseTables.APPLICATION).update(application) {
+                filter {
+                    eq("id", application.id)
+                }
+            }
+            ResultWrapper.Success(Unit)
+        } catch (e: Exception) {
+            ResultWrapper.Error(exceptionMapper.map(e))
+        }
+    }
+
     suspend fun deleteApplication(id: Int): ResultWrapper<Unit> {
         return try {
             supabaseClient.from(DatabaseTables.APPLICATION).delete {
@@ -61,6 +77,16 @@ class ApplicationRepository @Inject constructor(
                 }
             }.decodeSingleOrNull<ApplicationModel>()
             if(applicationResult == null) return ResultWrapper.Error(AppError.DataNotCreated)
+            ResultWrapper.Success(applicationResult)
+        } catch (e : Exception){
+            ResultWrapper.Error(exceptionMapper.map(e))
+        }
+    }
+
+    suspend fun getAllApplications(): ResultWrapper<List<ApplicationModel>>{
+        return try {
+            val applicationResult = supabaseClient.from(DatabaseTables.APPLICATION).select {
+            }.decodeList<ApplicationModel>()
             ResultWrapper.Success(applicationResult)
         } catch (e : Exception){
             ResultWrapper.Error(exceptionMapper.map(e))

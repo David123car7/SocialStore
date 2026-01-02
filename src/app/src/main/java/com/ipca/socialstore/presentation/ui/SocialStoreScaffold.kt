@@ -11,10 +11,12 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.ipca.socialstore.data.enums.UserRole
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountTree
 import androidx.compose.material.icons.filled.FileOpen
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Preview
 import androidx.compose.material.icons.filled.Storage
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.runtime.getValue
@@ -71,10 +73,20 @@ fun SocialStoreScaffoldContent(
             route = AdminRoutes.AdminHome,
             isVisible = userRole == UserRole.ADMIN
         ),
+        BottomNavItem( //AdminHome
+            icon = Icons.Default.Preview,
+            route = CandidateRoutes.ApplicationState,
+            isVisible = userRole == UserRole.CANDIDATE
+        ),
         BottomNavItem( //ApplicationInfo
             icon = Icons.Default.FileOpen,
             route = DefaultRoutes.ApplicationInfo,
             isVisible = userRole == UserRole.DEFAULT
+        ),
+        BottomNavItem( //ApplicationInfo
+            icon = Icons.Default.AccountTree,
+            route = AdminRoutes.ListApplications,
+            isVisible = userRole == UserRole.ADMIN
         ),
         BottomNavItem( //Admin Notifications
             icon = Icons.Default.Notifications,
@@ -162,7 +174,7 @@ fun SocialStoreScaffoldGuestPreview() {
     SocialStoreTheme {
         SocialStoreScaffoldContent(
             navController = rememberNavController(),
-            userRole = UserRole.DEFAULT,
+            userRole = UserRole.CANDIDATE,
             logout = {}
         ) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {

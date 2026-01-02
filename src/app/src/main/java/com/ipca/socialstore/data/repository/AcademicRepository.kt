@@ -6,6 +6,7 @@ import com.ipca.socialstore.data.exceptions.ExceptionMapper
 import com.ipca.socialstore.data.helpers.from
 import com.ipca.socialstore.data.models.AcademicModel
 import com.ipca.socialstore.data.models.ApplicationModel
+import com.ipca.socialstore.data.models.ApplicationStateModel
 import com.ipca.socialstore.data.models.TableIdModel
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
 import io.github.jan.supabase.SupabaseClient
@@ -27,6 +28,23 @@ class AcademicRepository @Inject constructor(
             ResultWrapper.Error(exceptionMapper.map(e))
         }
     }
+
+    suspend fun updateAcademicData(academicModel: AcademicModel): ResultWrapper<Int> {
+        if(academicModel.id == null)
+            return ResultWrapper.Error(AppError.UnknownError("Academic Id Null"))
+
+        return try {
+            supabaseClient.from(DatabaseTables.ACADEMIC).update(academicModel) {
+                filter {
+                    eq("id", academicModel.id)
+                }
+            }
+            ResultWrapper.Success(academicModel.id)
+        } catch (e: Exception) {
+            ResultWrapper.Error(exceptionMapper.map(e))
+        }
+    }
+
 
     suspend fun deleteAcademic(id: Int): ResultWrapper<Unit> {
         return try {

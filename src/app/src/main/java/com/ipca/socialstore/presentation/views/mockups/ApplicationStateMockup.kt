@@ -32,10 +32,10 @@ import androidx.navigation.compose.rememberNavController
 import com.ipca.socialstore.data.enums.UserRole
 import com.ipca.socialstore.presentation.ui.SocialStoreScaffold
 import com.ipca.socialstore.presentation.ui.components.ExpandableSection
+import com.ipca.socialstore.presentation.ui.components.ReadOnlyField
 import com.ipca.socialstore.presentation.ui.theme.SocialStoreTheme
 import com.ipca.socialstore.presentation.views.application.applicationState.CategoryBox
 import com.ipca.socialstore.presentation.views.application.applicationState.DocumentRow
-import com.ipca.socialstore.presentation.views.application.applicationState.ReadOnlyField
 
 // --- ENUM DE ESTADOS ---
 enum class ApplicationState(

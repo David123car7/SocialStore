@@ -13,6 +13,7 @@ enum class DatabaseTables(val tableName: String) {
     APPLICATION_DOCUMENT_TYPE("application_document_type"),
     APPLICATION_DOCUMENT("application_document"),
     APPLICATION_STATE("application_state"),
+    APPLICATION_DATA_STATE("application_data_state"),
     ACADEMIC("academic"),
     DOCUMENT("document"),
     DOCUMENT_STATE("document_state"),

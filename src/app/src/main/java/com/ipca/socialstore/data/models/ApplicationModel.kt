@@ -28,8 +28,14 @@ data class ApplicationModel(
     @SerialName("requestType")
     val requestType: String,
 
+    @SerialName("created_at")
+    val createdAt: String,
+
     @SerialName("state_id")
     val stateId: Int,
+
+    @SerialName("data_state")
+    val dataStateId: Int,
 
     @SerialName("academic_id")
     val academicId: Int?,
