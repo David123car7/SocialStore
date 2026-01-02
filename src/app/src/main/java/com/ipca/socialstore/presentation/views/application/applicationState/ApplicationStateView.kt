@@ -72,6 +72,7 @@ import com.ipca.socialstore.presentation.ui.components.AlertComponent
 import com.ipca.socialstore.presentation.ui.components.ButtonTracedComponent
 import com.ipca.socialstore.presentation.ui.components.ExpandableSection
 import com.ipca.socialstore.presentation.ui.components.ReadOnlyField
+import com.ipca.socialstore.presentation.ui.components.WarningComponent
 import com.ipca.socialstore.presentation.ui.theme.SocialStoreTheme
 import com.ipca.socialstore.presentation.utils.getFileNameFromUri
 import com.ipca.socialstore.presentation.views.application.status.TimelineLine
@@ -199,39 +200,8 @@ fun ApplicationStateViewContent(
             isExpanded = isDataExpanded,
             onExpandChange = { isDataExpanded = it }
         ) {
-            if (uiState.application.applicationDataState.state == ApplicationDataStatus.DENIED.status) {
-                Card(
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFFFFCCC7)),
-                    border = BorderStroke(1.dp, Color(0xFFCF1322)),
-                    modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)
-                ) {
-                    Column(modifier = Modifier.padding(12.dp)) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(
-                                Icons.Default.Warning,
-                                contentDescription = null,
-                                tint = Color(0xFFCF1322)
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(
-                                text = "Correção Necessária",
-                                style = MaterialTheme.typography.titleSmall,
-                                color = Color(0xFFCF1322),
-                                fontWeight = FontWeight.Bold
-                            )
-                        }
-                        Text(
-                            text = uiState.application.applicationDataState.message ?: "",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = Color(0xFF5C0011),
-                            modifier = Modifier.padding(
-                                top = 4.dp,
-                                start = 32.dp
-                            )
-                        )
-                    }
-                }
-            }
+            if (uiState.application.applicationDataState.state == ApplicationDataStatus.DENIED.status)
+                WarningComponent(tittle = "Correção Necessária.", message = uiState.application.applicationDataState.message ?: "", icon = Icons.Default.Warning)
             if (uiState.application.applicationDataState.state != ApplicationDataStatus.DENIED.status) {
                 CategoryBox(title = "Dados Pessoais", bgColor = Color.White) {
                     ReadOnlyField("Nome Completo", uiState.application.name)
@@ -325,8 +295,6 @@ fun ApplicationStateViewContent(
                 }
             }
         }
-    }
-
         ExpandableSection(
             title = "Meus Documentos",
             icon = Icons.Outlined.Person,
@@ -468,6 +436,7 @@ fun ApplicationStateViewContent(
                 text = "Eliminar Candidatura",
             )
         }
+    }
 }
 
 

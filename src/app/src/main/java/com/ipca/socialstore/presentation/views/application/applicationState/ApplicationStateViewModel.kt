@@ -81,6 +81,36 @@ class ApplicationStateViewModel @Inject constructor(
                         application = applicationResult.data,
                         isLoading = false,
                     )
+                    val docBankStatements = getDocuments(
+                        applicationId = applicationResult.data.id!!,
+                        documentType = DocumentType.BANK_STATEMENTS.folderName
+                    )
+
+                    val docIncomeProof = getDocuments(
+                        applicationId = applicationResult.data.id,
+                        documentType = DocumentType.INCOME_PROOF.folderName
+                    )
+                    val docOtherIncome = getDocuments(
+                        applicationId = applicationResult.data.id,
+                        documentType = DocumentType.OTHER_INCOME.folderName
+                    )
+                    val docPermanentExpenses = getDocuments(
+                        applicationId = applicationResult.data.id,
+                        documentType = DocumentType.PERMANENT_EXPENSES.folderName
+                    )
+                    val docInternationalSupport = getDocuments(
+                        applicationId = applicationResult.data.id,
+                        documentType = DocumentType.INTERNATIONAL_SUPPORT.folderName
+                    )
+
+                    uiState.value = uiState.value.copy(
+                        documentsBankStatements = docBankStatements,
+                        documentsOtherIncome = docOtherIncome,
+                        documentsIncomeProof = docIncomeProof,
+                        documentsInternationalSupport = docInternationalSupport,
+                        documentsPermanentExpenses = docPermanentExpenses
+                    )
+                    getAppDocTypeStates(applicationId = applicationResult.data.id)
                 }
                 is ResultWrapper.Error -> {
                     uiState.value = uiState.value.copy(
@@ -94,9 +124,8 @@ class ApplicationStateViewModel @Inject constructor(
 
     fun updateSchoolYear(value: String) {
         val year = if (value.isBlank()) 0 else value.toIntOrNull() ?: return
-
         uiState.value = uiState.value.copy(
-            application = uiState.value.application
+            application = uiState.value.application.copy(schoolYear = year)
         )
     }
 

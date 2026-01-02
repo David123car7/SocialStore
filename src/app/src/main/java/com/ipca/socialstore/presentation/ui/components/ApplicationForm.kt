@@ -49,7 +49,7 @@ fun ApplicationForm(
     cc: String,
     phoneNumber: String,
     schoolYear: String,
-    requestType: String, // Pass the label or identifier
+    requestType: String,
 
     // --- 2. Logic Values ---
     isStudent: Boolean = false,
