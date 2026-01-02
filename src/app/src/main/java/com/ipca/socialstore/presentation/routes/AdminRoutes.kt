@@ -6,6 +6,7 @@ sealed class AdminRoutes {
     @Serializable
     object AdminHome : AdminRoutes()
 
+    // --- Applications ---
     @Serializable
     object ListApplications: AdminRoutes()
 

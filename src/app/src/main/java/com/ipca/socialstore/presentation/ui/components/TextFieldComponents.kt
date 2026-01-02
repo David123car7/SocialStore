@@ -32,14 +32,15 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.ipca.socialstore.data.enums.RequestType
+import com.ipca.socialstore.presentation.ui.theme.GreenIPCA
 
 @Composable
-fun TextFieldStringComponent(modifier: Modifier, label: String, value: String, icon: ImageVector, onValueUpdate:(newValue: String)->Unit) {
+fun TextFieldStringComponent(modifier: Modifier, label: String, value: String, icon: ImageVector? = null, onValueUpdate:(newValue: String)->Unit) {
     OutlinedTextField(
         value = value,
         onValueChange = onValueUpdate,
         label = { Text(label) },
-        leadingIcon = { Icon(icon, null) },
+        leadingIcon = { if(icon != null) Icon(icon, null)},
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
         singleLine = true

@@ -29,6 +29,22 @@ class ApplicationStateRepository @Inject constructor(
         }
     }
 
+    suspend fun updateApplicationState(applicationState: ApplicationStateModel): ResultWrapper<Int> {
+        if(applicationState.id == null)
+            return ResultWrapper.Error(AppError.UnknownError("Appllication State Id Null"))
+
+        return try {
+            supabaseClient.from(DatabaseTables.APPLICATION_STATE).update(applicationState) {
+                filter {
+                    eq("id", applicationState.id!!)
+                }
+            }
+            ResultWrapper.Success(applicationState.id)
+        } catch (e: Exception) {
+            ResultWrapper.Error(exceptionMapper.map(e))
+        }
+    }
+
     suspend fun getApplicationState(id: Int): ResultWrapper<ApplicationStateModel>{
         return try {
             val applicationStateResult = supabaseClient.from(DatabaseTables.APPLICATION_STATE).select {
@@ -39,6 +55,33 @@ class ApplicationStateRepository @Inject constructor(
             if(applicationStateResult == null) return ResultWrapper.Error(AppError.DataNotFound)
             ResultWrapper.Success(applicationStateResult)
         } catch (e : Exception){
+            ResultWrapper.Error(exceptionMapper.map(e))
+        }
+    }
+
+    suspend fun getApplicationStates(ids: List<Int>): ResultWrapper<List<ApplicationStateModel>>{
+        return try {
+            val applicationStateResult = supabaseClient.from(DatabaseTables.APPLICATION_STATE).select {
+                filter {
+                    isIn("id", ids)
+                }
+            }.decodeList<ApplicationStateModel>()
+            ResultWrapper.Success(applicationStateResult)
+        } catch (e : Exception){
+            ResultWrapper.Error(exceptionMapper.map(e))
+        }
+    }
+
+    suspend fun setApplicationStateMessage(id: Int, message: String): ResultWrapper<Int> {
+        return try {
+            val updateData = mapOf("message" to message)
+            supabaseClient.from(DatabaseTables.APPLICATION_STATE).update(updateData) {
+                filter {
+                    eq("id", id)
+                }
+            }
+            ResultWrapper.Success(id)
+        } catch (e: Exception) {
             ResultWrapper.Error(exceptionMapper.map(e))
         }
     }

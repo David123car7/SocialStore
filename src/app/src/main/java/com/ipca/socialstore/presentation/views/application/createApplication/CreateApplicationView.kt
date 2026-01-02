@@ -150,7 +150,7 @@ fun CreateApplicationViewContent(
     ) {
         TextFieldStringComponent(
             modifier = Modifier,
-            label = "Email",
+            label = "Name",
             value = uiState.application.name,
             icon = Icons.Default.Star,
             onValueUpdate = onNameUpdate
@@ -321,7 +321,9 @@ fun CreateApplicationViewPreview() {
                 phoneNumber = "",
                 email = "",
                 requestType = "",
-                academicId = null
+                academicId = null,
+                createdAt = "",
+                dataStateId = -1
             ),
             academicData = AcademicModel(typeCourse = "", course = "", studenNumber = "")
         )
