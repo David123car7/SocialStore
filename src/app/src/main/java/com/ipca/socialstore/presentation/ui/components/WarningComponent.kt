@@ -23,38 +23,40 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun WarningComponent(tittle: String, message: String, icon: ImageVector? = null){
+fun WarningComponent(tittle: String, message: String?,bgColor: Color, mainColor: Color,icon: ImageVector? = null){
     Card(
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFFFCCC7)),
-        border = BorderStroke(1.dp, Color(0xFFCF1322)),
+        colors = CardDefaults.cardColors(containerColor = bgColor),
+        border = BorderStroke(1.dp, mainColor),
         modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)
     ) {
         Column(modifier = Modifier.padding(12.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 if(icon != null){
                     Icon(
-                        Icons.Default.Warning,
+                        imageVector = icon,
                         contentDescription = null,
-                        tint = Color(0xFFCF1322)
+                        tint = mainColor
                     )
                 }
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = tittle,
                     style = MaterialTheme.typography.titleSmall,
-                    color = Color(0xFFCF1322),
+                    color = mainColor,
                     fontWeight = FontWeight.Bold
                 )
             }
-            Text(
-                text = message,
-                style = MaterialTheme.typography.bodyMedium,
-                color = Color(0xFF5C0011),
-                modifier = Modifier.padding(
-                    top = 4.dp,
-                    start = 32.dp
+            if(message != null){
+                Text(
+                    text = message,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.Black,
+                    modifier = Modifier.padding(
+                        top = 4.dp,
+                        start = 32.dp
+                    )
                 )
-            )
+            }
         }
     }
 }

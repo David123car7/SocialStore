@@ -1,4 +1,4 @@
-package com.ipca.socialstore.presentation.views.application.listApplications
+package com.ipca.socialstore.presentation.views.application.applicationStateAdmin
 
 import android.net.Uri
 import androidx.compose.runtime.mutableStateOf
@@ -20,15 +20,15 @@ import com.ipca.socialstore.presentation.models.DocumentReceiverModel
 import com.ipca.socialstore.presentation.utils.ErrorText
 import com.ipca.socialstore.presentation.utils.FileSaveManager
 import com.ipca.socialstore.presentation.utils.asUiText
+import com.ipca.socialstore.presentation.views.application.applicationState.createEmptyApplication
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-data class ListApplicationsState(
-    val applications: List<ApplicationModelReceiver> = emptyList(),
-
+data class ApplicationAdminState(
+    val application: ApplicationModelReceiver = createEmptyApplication(),
     val documentsBankStatements: List<DocumentReceiverModel> = emptyList(),
     val documentsIncomeProof: List<DocumentReceiverModel> = emptyList(),
     val documentsOtherIncome: List<DocumentReceiverModel> = emptyList(),
@@ -46,15 +46,13 @@ data class ListApplicationsState(
 )
 
 @HiltViewModel
-class ListApplicationsViewModel @Inject constructor(
-    private val getAllAplicationsService: GetAllAplicationsService,
+class ApplicationStateAdminViewModel @Inject constructor(
     private val updateApplicationDataStateUseCase: UpdateApplicationDataStateUseCase,
     private val getApplicationDocumentsService: GetApplicationDocumentsService,
     private val getAppDocTypesUseCase: GetAppDocTypesUseCase,
     private val downloadFileUseCase: DownloadFileUseCase,
-    private val fileSaveManager: FileSaveManager): ViewModel(){
-    var uiState = mutableStateOf(ListApplicationsState())
-
+    private val fileSaveManager: FileSaveManager) : ViewModel(){
+    var uiState = mutableStateOf(ApplicationAdminState())
     sealed class DownloadEvent {
         object Loading : DownloadEvent()
         data class Error(val message: String) : DownloadEvent()
@@ -65,10 +63,6 @@ class ListApplicationsViewModel @Inject constructor(
     private val _downloadEvent = Channel<DownloadEvent>()
     val downloadEvent = _downloadEvent.receiveAsFlow()
     private var pendingFileBytes: ByteArray? = null
-
-    init {
-        getAllApplications()
-    }
 
     fun updateApplicationDataState(id: Int, message: String) {
         val applicationDataStateModel = ApplicationDataStateModel(
@@ -202,28 +196,6 @@ class ListApplicationsViewModel @Inject constructor(
                     isLoading = false,
                     error = appDocTypesResult.error.asUiText()
                 )
-            }
-        }
-    }
-
-    fun getAllApplications(){
-        viewModelScope.launch {
-            uiState.value = uiState.value.copy(isLoading = true)
-            val result = getAllAplicationsService()
-            when(result){
-                is ResultWrapper.Success -> {
-                    uiState.value = uiState.value.copy(
-                        isLoading = false,
-                        applications = result.data
-                    )
-
-                }
-                is ResultWrapper.Error -> {
-                    uiState.value = uiState.value.copy(
-                        isLoading = false,
-                        error = result.error.asUiText()
-                    )
-                }
             }
         }
     }

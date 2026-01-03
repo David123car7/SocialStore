@@ -201,7 +201,13 @@ fun ApplicationStateViewContent(
             onExpandChange = { isDataExpanded = it }
         ) {
             if (uiState.application.applicationDataState.state == ApplicationDataStatus.DENIED.status)
-                WarningComponent(tittle = "Correção Necessária.", message = uiState.application.applicationDataState.message ?: "", icon = Icons.Default.Warning)
+                WarningComponent(
+                    tittle = "Correção Necessária.",
+                    message = uiState.application.applicationDataState.message ?: "",
+                    bgColor = Color(0xFFFFCCC7),
+                    mainColor = Color(0xFFCF1322),
+                    icon = Icons.Default.Warning
+                )
             if (uiState.application.applicationDataState.state != ApplicationDataStatus.DENIED.status) {
                 CategoryBox(title = "Dados Pessoais", bgColor = Color.White) {
                     ReadOnlyField("Nome Completo", uiState.application.name)
@@ -623,6 +629,7 @@ fun TimelineStep(number: String, label: String, isActive: Boolean, isCompleted: 
 fun CategoryBox(
     title: String,
     description: String? = null,
+    descriptionColor: Color = Color.Black,
     bgColor: Color,
     content: @Composable ColumnScope.() -> Unit
 ) {
@@ -637,7 +644,7 @@ fun CategoryBox(
                 Text(title, fontWeight = FontWeight.Bold, fontSize = 15.sp, color = Color(0xFF263238))
             }
             if(description != null)
-                Text(description, fontWeight = FontWeight.Normal, fontSize = 12.sp, color = Color.Red)
+                Text(description, fontWeight = FontWeight.Normal, fontSize = 12.sp, color = descriptionColor)
             Divider(modifier = Modifier.padding(vertical = 12.dp), color = Color(0xFFEEEEEE))
             content()
         }
