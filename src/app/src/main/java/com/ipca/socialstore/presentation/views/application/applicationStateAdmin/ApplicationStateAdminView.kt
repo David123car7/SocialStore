@@ -23,6 +23,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
+import androidx.compose.material.icons.filled.CheckBox
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Visibility
@@ -64,6 +65,7 @@ import com.ipca.socialstore.data.enums.DocumentStatus
 import com.ipca.socialstore.data.enums.UserRole
 import com.ipca.socialstore.presentation.models.ApplicationModelReceiver
 import com.ipca.socialstore.presentation.models.DocumentReceiverModel
+import com.ipca.socialstore.presentation.ui.components.AlertComponent
 import com.ipca.socialstore.presentation.ui.components.AlertInputComponent
 import com.ipca.socialstore.presentation.ui.components.ExpandableSection
 import com.ipca.socialstore.presentation.ui.components.ReadOnlyField
@@ -111,8 +113,10 @@ fun AplicationStateAdminView(modifier: Modifier, navController: NavController, u
     ApplicationStateAdminContent(
         modifier = modifier,
         uiState = uiState,
-        onDenyData = { id, msg -> viewModel.updateApplicationDataState(id = id, message = msg)},
-        onDownloadFile = {fileName, filePath -> viewModel.downloadDocument(filePath = filePath, fileName = fileName)}
+        onDenyData = {msg -> viewModel.updateApplicationDataState(state = ApplicationDataStatus.DENIED.status,message = msg)},
+        onDownloadFile = {fileName, filePath -> viewModel.downloadDocument(filePath = filePath, fileName = fileName)},
+        goBack = {navController.popBackStack()},
+        onAcceptApplicationData = {viewModel.updateApplicationDataState(state = ApplicationDataStatus.ACCEPTED.status,message = "")}
     )
 }
 
@@ -120,10 +124,10 @@ fun AplicationStateAdminView(modifier: Modifier, navController: NavController, u
 fun ApplicationStateAdminContent(
     modifier: Modifier,
     uiState: ApplicationAdminState,
-    onDenyData: (Int, String) -> Unit,
+    goBack:() -> Unit,
+    onDenyData: (String) -> Unit,
+    onAcceptApplicationData:() -> Unit,
     onDownloadFile:(fileName: String, filePath: String)->Unit){
-    var isDataExpanded by remember { mutableStateOf(false) }
-    var isDocsExpanded by remember { mutableStateOf(false) }
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -142,7 +146,7 @@ fun ApplicationStateAdminContent(
                     .padding(horizontal = 8.dp, vertical = 12.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                IconButton(onClick = {  }) {
+                IconButton(onClick = goBack) {
                     Icon(
                         imageVector = Icons.Default.ArrowBackIosNew,
                         contentDescription = "Voltar",
@@ -165,109 +169,95 @@ fun ApplicationStateAdminContent(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
-            ExpandableSection(
-                title = "Dados da candidatura",
-                icon = Icons.Outlined.Person,
-                isExpanded = isDataExpanded,
-                onExpandChange = { isDataExpanded = !isDataExpanded }
-            ) {
-                ApplicationData(
-                    application = uiState.application,
-                    onSubmitMessage = onDenyData,
-                    bgColor = Color.White
-                )
-            }
+
+            ApplicationData(
+                application = uiState.application,
+                onSubmitMessage = onDenyData,
+                onAcceptApplicationData = onAcceptApplicationData
+            )
 
             val documentsCompletedColor = Color(0x120FFC0B)
             val documentsWrongColor = Color(0x1BFF0000)
 
-            ExpandableSection(
-                title = "Documentos da candidatura",
-                icon = Icons.Outlined.Person,
-                isExpanded = isDocsExpanded,
-                onExpandChange = { isDocsExpanded = !isDocsExpanded }
-            ) {
-                var bankStatementsBgColor = Color.White
-                var bankStatementsTittle = "Extratos Bancários"
-                if(uiState.bankStatementDocsState?.state == ApplicationDocumentTypeState.COMPLETED.state){
-                    bankStatementsBgColor = documentsCompletedColor
-                    bankStatementsTittle += " (Completo)"
-                }
-                else if(uiState.bankStatementDocsState?.state == ApplicationDocumentTypeState.SOMETHING_WRONG.state){
-                    bankStatementsBgColor = documentsWrongColor
-                }
-                ApplicationDocuments(
-                    documentsList = uiState.documentsBankStatements,
-                    tittle = bankStatementsTittle,
-                    bgColor = bankStatementsBgColor,
-                    onDownloadFile = onDownloadFile
-                )
-
-                // --- 2. COMPROVATIVOS DE RENDIMENTO ---
-                var incomeProofBgColor = Color.White
-                var incomeProofTittle = "Comprovativos de Rendimento"
-                if(uiState.incomeProofDocsState?.state == ApplicationDocumentTypeState.COMPLETED.state){
-                    incomeProofBgColor = documentsCompletedColor
-                    incomeProofTittle += " (Completo)"
-                }
-                else if(uiState.incomeProofDocsState?.state == ApplicationDocumentTypeState.SOMETHING_WRONG.state){
-                    incomeProofBgColor = documentsWrongColor
-                }
-                ApplicationDocuments(
-                    documentsList = uiState.documentsIncomeProof,
-                    tittle = incomeProofTittle,
-                    bgColor = incomeProofBgColor,
-                    onDownloadFile = onDownloadFile
-                )
-
-                var otherIncomeBgColor = Color.White
-                var otherIncomeTittle = "Outros Rendimentos"
-                if(uiState.otherIncomeDocsState?.state == ApplicationDocumentTypeState.COMPLETED.state){
-                    otherIncomeBgColor = documentsCompletedColor
-                    otherIncomeTittle += " (Completo)"
-                }
-                else if(uiState.otherIncomeDocsState?.state == ApplicationDocumentTypeState.SOMETHING_WRONG.state){
-                    otherIncomeBgColor = documentsWrongColor
-                }
-                ApplicationDocuments(
-                    documentsList = uiState.documentsOtherIncome,
-                    tittle = otherIncomeTittle,
-                    bgColor = otherIncomeBgColor,
-                    onDownloadFile = onDownloadFile
-                )
-
-                var permanentExpensesBgColor = Color.White
-                var permanentExpensesTittle = "Despesas Permanentes"
-                if(uiState.permanentExpensesDocsState?.state == ApplicationDocumentTypeState.COMPLETED.state){
-                    permanentExpensesBgColor = documentsCompletedColor
-                    permanentExpensesTittle += " (Completo)"
-                }
-                else if(uiState.permanentExpensesDocsState?.state == ApplicationDocumentTypeState.SOMETHING_WRONG.state){
-                    permanentExpensesBgColor = documentsWrongColor
-                }
-                ApplicationDocuments(
-                    documentsList = uiState.documentsPermanentExpenses,
-                    tittle = permanentExpensesTittle,
-                    bgColor = permanentExpensesBgColor,
-                    onDownloadFile = onDownloadFile
-                )
-
-                var internationalSupportBgColor = Color.White
-                var internationalSupportTittle = "Apoio Internacional"
-                if(uiState.internationalSupportDocsState?.state == ApplicationDocumentTypeState.COMPLETED.state){
-                    internationalSupportBgColor = documentsCompletedColor
-                    internationalSupportTittle += " (Completo)"
-                }
-                else if(uiState.internationalSupportDocsState?.state == ApplicationDocumentTypeState.SOMETHING_WRONG.state){
-                    internationalSupportBgColor = documentsWrongColor
-                }
-                ApplicationDocuments(
-                    documentsList = uiState.documentsInternationalSupport,
-                    tittle = internationalSupportTittle,
-                    bgColor = internationalSupportBgColor,
-                    onDownloadFile = onDownloadFile
-                )
+            var bankStatementsBgColor = Color.White
+            var bankStatementsTittle = "Extratos Bancários"
+            if(uiState.bankStatementDocsState?.state == ApplicationDocumentTypeState.COMPLETED.state){
+                bankStatementsBgColor = documentsCompletedColor
+                bankStatementsTittle += " (Completo)"
             }
+            else if(uiState.bankStatementDocsState?.state == ApplicationDocumentTypeState.SOMETHING_WRONG.state){
+                bankStatementsBgColor = documentsWrongColor
+            }
+            ApplicationDocuments(
+                documentsList = uiState.documentsBankStatements,
+                tittle = bankStatementsTittle,
+                bgColor = bankStatementsBgColor,
+                onDownloadFile = onDownloadFile
+            )
+
+            var incomeProofBgColor = Color.White
+            var incomeProofTittle = "Comprovativos de Rendimento"
+            if(uiState.incomeProofDocsState?.state == ApplicationDocumentTypeState.COMPLETED.state){
+                incomeProofBgColor = documentsCompletedColor
+                incomeProofTittle += " (Completo)"
+            }
+            else if(uiState.incomeProofDocsState?.state == ApplicationDocumentTypeState.SOMETHING_WRONG.state){
+                incomeProofBgColor = documentsWrongColor
+            }
+            ApplicationDocuments(
+                documentsList = uiState.documentsIncomeProof,
+                tittle = incomeProofTittle,
+                bgColor = incomeProofBgColor,
+                onDownloadFile = onDownloadFile
+            )
+
+            var otherIncomeBgColor = Color.White
+            var otherIncomeTittle = "Outros Rendimentos"
+            if(uiState.otherIncomeDocsState?.state == ApplicationDocumentTypeState.COMPLETED.state){
+                otherIncomeBgColor = documentsCompletedColor
+                otherIncomeTittle += " (Completo)"
+            }
+            else if(uiState.otherIncomeDocsState?.state == ApplicationDocumentTypeState.SOMETHING_WRONG.state){
+                otherIncomeBgColor = documentsWrongColor
+            }
+            ApplicationDocuments(
+                documentsList = uiState.documentsOtherIncome,
+                tittle = otherIncomeTittle,
+                bgColor = otherIncomeBgColor,
+                onDownloadFile = onDownloadFile
+            )
+
+            var permanentExpensesBgColor = Color.White
+            var permanentExpensesTittle = "Despesas Permanentes"
+            if(uiState.permanentExpensesDocsState?.state == ApplicationDocumentTypeState.COMPLETED.state){
+                permanentExpensesBgColor = documentsCompletedColor
+                permanentExpensesTittle += " (Completo)"
+            }
+            else if(uiState.permanentExpensesDocsState?.state == ApplicationDocumentTypeState.SOMETHING_WRONG.state){
+                permanentExpensesBgColor = documentsWrongColor
+            }
+            ApplicationDocuments(
+                documentsList = uiState.documentsPermanentExpenses,
+                tittle = permanentExpensesTittle,
+                bgColor = permanentExpensesBgColor,
+                onDownloadFile = onDownloadFile
+            )
+
+            var internationalSupportBgColor = Color.White
+            var internationalSupportTittle = "Apoio Internacional"
+            if(uiState.internationalSupportDocsState?.state == ApplicationDocumentTypeState.COMPLETED.state){
+                internationalSupportBgColor = documentsCompletedColor
+                internationalSupportTittle += " (Completo)"
+            }
+            else if(uiState.internationalSupportDocsState?.state == ApplicationDocumentTypeState.SOMETHING_WRONG.state){
+                internationalSupportBgColor = documentsWrongColor
+            }
+            ApplicationDocuments(
+                documentsList = uiState.documentsInternationalSupport,
+                tittle = internationalSupportTittle,
+                bgColor = internationalSupportBgColor,
+                onDownloadFile = onDownloadFile
+            )
         }
     }
 }
@@ -275,37 +265,56 @@ fun ApplicationStateAdminContent(
 @Composable
 fun ApplicationData(
     application: ApplicationModelReceiver,
-    bgColor: Color,
-    onSubmitMessage: (Int, String) -> Unit,
+    onSubmitMessage: (String) -> Unit,
+    onAcceptApplicationData:() -> Unit,
 ) {
-    var showAlertBox by remember { mutableStateOf(false) }
+    var showAlertDenyDataBox by remember { mutableStateOf(false) }
+    var showAlertAcceptDataBox by remember { mutableStateOf(false) }
+
     AlertInputComponent(
-        show = showAlertBox,
-        label = "candidatura",
+        show = showAlertDenyDataBox,
         title = "Não Aceitar",
+        icon = Icons.Filled.Warning,
+        color = Color(0xFFCF1322),
         message = "Escreve o motivo por estes dados não serem aceites.",
-        onConfirm = { msg -> onSubmitMessage(application.applicationDataState.id!!, msg)},
-        onDismiss = {showAlertBox = false}
+        onConfirm = { msg -> onSubmitMessage(msg)},
+        onDismiss = {showAlertDenyDataBox = false}
     )
-    CategoryBox(title = "Dados Pessoais", description = "Dados Aceites", descriptionColor = GreenIPCA,bgColor = bgColor) {
-        if (application.applicationDataState.state == ApplicationDataStatus.DENIED.status) {
-            WarningComponent(
-                tittle = "Mensagem Enviada.",
-                message = application.applicationDataState.message ?: "",
-                bgColor = Color(0xFFFFCCC7),
-                mainColor = Color(0xFFCF1322),
-                icon = Icons.Default.Warning
-            )
-        }
-        if (application.applicationDataState.state == ApplicationDataStatus.ACCEPTED.status) {
-            WarningComponent(
-                tittle = "Dados Aceites",
-                message = "",
-                bgColor = Color(0x120FFC0B),
-                mainColor = GreenIPCA,
-                icon = Icons.Default.Warning
-            )
-        }
+
+    AlertComponent(
+        show = showAlertAcceptDataBox,
+        title = "Aceitar",
+        icon = Icons.Filled.CheckBox,
+        color = GreenIPCA,
+        message = "De certeza que queres aceitar esta candidatura?",
+        onConfirm = onAcceptApplicationData,
+        onDismiss = {showAlertAcceptDataBox = false}
+    )
+
+    var dataCategoryDesc: String = ""
+    var dataCategoryDescTextColor: Color = Color.Black
+    var dataCategoryDescBgTextColor: Color = Color.White
+    if(application.applicationDataState.state == ApplicationDataStatus.ACCEPTED.status){
+        dataCategoryDesc = "Dados Aceites"
+        dataCategoryDescTextColor = GreenIPCA
+        dataCategoryDescBgTextColor = Color(0x120FFC0B)
+    }
+    if(application.applicationDataState.state == ApplicationDataStatus.DENIED.status){
+        dataCategoryDesc = "Dados Negados"
+        dataCategoryDescTextColor = Color(0xFFCF1322)
+        dataCategoryDescBgTextColor = Color(0x1BFF0000)
+    }
+    if(application.applicationDataState.state == ApplicationDataStatus.TO_REVIEW.status){
+        dataCategoryDesc = "Por Rever"
+        dataCategoryDescTextColor = Color(0xFFDAA210)
+        dataCategoryDescBgTextColor = Color(0x43DAA210)
+    }
+
+    CategoryBox(
+        title = "Dados Pessoais",
+        description = dataCategoryDesc,
+        descriptionTextColor = dataCategoryDescTextColor,
+        descriptionBgTextColor = dataCategoryDescBgTextColor) {
         ReadOnlyField("Nome Completo", application.name)
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             Box(Modifier.weight(1f)) {
@@ -331,12 +340,11 @@ fun ApplicationData(
 
         if(application.applicationDataState.state == ApplicationDataStatus.TO_REVIEW.status){
             HorizontalDivider(modifier = Modifier.padding(bottom = 10.dp))
-
             Column(verticalArrangement = Arrangement.spacedBy(20.dp)
             ) {
                 Row(horizontalArrangement = Arrangement.SpaceEvenly) {
                     Button(
-                        onClick = {  },
+                        onClick = {showAlertAcceptDataBox = true},
                         modifier = Modifier
                             .padding(5.dp)
                             .weight(1f)
@@ -347,7 +355,7 @@ fun ApplicationData(
                         Text("Aceitar")
                     }
                     Button(
-                        onClick = { showAlertBox = true },
+                        onClick = { showAlertDenyDataBox = true },
                         modifier = Modifier
                             .padding(5.dp)
                             .weight(1f)

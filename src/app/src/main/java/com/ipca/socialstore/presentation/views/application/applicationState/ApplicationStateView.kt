@@ -40,6 +40,7 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -73,6 +74,7 @@ import com.ipca.socialstore.presentation.ui.components.ButtonTracedComponent
 import com.ipca.socialstore.presentation.ui.components.ExpandableSection
 import com.ipca.socialstore.presentation.ui.components.ReadOnlyField
 import com.ipca.socialstore.presentation.ui.components.WarningComponent
+import com.ipca.socialstore.presentation.ui.theme.GreenIPCA
 import com.ipca.socialstore.presentation.ui.theme.SocialStoreTheme
 import com.ipca.socialstore.presentation.utils.getFileNameFromUri
 import com.ipca.socialstore.presentation.views.application.status.TimelineLine
@@ -189,6 +191,8 @@ fun ApplicationStateViewContent(
         AlertComponent(
             show = showAlertBox,
             title = "Eliminar Candidatura",
+            icon = Icons.Default.Warning,
+            color = Color(0xFFFF5252),
             message = "Tens a certeza que queres eliminar o ficheiro?",
             onConfirm = {onDeleteApplication()},
             onDismiss = {showAlertBox = false}
@@ -200,16 +204,41 @@ fun ApplicationStateViewContent(
             isExpanded = isDataExpanded,
             onExpandChange = { isDataExpanded = it }
         ) {
-            if (uiState.application.applicationDataState.state == ApplicationDataStatus.DENIED.status)
+            if (uiState.application.applicationDataState.state == ApplicationDataStatus.DENIED.status){
                 WarningComponent(
-                    tittle = "Correção Necessária.",
+                    tittle = "Correção Necessár00ia.",
                     message = uiState.application.applicationDataState.message ?: "",
                     bgColor = Color(0xFFFFCCC7),
                     mainColor = Color(0xFFCF1322),
                     icon = Icons.Default.Warning
                 )
+            }
+            var dataCategoryDesc: String = ""
+            var dataCategoryDescTextColor: Color = Color.Black
+            var dataCategoryDescBgTextColor: Color = Color.White
+            if(uiState.application.applicationDataState.state == ApplicationDataStatus.ACCEPTED.status){
+                dataCategoryDesc = "Dados Aceites"
+                dataCategoryDescTextColor = GreenIPCA
+                dataCategoryDescBgTextColor = Color(0x120FFC0B)
+            }
+            if(uiState.application.applicationDataState.state == ApplicationDataStatus.DENIED.status){
+                dataCategoryDesc = "Dados Negados"
+                dataCategoryDescTextColor = Color(0xFFCF1322)
+                dataCategoryDescBgTextColor = Color(0x1BFF0000)
+            }
+            if(uiState.application.applicationDataState.state == ApplicationDataStatus.TO_REVIEW.status){
+                dataCategoryDesc = "Por Rever"
+                dataCategoryDescTextColor = Color(0xFFDAA210)
+                dataCategoryDescBgTextColor = Color(0x43DAA210)
+            }
+
             if (uiState.application.applicationDataState.state != ApplicationDataStatus.DENIED.status) {
-                CategoryBox(title = "Dados Pessoais", bgColor = Color.White) {
+                CategoryBox(
+                    title = "Dados Pessoais",
+                    description = dataCategoryDesc,
+                    descriptionTextColor = dataCategoryDescTextColor,
+                    descriptionBgTextColor = dataCategoryDescBgTextColor
+                ) {
                     ReadOnlyField("Nome Completo", uiState.application.name)
                     Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                         Box(Modifier.weight(1f)) {
@@ -265,9 +294,14 @@ fun ApplicationStateViewContent(
                 }
             }
             else {
-                CategoryBox(title = "Dados Pessoais", bgColor = Color.White) {
+                CategoryBox(
+                    title = "Dados Pessoais",
+                    description = dataCategoryDesc,
+                    descriptionTextColor = dataCategoryDescTextColor,
+                    descriptionBgTextColor = dataCategoryDescBgTextColor
+                ) {
                     ApplicationForm(
-                        modifier = Modifier, // Optional: add padding or fillMaxSize here if needed
+                        modifier = Modifier,
                         name = uiState.application.name,
                         birthDate = uiState.application.birthDate,
                         cc = uiState.application.cc,
@@ -629,8 +663,9 @@ fun TimelineStep(number: String, label: String, isActive: Boolean, isCompleted: 
 fun CategoryBox(
     title: String,
     description: String? = null,
-    descriptionColor: Color = Color.Black,
-    bgColor: Color,
+    descriptionTextColor: Color = Color.Black,
+    descriptionBgTextColor: Color = Color.White,
+    bgColor: Color = Color.White,
     content: @Composable ColumnScope.() -> Unit
 ) {
     Card(
@@ -642,9 +677,22 @@ fun CategoryBox(
         Column(modifier = Modifier.padding(16.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(title, fontWeight = FontWeight.Bold, fontSize = 15.sp, color = Color(0xFF263238))
+                if(description != null){
+                    Surface(
+                        modifier = Modifier.padding(start = 15.dp),
+                        color = descriptionBgTextColor,
+                        shape = RoundedCornerShape(16.dp),
+                    ) {
+                        Text(
+                            text = description,
+                            color = descriptionTextColor,
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                        )
+                    }
+                }
             }
-            if(description != null)
-                Text(description, fontWeight = FontWeight.Normal, fontSize = 12.sp, color = descriptionColor)
             Divider(modifier = Modifier.padding(vertical = 12.dp), color = Color(0xFFEEEEEE))
             content()
         }

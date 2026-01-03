@@ -29,6 +29,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -40,7 +41,8 @@ fun AlertInputComponent(
     show: Boolean,
     title: String,
     message: String,
-    label: String,
+    icon: ImageVector,
+    color: Color,
     onConfirm: (String) -> Unit,
     onDismiss: () -> Unit
 ) {
@@ -62,7 +64,7 @@ fun AlertInputComponent(
                     verticalArrangement = Arrangement.Center
                 ) {
                     Icon(
-                        imageVector = Icons.Default.Edit, // Mudei para ícone de edição
+                        imageVector = icon, // Mudei para ícone de edição
                         contentDescription = null,
                         tint = Color(0xFFFF5252),
                         modifier = Modifier.size(48.dp)
@@ -92,15 +94,14 @@ fun AlertInputComponent(
                     OutlinedTextField(
                         value = text,
                         onValueChange = { text = it },
-                        label = { Text(label) },
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(12.dp),
                         singleLine = false,
                         maxLines = 4,
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = Color(0xFFFF5252),
-                            focusedLabelColor = Color(0xFFFF5252),
-                            cursorColor = Color(0xFFFF5252)
+                            focusedBorderColor = color,
+                            focusedLabelColor = color,
+                            cursorColor = color
                         )
                     )
 
@@ -129,8 +130,8 @@ fun AlertInputComponent(
                             enabled = text.isNotBlank(),
                             shape = RoundedCornerShape(50),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = Color(0xFFFF5252),
-                                disabledContainerColor = Color(0xFFFF5252).copy(alpha = 0.5f)
+                                containerColor = color,
+                                disabledContainerColor = color.copy(alpha = 0.5f)
                             ),
                             modifier = Modifier.weight(1f).padding(start = 8.dp)
                         ) {

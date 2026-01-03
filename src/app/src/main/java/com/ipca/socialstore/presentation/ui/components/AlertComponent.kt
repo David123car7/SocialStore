@@ -25,6 +25,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -35,6 +36,8 @@ import androidx.compose.ui.window.Dialog
 fun AlertComponent(
     show: Boolean,
     title: String,
+    icon: ImageVector,
+    color: Color,
     message: String,
     onConfirm: () -> Unit,
     onDismiss: () -> Unit
@@ -55,9 +58,9 @@ fun AlertComponent(
                     verticalArrangement = Arrangement.Center
                 ) {
                     Icon(
-                        imageVector = Icons.Default.Warning, // Ou Delete
+                        imageVector = icon, // Ou Delete
                         contentDescription = null,
-                        tint = Color(0xFFFF5252), // Vermelho suave
+                        tint = color, // Vermelho suave
                         modifier = Modifier.size(48.dp)
                     )
 
@@ -90,16 +93,23 @@ fun AlertComponent(
                             onClick = onDismiss,
                             shape = RoundedCornerShape(50),
                             border = BorderStroke(1.dp, Color.Gray),
-                            modifier = Modifier.weight(1f).padding(end = 8.dp)
+                            modifier = Modifier
+                                .weight(1f)
+                                .padding(end = 8.dp)
                         ) {
                             Text("Não", color = Color.Gray)
                         }
 
                         Button(
-                            onClick = onConfirm,
+                            onClick = {
+                                onConfirm()
+                                onDismiss()
+                            },
                             shape = RoundedCornerShape(50),
-                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF5252)),
-                            modifier = Modifier.weight(1f).padding(start = 8.dp)
+                            colors = ButtonDefaults.buttonColors(containerColor = color),
+                            modifier = Modifier
+                                .weight(1f)
+                                .padding(start = 8.dp)
                         ) {
                             Text("Sim", color = Color.White)
                         }
