@@ -1,6 +1,7 @@
 package com.ipca.socialstore.presentation.views.application.applicationStateAdmin
 
 import android.net.Uri
+import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -70,7 +71,6 @@ class ApplicationStateAdminViewModel @Inject constructor(
 
     val applicationId: String? = savedStateHandle["applicationId"]
 
-
     init {
         viewModelScope.launch {
             getApplication(applicationId?.toIntOrNull())
@@ -99,9 +99,9 @@ class ApplicationStateAdminViewModel @Inject constructor(
         }
     }
 
-    fun updateApplicationDataState(id: Int, message: String) {
+    fun updateApplicationDataState(state: String, message: String) {
         val applicationDataStateModel = ApplicationDataStateModel(
-            id = id, state = ApplicationDataStatus.DENIED.status, message = message
+            id = uiState.value.application.applicationDataState.id, state = state, message = message
         )
         viewModelScope.launch {
             uiState.value = uiState.value.copy(isLoading = true)

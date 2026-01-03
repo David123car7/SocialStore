@@ -33,12 +33,16 @@ class ApplicationDataStateRepository @Inject constructor(
             return ResultWrapper.Error(AppError.UnknownError("Appllication Data State Id Null"))
 
         return try {
-            supabaseClient.from(DatabaseTables.APPLICATION_DATA_STATE).update(applicationDataState) {
+            val result = supabaseClient.from(DatabaseTables.APPLICATION_DATA_STATE).update(applicationDataState) {
                 filter {
                     eq("id", applicationDataState.id)
                 }
+                select(columns = Columns.list("id"))
+            }.decodeSingleOrNull<TableIdModel>()
+            if (result == null) {
+                return ResultWrapper.Error(AppError.DataNotFound)
             }
-            ResultWrapper.Success(applicationDataState.id)
+            ResultWrapper.Success(result.id)
         } catch (e: Exception) {
             ResultWrapper.Error(exceptionMapper.map(e))
         }
