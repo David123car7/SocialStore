@@ -9,6 +9,8 @@ sealed class AdminRoutes {
     // --- Applications ---
     @Serializable
     object ListApplications: AdminRoutes()
+    @Serializable
+    object ApplicationState: AdminRoutes()
 
     // --- Campaigns ---
     @Serializable

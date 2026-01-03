@@ -15,9 +15,11 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.ipca.socialstore.Work.StockWorkManager
 import com.ipca.socialstore.presentation.views.authentication.login.LoginView
 import com.ipca.socialstore.presentation.main.MainViewModel
@@ -39,6 +41,8 @@ import com.ipca.socialstore.presentation.ui.theme.SocialStoreTheme
 import com.ipca.socialstore.presentation.utils.NavigationLogic
 import com.ipca.socialstore.presentation.views.application.applicationInfo.ApplicationInfoView
 import com.ipca.socialstore.presentation.views.application.applicationState.ApplicationStateView
+import com.ipca.socialstore.presentation.views.application.applicationStateAdmin.AplicationStateAdminView
+import com.ipca.socialstore.presentation.views.application.applicationStateAdmin.ApplicationStateAdminViewModel
 import com.ipca.socialstore.presentation.views.application.createApplication.CreateApplicationView
 import com.ipca.socialstore.presentation.views.application.listApplications.ListApplicationsView
 import com.ipca.socialstore.presentation.views.authentication.resetPassword.ResetPasswordView
@@ -128,6 +132,14 @@ class MainActivity : ComponentActivity() {
                         composable <AdminRoutes.CreateDonation>{
                             CreateDonationView(modifier = Modifier.padding(innerPadding), navController = navController)
                         }
+                        composable(
+                            route = AdminRoutes.ApplicationState::class.qualifiedName!! + "/{applicationId}",
+                            arguments = listOf(
+                                navArgument("applicationId") { type = NavType.StringType }
+                            )
+                        ) {
+                            AplicationStateAdminView(modifier = Modifier.padding(innerPadding), navController = navController, userRole = mainState.userRole)
+                        }
                         composable <AdminRoutes.SelectStock>{
                             StockItemDetailView(modifier = Modifier.padding(innerPadding), navController = navController, viewModel = stockViewModel)
                         }
@@ -138,6 +150,7 @@ class MainActivity : ComponentActivity() {
                             NotificationHistoryView(modifier = Modifier.padding(innerPadding), navController = navController)
                         }
                     }
+
                     LaunchedEffect(mainState.isLoggedIn) {
                         NavigationLogic.navigateTo(
                             navController = navController,

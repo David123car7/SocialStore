@@ -19,14 +19,17 @@ class GetUserApplicationService @Inject constructor(
     private val applicationDataStateRepository: ApplicationDataStateRepository,
     private val academicRepository: AcademicRepository
 ) {
-    suspend operator fun invoke(): ResultWrapper<ApplicationModelReceiver> {
-        val uidResult = authRepository.getUserUid()
-        if (uidResult is ResultWrapper.Error) return ResultWrapper.Error(uidResult.error)
-        val uid = (uidResult as ResultWrapper.Success).data
+    suspend operator fun invoke(appId: Int? = null): ResultWrapper<ApplicationModelReceiver> {
+        var applicationId = appId
+        if(applicationId == null){
+            val uidResult = authRepository.getUserUid()
+            if (uidResult is ResultWrapper.Error) return ResultWrapper.Error(uidResult.error)
+            val uid = (uidResult as ResultWrapper.Success).data
 
-        val applicationIdResult = userRepository.getUserApplicationId(uid = uid)
-        if (applicationIdResult is ResultWrapper.Error) return ResultWrapper.Error(applicationIdResult.error)
-        val applicationId = (applicationIdResult as ResultWrapper.Success).data
+            val applicationIdResult = userRepository.getUserApplicationId(uid = uid)
+            if (applicationIdResult is ResultWrapper.Error) return ResultWrapper.Error(applicationIdResult.error)
+            applicationId = (applicationIdResult as ResultWrapper.Success).data
+        }
 
         val applicationResult = applicationRepository.getApplication(applicationId)
         if (applicationResult is ResultWrapper.Error)

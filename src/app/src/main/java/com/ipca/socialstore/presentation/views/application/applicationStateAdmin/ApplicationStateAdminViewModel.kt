@@ -2,6 +2,7 @@ package com.ipca.socialstore.presentation.views.application.applicationStateAdmi
 
 import android.net.Uri
 import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ipca.socialstore.data.enums.ApplicationDataStatus
@@ -13,6 +14,7 @@ import com.ipca.socialstore.data.resultwrappers.ResultWrapper
 import com.ipca.socialstore.domain.appDocType.GetAppDocTypesUseCase
 import com.ipca.socialstore.domain.application.UpdateApplicationDataStateUseCase
 import com.ipca.socialstore.domain.services.application.GetAllAplicationsService
+import com.ipca.socialstore.domain.services.application.GetUserApplicationService
 import com.ipca.socialstore.domain.services.document.GetApplicationDocumentsService
 import com.ipca.socialstore.domain.storage.DownloadFileUseCase
 import com.ipca.socialstore.presentation.models.ApplicationModelReceiver
@@ -47,11 +49,13 @@ data class ApplicationAdminState(
 
 @HiltViewModel
 class ApplicationStateAdminViewModel @Inject constructor(
+    private val getUserApplicationService: GetUserApplicationService,
     private val updateApplicationDataStateUseCase: UpdateApplicationDataStateUseCase,
     private val getApplicationDocumentsService: GetApplicationDocumentsService,
     private val getAppDocTypesUseCase: GetAppDocTypesUseCase,
     private val downloadFileUseCase: DownloadFileUseCase,
-    private val fileSaveManager: FileSaveManager) : ViewModel(){
+    private val fileSaveManager: FileSaveManager,
+    savedStateHandle: SavedStateHandle) : ViewModel(){
     var uiState = mutableStateOf(ApplicationAdminState())
     sealed class DownloadEvent {
         object Loading : DownloadEvent()
@@ -63,6 +67,37 @@ class ApplicationStateAdminViewModel @Inject constructor(
     private val _downloadEvent = Channel<DownloadEvent>()
     val downloadEvent = _downloadEvent.receiveAsFlow()
     private var pendingFileBytes: ByteArray? = null
+
+    val applicationId: String? = savedStateHandle["applicationId"]
+
+
+    init {
+        viewModelScope.launch {
+            getApplication(applicationId?.toIntOrNull())
+        }
+    }
+
+    fun getApplication(applicationId: Int?){
+        if(applicationId == null) return
+        viewModelScope.launch {
+            val applicationResult = getUserApplicationService(appId = applicationId)
+            when(applicationResult){
+                is ResultWrapper.Success -> {
+                    uiState.value = uiState.value.copy(
+                        application = applicationResult.data,
+                        isLoading = false,
+                    )
+                    getApplicationDocuments(applicationId = applicationId)
+                }
+                is ResultWrapper.Error -> {
+                    uiState.value = uiState.value.copy(
+                        isLoading = false,
+                        error = applicationResult.error.asUiText()
+                    )
+                }
+            }
+        }
+    }
 
     fun updateApplicationDataState(id: Int, message: String) {
         val applicationDataStateModel = ApplicationDataStateModel(
