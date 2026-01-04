@@ -75,7 +75,6 @@ fun SchedulingManagementContent(
                 BeneficiaryCard(
                     item.name,
                     item.id.toString(),
-                    item.createdAt,
                     status = "Regular",
                     onClick = {onClick(item)}
                 )
@@ -89,7 +88,6 @@ fun SchedulingManagementContent(
 fun BeneficiaryCard(
     name: String,
     processNumber: String,
-    lastInteraction: String,
     status: String,
     onClick: () -> Unit
 ) {
@@ -125,11 +123,6 @@ fun BeneficiaryCard(
 
                 Spacer(modifier = Modifier.height(4.dp))
 
-                Text(
-                    text = "Última: $lastInteraction",
-                    style = MaterialTheme.typography.labelSmall,
-                    color = Color(0xFF136342)
-                )
             }
             Surface(
                 color = if (status == "Falta") Color(0xFFFFDAD4) else Color(0xFFE8F5E9),

@@ -5,10 +5,13 @@ import com.ipca.socialstore.data.exceptions.AppError
 import com.ipca.socialstore.data.exceptions.ExceptionMapper
 import com.ipca.socialstore.data.helpers.from
 import com.ipca.socialstore.data.models.BeneficiaryModel
+import com.ipca.socialstore.data.models.SchedulingModel
 import com.ipca.socialstore.data.models.TableIdModel
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.postgrest.query.Columns
+import io.github.jan.supabase.postgrest.query.PostgrestQueryBuilder
+import io.github.jan.supabase.postgrest.query.request.SelectRequestBuilder
 import javax.inject.Inject
 
 class BeneficiaryRepository  @Inject constructor(private val supabase : SupabaseClient, private val exceptionMapper: ExceptionMapper){
@@ -72,6 +75,8 @@ class BeneficiaryRepository  @Inject constructor(private val supabase : Supabase
             return ResultWrapper.Error(exceptionMapper.map(e))
         }
     }
+
+
 
 }
 

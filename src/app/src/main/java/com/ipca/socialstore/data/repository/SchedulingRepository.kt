@@ -95,5 +95,54 @@ class SchedulingRepository @Inject constructor(
         }
     }
 
+    suspend fun updateReason(schedulingId: Int, newReason: String): ResultWrapper<SchedulingModel> {
+        return try {
+            val result = supabase.from(DatabaseTables.SCHEDULING)
+                .update(
+                    {
+                        set("reason", newReason)
+                        set("state", "justified")
+                    }
+                ) {
+                    filter {
+                        eq("id", schedulingId)
+                    }
+                }.decodeSingle<SchedulingModel>()
+
+            ResultWrapper.Success(result)
+        } catch (e: Exception) {
+            ResultWrapper.Error(exceptionMapper.map(e))
+        }
+    }
+
+    suspend fun getBeneficiaryBySchedulingId(schedulingId : Int) : ResultWrapper<SchedulingModel>{
+        return try {
+            val result = supabase.from(DatabaseTables.SCHEDULING)
+                .select {
+                    filter {
+                        eq("id",schedulingId )
+                    }
+                }.decodeSingle<SchedulingModel>()
+            ResultWrapper.Success(result)
+        }catch (e : Exception){
+            return ResultWrapper.Error(exceptionMapper.map(e))
+        }
+    }
+
+    suspend fun getSchedulingById(id: Int): ResultWrapper<SchedulingModel>{
+        return try {
+            val result = supabase.from(DatabaseTables.SCHEDULING)
+                .select{
+                    filter {
+                        eq("id", id)
+                    }
+                }
+            val response = result.decodeSingle<SchedulingModel>()
+            ResultWrapper.Success(response)
+        } catch (e: Exception) {
+            ResultWrapper.Error(exceptionMapper.map(e))
+        }
+    }
+
 
 }

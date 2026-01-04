@@ -15,7 +15,10 @@ data class SchedulingModel(
     val beneficiaryId : Int,
 
     @SerialName("state")
-    val state : String
+    val state : String,
+
+    @SerialName("reason")
+    val reason : String?,
 
 
 )

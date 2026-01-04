@@ -251,13 +251,13 @@ fun SchedulingItem(date: String, type: String) {
         Icon(Icons.Default.KeyboardArrowRight, null, tint = Color.Gray)
     }
 }
+/*
 @Preview(showBackground = true)
 @Composable
 fun Preview() {
     SocialStoreTheme {
         val mockBeneficiary = BeneficiaryModel(
             id = 12345,
-            createdAt = "now",
             name = "Alice Pereira",
             birthDate = "12/05/2003",
             addressId = 1
@@ -275,3 +275,6 @@ fun Preview() {
         )
     }
 }
+
+
+ */
