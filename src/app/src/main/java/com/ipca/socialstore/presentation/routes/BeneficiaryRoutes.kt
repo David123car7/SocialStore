@@ -9,4 +9,7 @@ sealed class BeneficiaryRoutes {
 
     @Serializable
     object BeneficiaryScheduling : BeneficiaryRoutes()
+
+    @Serializable
+    object JustifyScheduling : BeneficiaryRoutes()
 }

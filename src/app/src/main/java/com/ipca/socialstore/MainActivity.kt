@@ -35,6 +35,7 @@ import com.ipca.socialstore.presentation.views.stock.List.ListAllStockViewModel
 import com.ipca.socialstore.presentation.views.stock.List.StockItemDetailView
 import com.ipca.socialstore.presentation.ui.theme.SocialStoreTheme
 import com.ipca.socialstore.presentation.utils.NavigationLogic
+import com.ipca.socialstore.presentation.views.Scheduling.cancelByUser.JustificationScreenView
 import com.ipca.socialstore.presentation.views.Scheduling.listAllSchedulingUser.ListAllSchedulingUserView
 import com.ipca.socialstore.presentation.views.Scheduling.mainPage.SchedulingMainPageView
 import com.ipca.socialstore.presentation.views.Scheduling.management.SchedulingManagementView
@@ -176,6 +177,17 @@ class MainActivity : ComponentActivity() {
                         }
                         composable <BeneficiaryRoutes.BeneficiaryScheduling>{
                             ListAllSchedulingUserView(modifier = Modifier.padding(innerPadding), navController = navController)
+                        }
+                        composable(
+                            route = BeneficiaryRoutes.JustifyScheduling::class.qualifiedName!! + "/{schedulingId}",
+                            arguments = listOf(
+                                navArgument("schedulingId") { type = NavType.StringType }
+                            )
+                        ) {
+                            JustificationScreenView(
+                                modifier = Modifier.padding(innerPadding),
+                                navController = navController
+                            )
                         }
                     }
 

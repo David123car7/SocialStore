@@ -7,10 +7,6 @@ import kotlinx.serialization.Serializable
 data class UserModel(
     @SerialName("id")
     val id: String?,
-
-    @SerialName("profile_id")
-    val profileId: Int?,
-
     @SerialName("role")
     val role: String,
 
