@@ -9,11 +9,14 @@ import com.ipca.socialstore.data.models.TableIdModel
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.postgrest.query.Columns
+import io.github.jan.supabase.postgrest.query.Count
+import java.util.Calendar
 import javax.inject.Inject
 
 class SchedulingRepository @Inject constructor(
     private val supabase: SupabaseClient,
-    private val exceptionMapper: ExceptionMapper){
+    private val exceptionMapper: ExceptionMapper)
+{
 
     suspend fun createScheduling(scheduling : SchedulingModel) : ResultWrapper<Int> {
         return try {
@@ -27,4 +30,70 @@ class SchedulingRepository @Inject constructor(
             ResultWrapper.Error(exceptionMapper.map(e))
         }
     }
+
+    suspend fun getSchedulingByMonth(month: Int, year: Int): ResultWrapper<List<SchedulingModel>> {
+        val monthStr = month.toString().padStart(2, '0')
+        val firstDay = "$year-$monthStr-01"
+
+        val nextMonth = if (month == 12) 1 else month + 1
+        val nextYear = if (month == 12) year + 1 else year
+        val nextMonthStr = nextMonth.toString().padStart(2, '0')
+        val firstDayNextMonth = "$nextYear-$nextMonthStr-01"
+
+        return try {
+            val scheduling = supabase.from(DatabaseTables.SCHEDULING)
+                .select {
+                    filter {
+                        and {
+                            gte("scheduling_date", firstDay)
+                            lt("scheduling_date", firstDayNextMonth)
+                            neq("state", "canceled")
+                        }
+
+                    }
+                }
+                .decodeList<SchedulingModel>()
+
+            println("Query rigorosa: $firstDay até < $firstDayNextMonth")
+            println(scheduling)
+            ResultWrapper.Success(scheduling)
+        } catch (e: Exception) {
+            ResultWrapper.Error(exceptionMapper.map(e))
+        }
+    }
+
+    suspend fun cancelScheduling(id: Int): ResultWrapper<Boolean> {
+        return try {
+            supabase.from(DatabaseTables.SCHEDULING)
+                .update(
+                    {
+                        set("state", "canceled")
+                    }
+                ) {
+                    filter {
+                        eq("id", id)
+                    }
+                }
+            ResultWrapper.Success(true)
+        } catch (e: Exception) {
+            ResultWrapper.Error(exceptionMapper.map(e))
+        }
+    }
+
+    suspend fun getSchedulingByBeneficiaryId(id: Int): ResultWrapper<List<SchedulingModel>>{
+        return try {
+            val result = supabase.from(DatabaseTables.SCHEDULING)
+                .select{
+                    filter {
+                        eq("beneficiary_id", id)
+                    }
+                }
+            val response = result.decodeList<SchedulingModel>()
+            ResultWrapper.Success(response)
+        } catch (e: Exception) {
+            ResultWrapper.Error(exceptionMapper.map(e))
+        }
+    }
+
+
 }

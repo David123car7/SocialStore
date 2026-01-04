@@ -6,4 +6,7 @@ import kotlinx.serialization.Serializable
 sealed class BeneficiaryRoutes {
     @Serializable
     object BeneficiaryHome: BeneficiaryRoutes()
+
+    @Serializable
+    object BeneficiaryScheduling : BeneficiaryRoutes()
 }

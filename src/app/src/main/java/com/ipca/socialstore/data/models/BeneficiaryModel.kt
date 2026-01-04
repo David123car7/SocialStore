@@ -8,9 +8,12 @@ data class BeneficiaryModel(
 
     val id : Int? = null,
 
-    @SerialName("createdAt")
+    @SerialName("created_At")
     val createdAt : String,
-
-    @SerialName("uid")
-    val uid : Int,
+    @SerialName("name")
+    val name : String,
+    @SerialName("birth_date")
+    val birthDate : String,
+    @SerialName("address_id")
+    val addressId : Int
 )

@@ -114,12 +114,10 @@ private fun StockList(
     val itemTypes = remember(items) {
         items?.map { it.item.itemType }?.filter { it!!.isNotBlank() }?.distinct() ?: emptyList()
     }
-
-    // Box principal para garantir que o FAB fique por cima de tudo
+    
     Box(modifier = modifier.fillMaxSize()) {
         Column(modifier = Modifier.fillMaxSize()) {
 
-            // 1. BARRA DE PESQUISA E FILTROS SEMPRE FORA DA LÓGICA DE VAZIO
             SearchBarContent { newValue -> onSearchItem(newValue) }
             HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
