@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-enum class ApplicationStatus(val status: String) {
+enum class ApplicationStates(val status: String) {
     @SerialName("pending")
     PENDING("pending"),
 

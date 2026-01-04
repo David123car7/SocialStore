@@ -13,7 +13,7 @@ class CreateAllAppDocTypesUseCase @Inject constructor(private val appDocTypeRep:
             val appDocType = ApplicationDocumentTypeModel(
                 applicationId = applicationId,
                 type = type.folderName,
-                state = ApplicationDocumentTypeState.NOT_COMPLETED.state,
+                state = ApplicationDocumentTypeState.TO_REVIEW.state,
                 description = null
             )
 

@@ -27,6 +27,26 @@ class ApplicationDocumentTypeRepository @Inject constructor(
         }
     }
 
+    suspend fun updateApplicationDocumentType(applicationDocState: ApplicationDocumentTypeModel): ResultWrapper<Int> {
+        val id = applicationDocState.id
+            ?: return ResultWrapper.Error(AppError.UnknownError("Application Document Type Id Null"))
+        return try {
+            val result = supabaseClient.from(DatabaseTables.APPLICATION_DOCUMENT_TYPE)
+                .update(applicationDocState) {
+                    filter {
+                        eq("id", id)
+                    }
+                    select(columns = Columns.list("id"))
+                }.decodeSingleOrNull<TableIdModel>()
+            if (result == null) {
+                return ResultWrapper.Error(AppError.DataNotFound)
+            }
+            ResultWrapper.Success(result.id)
+        } catch (e: Exception) {
+            ResultWrapper.Error(exceptionMapper.map(e))
+        }
+    }
+
     suspend fun deleteApplicationDocumentType(id: Int): ResultWrapper<Unit> {
         return try {
             supabaseClient.from(DatabaseTables.APPLICATION_DOCUMENT_TYPE).delete {

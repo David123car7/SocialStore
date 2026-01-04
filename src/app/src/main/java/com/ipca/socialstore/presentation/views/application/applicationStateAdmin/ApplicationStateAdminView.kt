@@ -3,13 +3,11 @@ package com.ipca.socialstore.presentation.views.application.applicationStateAdmi
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -23,16 +21,14 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.CheckBox
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.Warning
-import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -51,28 +47,27 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.ipca.socialstore.data.enums.ApplicationDataStatus
 import com.ipca.socialstore.data.enums.ApplicationDocumentTypeState
-import com.ipca.socialstore.data.enums.ApplicationStatus
+import com.ipca.socialstore.data.enums.ApplicationStates
 import com.ipca.socialstore.data.enums.DocumentStatus
 import com.ipca.socialstore.data.enums.UserRole
+import com.ipca.socialstore.data.models.ApplicationDocumentTypeModel
 import com.ipca.socialstore.presentation.models.ApplicationModelReceiver
 import com.ipca.socialstore.presentation.models.DocumentReceiverModel
 import com.ipca.socialstore.presentation.ui.components.AlertComponent
 import com.ipca.socialstore.presentation.ui.components.AlertInputComponent
-import com.ipca.socialstore.presentation.ui.components.ExpandableSection
 import com.ipca.socialstore.presentation.ui.components.ReadOnlyField
-import com.ipca.socialstore.presentation.ui.components.WarningComponent
 import com.ipca.socialstore.presentation.ui.theme.GreenIPCA
 import com.ipca.socialstore.presentation.views.application.applicationState.CategoryBox
-import com.ipca.socialstore.presentation.views.application.listApplications.ListApplicationsViewModel
 import kotlin.collections.forEach
 
 @Composable
@@ -110,13 +105,41 @@ fun AplicationStateAdminView(modifier: Modifier, navController: NavController, u
         }
     }
 
+    LaunchedEffect(uiState.error) {
+        if(uiState.error != null){
+            Toast.makeText(context, uiState.error!!.asString(context = context), Toast.LENGTH_SHORT).show()
+        }
+    }
+
     ApplicationStateAdminContent(
         modifier = modifier,
         uiState = uiState,
         onDenyData = {msg -> viewModel.updateApplicationDataState(state = ApplicationDataStatus.DENIED.status,message = msg)},
         onDownloadFile = {fileName, filePath -> viewModel.downloadDocument(filePath = filePath, fileName = fileName)},
         goBack = {navController.popBackStack()},
-        onAcceptApplicationData = {viewModel.updateApplicationDataState(state = ApplicationDataStatus.ACCEPTED.status,message = "")}
+        onAcceptApplicationData = {viewModel.updateApplicationDataState(state = ApplicationDataStatus.ACCEPTED.status,message = "")},
+        onUpdateDocState = { doc, folderName,state, msg ->
+            if(doc != null){
+                if(state){
+                    viewModel.updateDocumentState(documentId = doc.stateId, folderName = folderName, state = DocumentStatus.ACCEPTED.status, message = msg)
+                }
+                else{
+                    viewModel.updateDocumentState(documentId = doc.id!!, folderName = folderName, state = DocumentStatus.DENIED.status, message = msg)
+                    viewModel.updateApplicationState(state = ApplicationStates.CORRECTION.status)
+                }
+            }
+        },
+        onUpdateTypeDocState = { id, state, type, msg ->
+            if(state){
+                viewModel.updateApplicationDocumentTypeState(id = id, state = ApplicationDocumentTypeState.COMPLETED.state, type =type ,message = msg)
+            }
+            else{
+                viewModel.updateApplicationDocumentTypeState(id = id, state = ApplicationDocumentTypeState.SOMETHING_WRONG.state, type =type ,message = msg)
+                viewModel.updateApplicationState(state = ApplicationStates.CORRECTION.status)
+            }
+        },
+        onDenyApplication = {},
+        onAcceptApplication = {}
     )
 }
 
@@ -127,7 +150,11 @@ fun ApplicationStateAdminContent(
     goBack:() -> Unit,
     onDenyData: (String) -> Unit,
     onAcceptApplicationData:() -> Unit,
-    onDownloadFile:(fileName: String, filePath: String)->Unit){
+    onUpdateDocState:(doc: DocumentReceiverModel?, folderName: String, state: Boolean, msg: String) -> Unit,
+    onUpdateTypeDocState:(docId: Int, state: Boolean, type: String,msg: String) -> Unit,
+    onDownloadFile:(fileName: String, filePath: String)->Unit,
+    onDenyApplication:() -> Unit,
+    onAcceptApplication:() -> Unit){
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -169,6 +196,29 @@ fun ApplicationStateAdminContent(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
+            var showAlertAcceptDocument by remember { mutableStateOf(false) }
+            var showAlertDenyDocument by remember { mutableStateOf(false) }
+            var documentSelected by remember { mutableStateOf<DocumentReceiverModel?>(null) }
+
+            AlertComponent(
+                show = showAlertAcceptDocument,
+                title = "Aceitar",
+                icon = Icons.Filled.CheckBox,
+                color = GreenIPCA,
+                message = "De certeza que queres aceitar este documento?",
+                onConfirm = {onUpdateDocState(documentSelected, documentSelected!!.folderName ,true, "")},
+                onDismiss = {showAlertAcceptDocument = false}
+            )
+
+            AlertInputComponent(
+                show = showAlertDenyDocument,
+                title = "Não Aceitar",
+                icon = Icons.Filled.Warning,
+                color = Color(0xFFCF1322),
+                message = "Escreve o motivo por este documento não ser aceito.",
+                onConfirm = { msg -> onUpdateDocState(documentSelected, documentSelected!!.folderName,false, msg )},
+                onDismiss = {showAlertDenyDocument = false}
+            )
 
             ApplicationData(
                 application = uiState.application,
@@ -176,87 +226,84 @@ fun ApplicationStateAdminContent(
                 onAcceptApplicationData = onAcceptApplicationData
             )
 
-            val documentsCompletedColor = Color(0x120FFC0B)
-            val documentsWrongColor = Color(0x1BFF0000)
-
-            var bankStatementsBgColor = Color.White
-            var bankStatementsTittle = "Extratos Bancários"
-            if(uiState.bankStatementDocsState?.state == ApplicationDocumentTypeState.COMPLETED.state){
-                bankStatementsBgColor = documentsCompletedColor
-                bankStatementsTittle += " (Completo)"
-            }
-            else if(uiState.bankStatementDocsState?.state == ApplicationDocumentTypeState.SOMETHING_WRONG.state){
-                bankStatementsBgColor = documentsWrongColor
-            }
             ApplicationDocuments(
                 documentsList = uiState.documentsBankStatements,
-                tittle = bankStatementsTittle,
-                bgColor = bankStatementsBgColor,
-                onDownloadFile = onDownloadFile
+                documentsState = uiState.bankStatementDocsState,
+                tittle = "Extratos Bancários",
+                bgColor = Color.White,
+                onDownloadFile = onDownloadFile,
+                onUpdateDocState = { doc, state ->
+                    documentSelected = doc
+                    if(state) showAlertAcceptDocument = true
+                    else showAlertDenyDocument = true
+                },
+                onUpdateTypeDocState = { id, state, type,msg ->
+                    onUpdateTypeDocState(id, state, type, msg)
+                }
             )
 
-            var incomeProofBgColor = Color.White
-            var incomeProofTittle = "Comprovativos de Rendimento"
-            if(uiState.incomeProofDocsState?.state == ApplicationDocumentTypeState.COMPLETED.state){
-                incomeProofBgColor = documentsCompletedColor
-                incomeProofTittle += " (Completo)"
-            }
-            else if(uiState.incomeProofDocsState?.state == ApplicationDocumentTypeState.SOMETHING_WRONG.state){
-                incomeProofBgColor = documentsWrongColor
-            }
             ApplicationDocuments(
                 documentsList = uiState.documentsIncomeProof,
-                tittle = incomeProofTittle,
-                bgColor = incomeProofBgColor,
-                onDownloadFile = onDownloadFile
+                documentsState = uiState.incomeProofDocsState,
+                tittle = "Comprovativos de Rendimento",
+                bgColor = Color.White,
+                onDownloadFile = onDownloadFile,
+                onUpdateDocState = { doc, state ->
+                    documentSelected = doc
+                    if(state) showAlertAcceptDocument = true
+                    else showAlertDenyDocument = true
+                },
+                onUpdateTypeDocState = { id, state, type,msg ->
+                    onUpdateTypeDocState(id, state, type, msg)
+                }
             )
 
-            var otherIncomeBgColor = Color.White
-            var otherIncomeTittle = "Outros Rendimentos"
-            if(uiState.otherIncomeDocsState?.state == ApplicationDocumentTypeState.COMPLETED.state){
-                otherIncomeBgColor = documentsCompletedColor
-                otherIncomeTittle += " (Completo)"
-            }
-            else if(uiState.otherIncomeDocsState?.state == ApplicationDocumentTypeState.SOMETHING_WRONG.state){
-                otherIncomeBgColor = documentsWrongColor
-            }
             ApplicationDocuments(
                 documentsList = uiState.documentsOtherIncome,
-                tittle = otherIncomeTittle,
-                bgColor = otherIncomeBgColor,
-                onDownloadFile = onDownloadFile
+                documentsState = uiState.otherIncomeDocsState,
+                tittle = "Outros Rendimentos",
+                bgColor = Color.White,
+                onDownloadFile = onDownloadFile,
+                onUpdateDocState = { doc, state ->
+                    documentSelected = doc
+                    if(state) showAlertAcceptDocument = true
+                    else showAlertDenyDocument = true
+                },
+                onUpdateTypeDocState = { id, state, type,msg ->
+                    onUpdateTypeDocState(id, state, type, msg)
+                }
             )
 
-            var permanentExpensesBgColor = Color.White
-            var permanentExpensesTittle = "Despesas Permanentes"
-            if(uiState.permanentExpensesDocsState?.state == ApplicationDocumentTypeState.COMPLETED.state){
-                permanentExpensesBgColor = documentsCompletedColor
-                permanentExpensesTittle += " (Completo)"
-            }
-            else if(uiState.permanentExpensesDocsState?.state == ApplicationDocumentTypeState.SOMETHING_WRONG.state){
-                permanentExpensesBgColor = documentsWrongColor
-            }
             ApplicationDocuments(
                 documentsList = uiState.documentsPermanentExpenses,
-                tittle = permanentExpensesTittle,
-                bgColor = permanentExpensesBgColor,
-                onDownloadFile = onDownloadFile
+                documentsState = uiState.permanentExpensesDocsState,
+                tittle = "Despesas Permanentes",
+                bgColor = Color.White,
+                onDownloadFile = onDownloadFile,
+                onUpdateDocState = { doc, state ->
+                    documentSelected = doc
+                    if(state) showAlertAcceptDocument = true
+                    else showAlertDenyDocument = true
+                },
+                onUpdateTypeDocState = { id, state, type,msg ->
+                    onUpdateTypeDocState(id, state, type, msg)
+                }
             )
 
-            var internationalSupportBgColor = Color.White
-            var internationalSupportTittle = "Apoio Internacional"
-            if(uiState.internationalSupportDocsState?.state == ApplicationDocumentTypeState.COMPLETED.state){
-                internationalSupportBgColor = documentsCompletedColor
-                internationalSupportTittle += " (Completo)"
-            }
-            else if(uiState.internationalSupportDocsState?.state == ApplicationDocumentTypeState.SOMETHING_WRONG.state){
-                internationalSupportBgColor = documentsWrongColor
-            }
             ApplicationDocuments(
                 documentsList = uiState.documentsInternationalSupport,
-                tittle = internationalSupportTittle,
-                bgColor = internationalSupportBgColor,
-                onDownloadFile = onDownloadFile
+                documentsState = uiState.internationalSupportDocsState,
+                tittle = "Apoio Internacional",
+                bgColor = Color.White,
+                onDownloadFile = onDownloadFile,
+                onUpdateDocState = { doc, state ->
+                    documentSelected = doc
+                    if(state) showAlertAcceptDocument = true
+                    else showAlertDenyDocument = true
+                },
+                onUpdateTypeDocState = { id, state, type,msg ->
+                    onUpdateTypeDocState(id, state, type, msg)
+                }
             )
         }
     }
@@ -374,10 +421,62 @@ fun ApplicationData(
 @Composable
 fun ApplicationDocuments(
     documentsList: List<DocumentReceiverModel>,
+    documentsState: ApplicationDocumentTypeModel,
     tittle: String,
     bgColor: Color,
+    onUpdateDocState:(doc: DocumentReceiverModel, state: Boolean)-> Unit,
+    onUpdateTypeDocState:(id: Int,state: Boolean, type: String, msg: String)-> Unit,
     onDownloadFile:(fileName: String, filePath: String)->Unit){
-    CategoryBox(title = tittle, bgColor = bgColor) {
+
+    var showAlertDenyDocsBox by remember { mutableStateOf(false) }
+    var showAlertAcceptDocsBox by remember { mutableStateOf(false) }
+
+    AlertInputComponent(
+        show = showAlertDenyDocsBox,
+        title = "Não Aceitar",
+        icon = Icons.Filled.Warning,
+        color = Color(0xFFCF1322),
+        message = "Escreve o motivo por estes documentos não serem aceites.",
+        onConfirm = { msg -> onUpdateTypeDocState(documentsState.id!!,false, documentsState.type,msg)},
+        onDismiss = {showAlertDenyDocsBox = false}
+    )
+
+    AlertComponent(
+        show = showAlertAcceptDocsBox,
+        title = "Aceitar",
+        icon = Icons.Filled.CheckBox,
+        color = GreenIPCA,
+        message = "De certeza que queres aceitar estes documentos?",
+        onConfirm = {onUpdateTypeDocState(documentsState.id!!,true, documentsState.type,"")},
+        onDismiss = {showAlertAcceptDocsBox = false}
+    )
+
+    var docCategoryDesc: String = ""
+    var docCategoryDescTextColor: Color = Color.Black
+    var docCategoryDescBgTextColor: Color = Color.White
+    if(documentsState.state == ApplicationDocumentTypeState.COMPLETED.state){
+        docCategoryDesc = "Completo"
+        docCategoryDescTextColor = GreenIPCA
+        docCategoryDescBgTextColor = Color(0x120FFC0B)
+    }
+    if(documentsState.state == ApplicationDocumentTypeState.SOMETHING_WRONG.state){
+        docCategoryDesc = "Incorreto"
+        docCategoryDescTextColor = Color(0xFFCF1322)
+        docCategoryDescBgTextColor = Color(0x1BFF0000)
+    }
+    if(documentsState.state == ApplicationDocumentTypeState.TO_REVIEW.state){
+        docCategoryDesc = "Por Rever"
+        docCategoryDescTextColor = Color(0xFFDAA210)
+        docCategoryDescBgTextColor = Color(0x43DAA210)
+    }
+
+    CategoryBox(
+        title = tittle,
+        bgColor = bgColor,
+        description = docCategoryDesc,
+        descriptionTextColor = docCategoryDescTextColor,
+        descriptionBgTextColor = docCategoryDescBgTextColor
+    ) {
         Column(
             modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -386,19 +485,23 @@ fun ApplicationDocuments(
                 var statusColor: Color
                 var icon: ImageVector
                 val status: String
+                var showUpdateButtons: Boolean
 
                 if (doc.state == DocumentStatus.ACCEPTED.status) {
                     statusColor = Color.Green
                     icon = Icons.Default.Star
                     status = "Aceite"
+                    showUpdateButtons = false
                 } else if (doc.state == DocumentStatus.TO_REVIEW.status) {
                     statusColor = Color.Gray
                     icon = Icons.Default.Star
                     status = "Por Rever"
+                    showUpdateButtons = true
                 } else {
                     statusColor = Color.Red
                     icon = Icons.Default.Star
                     status = "Não Aceite"
+                    showUpdateButtons = false
                 }
 
                 DocumentCard(
@@ -408,8 +511,40 @@ fun ApplicationDocuments(
                     statusColor = statusColor,
                     bgColor = bgColor,
                     imageVector = icon,
-                    onDownloadFile = { onDownloadFile(doc.name, doc.path) }
+                    showUpdateButtons = showUpdateButtons,
+                    onDownloadFile = { onDownloadFile(doc.name, doc.path)},
+                    onAcceptFile = { onUpdateDocState(doc, true)},
+                    onDenyFile = {onUpdateDocState(doc, false)}
                 )
+            }
+            if(documentsState.state == ApplicationDocumentTypeState.TO_REVIEW.state){
+                Column(verticalArrangement = Arrangement.spacedBy(20.dp)
+                ) {
+                    Row(horizontalArrangement = Arrangement.SpaceEvenly) {
+                        Button(
+                            onClick = {showAlertAcceptDocsBox = true},
+                            modifier = Modifier
+                                .padding(5.dp)
+                                .weight(1f)
+                                .height(40.dp),
+                            shape = RoundedCornerShape(12.dp),
+                            colors = ButtonDefaults.buttonColors(GreenIPCA)
+                        ) {
+                            Text("Aceitar")
+                        }
+                        Button(
+                            onClick = { showAlertDenyDocsBox = true },
+                            modifier = Modifier
+                                .padding(5.dp)
+                                .weight(1f)
+                                .height(40.dp),
+                            shape = RoundedCornerShape(12.dp),
+                            colors = ButtonDefaults.buttonColors(Color(0xFFCF1322))
+                        ) {
+                            Text("Rejeitar")
+                        }
+                    }
+                }
             }
         }
     }
@@ -423,41 +558,95 @@ fun DocumentCard(
     statusColor: Color,
     bgColor: Color,
     imageVector: ImageVector,
-    onDownloadFile:() -> Unit,
+    showUpdateButtons: Boolean,
+    onDownloadFile: () -> Unit,
+    onAcceptFile: () -> Unit,
+    onDenyFile: () -> Unit
 ) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(bgColor, RoundedCornerShape(6.dp))
-            .border(1.dp, statusColor.copy(alpha = 0.2f), RoundedCornerShape(6.dp))
+            .background(bgColor, RoundedCornerShape(12.dp))
+            .border(1.dp, statusColor.copy(alpha = 0.2f), RoundedCornerShape(12.dp))
             .padding(12.dp)
     ) {
         Row(
-            verticalAlignment = Alignment.CenterVertically,
+            verticalAlignment = Alignment.Top, 
             horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
-                Spacer(Modifier.width(12.dp))
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.weight(1f).padding(end = 8.dp)
+            ) {
+                Spacer(Modifier.width(4.dp))
+
                 Column {
-                    Text(fileName, fontWeight = FontWeight.SemiBold, fontSize = 13.sp, color = Color.Black)
-                    if(date != null)
-                        Text("Submetido em $date", style = MaterialTheme.typography.bodySmall, fontSize = 11.sp, color = Color.Gray)
+                    Text(
+                        text = fileName,
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 14.sp,
+                        color = Color.Black,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    if (date != null) {
+                        Spacer(modifier = Modifier.height(2.dp))
+                        Text(
+                            text = "Submetido em $date",
+                            style = MaterialTheme.typography.bodySmall,
+                            fontSize = 11.sp,
+                            color = Color.Gray
+                        )
+                    }
                 }
             }
 
-            IconButton(
-                onClick = onDownloadFile,
-                modifier = Modifier.size(24.dp)
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(0.dp) // Botões compactos
             ) {
-                Icon(
-                    imageVector = Icons.Default.Download,
-                    contentDescription = "downloadFile",
-                    tint = GreenIPCA,
-                    modifier = Modifier.size(20.dp)
-                )
+                IconButton(
+                    onClick = onDownloadFile,
+                    modifier = Modifier.size(32.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Download,
+                        contentDescription = "Download",
+                        tint = Color.Gray,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+
+                if(showUpdateButtons){
+                    IconButton(
+                        onClick = onDenyFile,
+                        modifier = Modifier.size(32.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Close,
+                            contentDescription = "Rejeitar",
+                            tint = Color(0xFFFF5252), // Vermelho Suave
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+
+                    IconButton(
+                        onClick = onAcceptFile,
+                        modifier = Modifier.size(32.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Check,
+                            contentDescription = "Aceitar",
+                            tint = Color(0xFF4CAF50), // Verde Material Design
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+                }
             }
         }
+
+        Spacer(modifier = Modifier.height(8.dp))
 
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(
@@ -466,8 +655,13 @@ fun DocumentCard(
                 tint = statusColor,
                 modifier = Modifier.size(16.dp)
             )
-            Spacer(Modifier.width(4.dp))
-            Text(status, color = statusColor, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+            Spacer(Modifier.width(6.dp))
+            Text(
+                text = status,
+                color = statusColor,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Bold
+            )
         }
     }
 }
@@ -476,5 +670,16 @@ fun DocumentCard(
 @Preview(showBackground = true)
 @Composable()
 fun ApplicationStateAdminPreview(){
-
+    DocumentCard(
+        fileName = "Kazzio.pfg",
+        date = "12/02/2026",
+        status = "to_review",
+        statusColor = GreenIPCA,
+        bgColor = Color.White,
+        imageVector = Icons.Filled.Check,
+        onDownloadFile = {},
+        onAcceptFile = {},
+        showUpdateButtons = true,
+        onDenyFile = {}
+    )
 }

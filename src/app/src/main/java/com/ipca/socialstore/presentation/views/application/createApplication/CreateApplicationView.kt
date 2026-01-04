@@ -267,42 +267,6 @@ fun CreateApplicationViewContent(
     }
 }
 
-@Composable
-fun FileRowItem(uri: Uri, onRemoveFile:(uri: Uri?)->Unit) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
-        )
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            val fileName = getFileNameFromUri(LocalContext.current, uri = uri)
-
-            Text(
-                text = fileName,
-                modifier = Modifier.weight(1f),
-                style = MaterialTheme.typography.bodyMedium,
-                maxLines = 1
-            )
-
-            IconButton(
-                onClick = { onRemoveFile(uri) },
-                modifier = Modifier.size(24.dp)
-            ) {
-            }
-        }
-    }
-}
-
-
 @Preview(showBackground = true)
 @Composable
 fun CreateApplicationViewPreview() {

@@ -20,7 +20,7 @@ class UpdateApplicationService @Inject constructor(
     suspend operator fun invoke(
         application: ApplicationModel,
         academicModel: AcademicModel?,
-        applicationDataStateId: Int): ResultWrapper<Unit> {
+        applicationDataState: ApplicationDataStateModel): ResultWrapper<Unit> {
         val updateAppResult = applicationRepository.updateApplication(application = application)
         if(updateAppResult is ResultWrapper.Error) return ResultWrapper.Error(updateAppResult.error)
         if(academicModel != null){
@@ -28,13 +28,7 @@ class UpdateApplicationService @Inject constructor(
             if(updateAcademicDataResult is ResultWrapper.Error) return ResultWrapper.Error(updateAcademicDataResult.error)
         }
 
-        val updateApplicationDataState = applicationDataStateRepository.updateApplicationDataState(
-            applicationDataState = ApplicationDataStateModel(
-                id = applicationDataStateId,
-                state = ApplicationDataStatus.TO_REVIEW.status,
-                message = ""
-            )
-        )
+        val updateApplicationDataState = applicationDataStateRepository.updateApplicationDataState(applicationDataState = applicationDataState)
         if(updateApplicationDataState is ResultWrapper.Error) return ResultWrapper.Error(updateApplicationDataState.error)
 
         return ResultWrapper.Success(Unit)

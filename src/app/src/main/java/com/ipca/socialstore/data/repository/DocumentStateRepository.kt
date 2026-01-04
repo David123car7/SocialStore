@@ -25,6 +25,26 @@ class DocumentStateRepository @Inject constructor(private val supabase: Supabase
         }
     }
 
+    suspend fun updateDocumentState(documentState: DocumentStateModel): ResultWrapper<Int> {
+        val id = documentState.id
+            ?: return ResultWrapper.Error(AppError.UnknownError("Document State Id Null"))
+        return try {
+            val result = supabase.from(DatabaseTables.DOCUMENT_STATE)
+                .update(documentState) {
+                    filter {
+                        eq("id", id)
+                    }
+                    select(columns = Columns.list("id"))
+                }.decodeSingleOrNull<TableIdModel>()
+            if (result == null) {
+                return ResultWrapper.Error(AppError.DataNotFound)
+            }
+            ResultWrapper.Success(result.id)
+        } catch (e: Exception) {
+            ResultWrapper.Error(exceptionMapper.map(e))
+        }
+    }
+
     suspend fun deleteDocumentState(id: Int): ResultWrapper<Unit> {
         return try {
             supabase.from(DatabaseTables.DOCUMENT_STATE).delete {

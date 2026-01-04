@@ -4,7 +4,7 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import com.ipca.socialstore.R
 import com.ipca.socialstore.data.enums.ApplicationDataStatus
-import com.ipca.socialstore.data.enums.ApplicationStatus
+import com.ipca.socialstore.data.enums.ApplicationStates
 import com.ipca.socialstore.data.enums.UserRole
 import com.ipca.socialstore.data.exceptions.AppError
 import com.ipca.socialstore.data.models.AcademicModel
@@ -80,7 +80,7 @@ class CreateApplicationService @Inject constructor(
             if (academicResult is ResultWrapper.Success) academicID = academicResult.data
         }
 
-        val applicationStateResult = applicationStateRepository.createApplicationState(applicationState = ApplicationStateModel(state = ApplicationStatus.PENDING.status))
+        val applicationStateResult = applicationStateRepository.createApplicationState(applicationState = ApplicationStateModel(state = ApplicationStates.PENDING.status))
         if(applicationStateResult is ResultWrapper.Error) return ResultWrapper.Error(applicationStateResult.error)
         val stateId = (applicationStateResult as ResultWrapper.Success).data
 
