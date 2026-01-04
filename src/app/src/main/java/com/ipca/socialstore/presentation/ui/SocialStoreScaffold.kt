@@ -11,6 +11,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.ipca.socialstore.data.enums.UserRole
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Accessibility
 import androidx.compose.material.icons.filled.Assignment
 import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.FileOpen
@@ -76,29 +77,22 @@ fun SocialStoreScaffoldContent(
             route = AdminRoutes.AdminHome,
             isVisible = userRole == UserRole.ADMIN
         ),
-        BottomNavItem( //AdminHome
-            icon = Icons.Default.Preview,
-            route = CandidateRoutes.ApplicationState,
-            isVisible = userRole == UserRole.CANDIDATE
-        ),
         BottomNavItem( //ApplicationInfo
             icon = Icons.Default.FileOpen,
             route = DefaultRoutes.ApplicationInfo,
             isVisible = userRole == UserRole.DEFAULT
         ),
         BottomNavItem(
-            icon = Icons.Default.Assignment,
-            route = AdminRoutes.SchedulingManagement,
-        BottomNavItem( //ApplicationInfo
-            icon = Icons.Default.AccountTree,
+            icon = Icons.Default.Accessibility,
             route = AdminRoutes.ListApplications,
             isVisible = userRole == UserRole.ADMIN
         ),
-        BottomNavItem( //Admin Notifications
-            icon = Icons.Default.Notifications,
-            route = AdminRoutes.NotificationHistory,
+        BottomNavItem(
+            icon = Icons.Default.Assignment,
+            route = AdminRoutes.SchedulingManagement,
             isVisible = userRole == UserRole.ADMIN
         ),
+
         BottomNavItem( //stock
             icon = Icons.Default.Storage,
             route = AdminRoutes.GetStock,
