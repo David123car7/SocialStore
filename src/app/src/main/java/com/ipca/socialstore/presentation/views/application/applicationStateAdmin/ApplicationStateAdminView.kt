@@ -138,8 +138,8 @@ fun AplicationStateAdminView(modifier: Modifier, navController: NavController, u
                 viewModel.updateApplicationState(state = ApplicationStates.CORRECTION.status)
             }
         },
-        onDenyApplication = {},
-        onAcceptApplication = {}
+        onDenyApplication = {viewModel.denyApplication()},
+        onAcceptApplication = {viewModel.acceptApplication()}
     )
 }
 
@@ -198,6 +198,8 @@ fun ApplicationStateAdminContent(
         ) {
             var showAlertAcceptDocument by remember { mutableStateOf(false) }
             var showAlertDenyDocument by remember { mutableStateOf(false) }
+            var showAlertAcceptApplication by remember { mutableStateOf(false) }
+            var showAlertDenyApplication by remember { mutableStateOf(false) }
             var documentSelected by remember { mutableStateOf<DocumentReceiverModel?>(null) }
 
             AlertComponent(
@@ -218,6 +220,26 @@ fun ApplicationStateAdminContent(
                 message = "Escreve o motivo por este documento não ser aceito.",
                 onConfirm = { msg -> onUpdateDocState(documentSelected, documentSelected!!.folderName,false, msg )},
                 onDismiss = {showAlertDenyDocument = false}
+            )
+
+            AlertComponent(
+                show = showAlertAcceptApplication,
+                title = "Aceitar",
+                icon = Icons.Filled.CheckBox,
+                color = GreenIPCA,
+                message = "De certeza que queres aceitar esta candidatura?",
+                onConfirm = {onAcceptApplication()},
+                onDismiss = {showAlertAcceptApplication = false}
+            )
+
+            AlertComponent(
+                show = showAlertDenyApplication,
+                title = "Não Aceitar",
+                icon = Icons.Filled.CheckBox,
+                color = GreenIPCA,
+                message = "De certeza que não queres aceitar esta candidatura?",
+                onConfirm = {onDenyApplication()},
+                onDismiss = {showAlertDenyApplication = false}
             )
 
             ApplicationData(
@@ -305,6 +327,30 @@ fun ApplicationStateAdminContent(
                     onUpdateTypeDocState(id, state, type, msg)
                 }
             )
+            Row(horizontalArrangement = Arrangement.SpaceEvenly) {
+                Button(
+                    onClick = {showAlertAcceptApplication = true},
+                    modifier = Modifier
+                        .padding(5.dp)
+                        .weight(1f)
+                        .height(40.dp),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(GreenIPCA)
+                ) {
+                    Text("Aceitar")
+                }
+                Button(
+                    onClick = { showAlertDenyApplication = true },
+                    modifier = Modifier
+                        .padding(5.dp)
+                        .weight(1f)
+                        .height(40.dp),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(Color(0xFFCF1322))
+                ) {
+                    Text("Rejeitar")
+                }
+            }
         }
     }
 }

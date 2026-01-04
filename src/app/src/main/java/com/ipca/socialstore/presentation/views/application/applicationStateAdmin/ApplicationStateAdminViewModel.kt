@@ -20,6 +20,8 @@ import com.ipca.socialstore.domain.appDocType.UpdateAppDocTypeUseCase
 import com.ipca.socialstore.domain.application.UpdateApplicationDataStateUseCase
 import com.ipca.socialstore.domain.applicationState.UpdateApplicationStateUseCase
 import com.ipca.socialstore.domain.documentState.UpdateDocumentStateUseCase
+import com.ipca.socialstore.domain.services.application.AcceptApplicationService
+import com.ipca.socialstore.domain.services.application.DenyApplicationService
 import com.ipca.socialstore.domain.services.application.GetUserApplicationService
 import com.ipca.socialstore.domain.services.document.GetApplicationDocumentsService
 import com.ipca.socialstore.domain.storage.DownloadFileUseCase
@@ -65,6 +67,8 @@ class ApplicationStateAdminViewModel @Inject constructor(
     private val updateDocumentStateUseCase: UpdateDocumentStateUseCase,
     private val updateAppDocTypeUseCase: UpdateAppDocTypeUseCase,
     private val updateApplicationStateUseCase: UpdateApplicationStateUseCase,
+    private val acceptApplicationService: AcceptApplicationService,
+    private val denyApplicationService: DenyApplicationService,
     savedStateHandle: SavedStateHandle) : ViewModel(){
     var uiState = mutableStateOf(ApplicationAdminState())
     sealed class DownloadEvent {
@@ -121,6 +125,52 @@ class ApplicationStateAdminViewModel @Inject constructor(
                         isLoading = false,
                     )
                     updateApplicationDataStateLocal(dataState = applicationDataStateModel)
+                }
+                is ResultWrapper.Error -> {
+                    uiState.value = uiState.value.copy(
+                        isLoading = false,
+                        error = result.error.asUiText()
+                    )
+                }
+            }
+        }
+    }
+
+    fun acceptApplication(){
+        viewModelScope.launch {
+            uiState.value = uiState.value.copy(isLoading = true)
+            val result = acceptApplicationService(
+                applicationId = uiState.value.application.id!!,
+                appStateId = uiState.value.application.applicationState.id!!
+            )
+            when(result){
+                is ResultWrapper.Success -> {
+                    uiState.value = uiState.value.copy(
+                        isLoading = false,
+                    )
+                }
+                is ResultWrapper.Error -> {
+                    uiState.value = uiState.value.copy(
+                        isLoading = false,
+                        error = result.error.asUiText()
+                    )
+                }
+            }
+        }
+    }
+
+    fun denyApplication(){
+        viewModelScope.launch {
+            uiState.value = uiState.value.copy(isLoading = true)
+            val result = denyApplicationService(
+                applicationId = uiState.value.application.id!!,
+                appStateId = uiState.value.application.applicationState.id!!
+            )
+            when(result){
+                is ResultWrapper.Success -> {
+                    uiState.value = uiState.value.copy(
+                        isLoading = false,
+                    )
                 }
                 is ResultWrapper.Error -> {
                     uiState.value = uiState.value.copy(
