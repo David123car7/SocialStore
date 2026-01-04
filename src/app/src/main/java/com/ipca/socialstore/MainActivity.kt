@@ -41,7 +41,10 @@ import com.ipca.socialstore.presentation.views.Scheduling.management.SchedulingM
 import com.ipca.socialstore.presentation.views.Scheduling.management.SchedulingManagementViewModel
 import com.ipca.socialstore.presentation.views.application.applicationInfo.ApplicationInfoView
 import com.ipca.socialstore.presentation.views.application.applicationState.ApplicationStateView
+import com.ipca.socialstore.presentation.views.application.applicationStateAdmin.AplicationStateAdminView
+import com.ipca.socialstore.presentation.views.application.applicationStateAdmin.ApplicationStateAdminViewModel
 import com.ipca.socialstore.presentation.views.application.createApplication.CreateApplicationView
+import com.ipca.socialstore.presentation.views.application.listApplications.ListApplicationsView
 import com.ipca.socialstore.presentation.views.authentication.resetPassword.ResetPasswordView
 import com.ipca.socialstore.presentation.views.beneficiary.BeneficiaryManagementView
 import com.ipca.socialstore.presentation.views.home.adminHome.AdminHomeView
@@ -116,6 +119,9 @@ class MainActivity : ComponentActivity() {
                         composable<AdminRoutes.AdminHome>{
                             AdminHomeView(modifier = Modifier.padding(innerPadding), navController = navController, userRole = mainState.userRole)
                         }
+                        composable<AdminRoutes.ListApplications>{
+                            ListApplicationsView(modifier = Modifier.padding(innerPadding), navController = navController, userRole = mainState.userRole)
+                        }
                         composable<AdminRoutes.CreateCampaign>{
                             CreateCampaingView(modifier = Modifier.padding(innerPadding))
                         }
@@ -133,6 +139,14 @@ class MainActivity : ComponentActivity() {
                         }
                         composable <AdminRoutes.CreateDonation>{
                             CreateDonationView(modifier = Modifier.padding(innerPadding), navController = navController)
+                        }
+                        composable(
+                            route = AdminRoutes.ApplicationState::class.qualifiedName!! + "/{applicationId}",
+                            arguments = listOf(
+                                navArgument("applicationId") { type = NavType.StringType }
+                            )
+                        ) {
+                            AplicationStateAdminView(modifier = Modifier.padding(innerPadding), navController = navController, userRole = mainState.userRole)
                         }
                         composable <AdminRoutes.SelectStock>{
                             StockItemDetailView(modifier = Modifier.padding(innerPadding), navController = navController, viewModel = stockViewModel)

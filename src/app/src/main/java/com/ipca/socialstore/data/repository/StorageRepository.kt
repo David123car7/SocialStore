@@ -113,4 +113,14 @@ class StorageRepository @Inject constructor(
         }
         return result ?: "unknown_file_${UUID.randomUUID()}"
     }
+
+    suspend fun downloadFile(bucketName: String, filePath: String): ResultWrapper<ByteArray> {
+        return try {
+            val bucket = supabaseClient.storage.from(bucketName)
+            val bytes = bucket.downloadAuthenticated(filePath)
+            ResultWrapper.Success(bytes)
+        } catch (e: Exception) {
+            ResultWrapper.Error(exceptionMapper.map(e))
+        }
+    }
 }

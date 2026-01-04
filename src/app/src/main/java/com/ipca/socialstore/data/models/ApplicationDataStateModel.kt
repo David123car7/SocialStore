@@ -4,10 +4,12 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ApplicationStateModel(
+data class ApplicationDataStateModel (
     val id: Int? = null,
 
     @SerialName("state")
     val state: String,
-)
 
+    @SerialName("message")
+    val message: String?,
+)

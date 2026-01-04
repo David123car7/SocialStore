@@ -57,6 +57,7 @@ android {
 dependencies {
     implementation(libs.androidx.hilt.work)
     implementation(libs.androidx.hilt.common)
+    implementation(libs.androidx.room.ktx)
     val work_version = "2.11.0"
 
     // AndroidX & Compose

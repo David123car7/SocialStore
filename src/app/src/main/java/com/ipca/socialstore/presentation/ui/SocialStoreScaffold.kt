@@ -76,6 +76,11 @@ fun SocialStoreScaffoldContent(
             route = AdminRoutes.AdminHome,
             isVisible = userRole == UserRole.ADMIN
         ),
+        BottomNavItem( //AdminHome
+            icon = Icons.Default.Preview,
+            route = CandidateRoutes.ApplicationState,
+            isVisible = userRole == UserRole.CANDIDATE
+        ),
         BottomNavItem( //ApplicationInfo
             icon = Icons.Default.FileOpen,
             route = DefaultRoutes.ApplicationInfo,
@@ -84,6 +89,14 @@ fun SocialStoreScaffoldContent(
         BottomNavItem(
             icon = Icons.Default.Assignment,
             route = AdminRoutes.SchedulingManagement,
+        BottomNavItem( //ApplicationInfo
+            icon = Icons.Default.AccountTree,
+            route = AdminRoutes.ListApplications,
+            isVisible = userRole == UserRole.ADMIN
+        ),
+        BottomNavItem( //Admin Notifications
+            icon = Icons.Default.Notifications,
+            route = AdminRoutes.NotificationHistory,
             isVisible = userRole == UserRole.ADMIN
         ),
         BottomNavItem( //stock

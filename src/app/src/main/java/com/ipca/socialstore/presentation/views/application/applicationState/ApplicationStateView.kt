@@ -1,5 +1,6 @@
 package com.ipca.socialstore.presentation.views.application.applicationState
 
+import ApplicationForm
 import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.ManagedActivityResultLauncher
@@ -29,6 +30,7 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -37,8 +39,8 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.InputChip
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -59,18 +61,20 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.ipca.socialstore.data.enums.ApplicationDataStatus
 import com.ipca.socialstore.data.enums.ApplicationDocumentTypeState
 import com.ipca.socialstore.data.enums.ApplicationStatus
 import com.ipca.socialstore.data.enums.DocumentStatus
 import com.ipca.socialstore.data.enums.DocumentType
 import com.ipca.socialstore.data.enums.UserRole
-import com.ipca.socialstore.data.models.AcademicModel
-import com.ipca.socialstore.data.models.ApplicationModel
 import com.ipca.socialstore.presentation.models.DocumentReceiverModel
 import com.ipca.socialstore.presentation.ui.SocialStoreScaffoldContent
 import com.ipca.socialstore.presentation.ui.components.AlertComponent
 import com.ipca.socialstore.presentation.ui.components.ButtonTracedComponent
 import com.ipca.socialstore.presentation.ui.components.ExpandableSection
+import com.ipca.socialstore.presentation.ui.components.ReadOnlyField
+import com.ipca.socialstore.presentation.ui.components.WarningComponent
+import com.ipca.socialstore.presentation.ui.theme.GreenIPCA
 import com.ipca.socialstore.presentation.ui.theme.SocialStoreTheme
 import com.ipca.socialstore.presentation.utils.getFileNameFromUri
 import com.ipca.socialstore.presentation.views.application.status.TimelineLine
@@ -79,7 +83,6 @@ import com.ipca.socialstore.presentation.views.application.status.TimelineLine
 fun ApplicationStateView(modifier: Modifier, navController: NavController, userRole: UserRole){
     val applicationStateViewModel: ApplicationStateViewModel = hiltViewModel()
     val uiState by applicationStateViewModel.uiState
-
     val context = LocalContext.current
 
     ApplicationStateViewContent(
@@ -92,13 +95,23 @@ fun ApplicationStateView(modifier: Modifier, navController: NavController, userR
                 context = context
             )
         },
+        onNameUpdate = applicationStateViewModel::updateName,
+        onYearUpdate = applicationStateViewModel::updateSchoolYear,
+        onBirthDateUpdate = applicationStateViewModel::updateBirthDate,
+        onCcUpdate = applicationStateViewModel::updateCc,
+        onPhoneUpdate = applicationStateViewModel::updatePhoneNumber,
+        onCourseUpdate = applicationStateViewModel::updateCourse,
+        onTypeCourseUpdate = applicationStateViewModel::updateTypeCourse,
+        onStudentNumberUpdate = applicationStateViewModel::updateStudentNumber,
+        onRequestTypeUpdate = applicationStateViewModel::updateRequestType,
         onDeleteFile = { doc, uri, folderName ->
             applicationStateViewModel.removeFile(uri = uri, document = doc, folderName = folderName)
         },
         onSubmitFile = {folderName -> applicationStateViewModel.submitFiles(folderName = folderName, context = context)},
         documentsCompletedColor = Color(0x120FFC0B),
         documentsWrongColor = Color(0x1BFF0000),
-        onDeleteApplication = { applicationStateViewModel.deleteApplication() }
+        onDeleteApplication = { applicationStateViewModel.deleteApplication()},
+        onApplicationUpdate = applicationStateViewModel::updateApplication
     )
 
     LaunchedEffect(uiState.error) {
@@ -118,9 +131,20 @@ fun ApplicationStateViewContent(
     onDeleteFile:(document: DocumentReceiverModel?, uri: Uri?, folderName: String) -> Unit,
     onAddSelectedFile:(folderName: String, uri: Uri?) -> Unit,
     onDeleteApplication:() -> Unit,
-    onSubmitFile:(folderName: String) -> Unit){
+    onSubmitFile:(folderName: String) -> Unit,
+    onNameUpdate: (String) -> Unit,
+    onYearUpdate: (String) -> Unit,
+    onBirthDateUpdate: (String) -> Unit,
+    onCcUpdate: (String) -> Unit,
+    onPhoneUpdate: (String) -> Unit,
+    onRequestTypeUpdate: (String) -> Unit,
+    onTypeCourseUpdate: (String) -> Unit,
+    onCourseUpdate: (String) -> Unit,
+    onStudentNumberUpdate: (String) -> Unit,
+    onApplicationUpdate:() ->Unit
+    ){
 
-    var isDataExpanded by remember { mutableStateOf(false) }
+    var isDataExpanded by remember { mutableStateOf(true) }
     var isDocsExpanded by remember { mutableStateOf(false) }
     var showAlertBox by remember { mutableStateOf(false) }
 
@@ -162,11 +186,13 @@ fun ApplicationStateViewContent(
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
-        StatusTimelineHeader(state = uiState.applicationState?.state ?: "")
+        StatusTimelineHeader(state = uiState.application.applicationState.state)
 
         AlertComponent(
             show = showAlertBox,
             title = "Eliminar Candidatura",
+            icon = Icons.Default.Warning,
+            color = Color(0xFFFF5252),
             message = "Tens a certeza que queres eliminar o ficheiro?",
             onConfirm = {onDeleteApplication()},
             onDismiss = {showAlertBox = false}
@@ -178,32 +204,137 @@ fun ApplicationStateViewContent(
             isExpanded = isDataExpanded,
             onExpandChange = { isDataExpanded = it }
         ) {
-            CategoryBox(title = "Dados Pessoais", bgColor = Color.White) {
-                ReadOnlyField("Nome Completo", uiState.application?.name ?: "")
-                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Box(Modifier.weight(1f)) { ReadOnlyField("Email", uiState.application?.email ?: "") }
-                    Box(Modifier.weight(1f)) { ReadOnlyField(label = "Ano Letivo", value = uiState.application?.schoolYear.toString())}
-                }
-                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Box(Modifier.weight(1f)) { ReadOnlyField(label = "CC", value = uiState.application?.cc ?: "") }
-                    Box(Modifier.weight(1f)) { ReadOnlyField(label = "Data Nasc.", value = uiState.application?.birthDate ?:"") }
-                }
-                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Box(Modifier.weight(1f)) {ReadOnlyField("Numero de Telemovel", uiState.application?.phoneNumber ?: "")}
-                    Box(Modifier.weight(1f)) {ReadOnlyField("Tipo de Pedido", uiState.application?.requestType ?: "")}
-                }
+            if (uiState.application.applicationDataState.state == ApplicationDataStatus.DENIED.status){
+                WarningComponent(
+                    tittle = "Correção Necessár00ia.",
+                    message = uiState.application.applicationDataState.message ?: "",
+                    bgColor = Color(0xFFFFCCC7),
+                    mainColor = Color(0xFFCF1322),
+                    icon = Icons.Default.Warning
+                )
             }
-            if(uiState.academicData != null){
-                CategoryBox(title = "Dados Académicos", bgColor = Color.White) {
-                    ReadOnlyField("Curso", uiState.academicData.course)
+            var dataCategoryDesc: String = ""
+            var dataCategoryDescTextColor: Color = Color.Black
+            var dataCategoryDescBgTextColor: Color = Color.White
+            if(uiState.application.applicationDataState.state == ApplicationDataStatus.ACCEPTED.status){
+                dataCategoryDesc = "Dados Aceites"
+                dataCategoryDescTextColor = GreenIPCA
+                dataCategoryDescBgTextColor = Color(0x120FFC0B)
+            }
+            if(uiState.application.applicationDataState.state == ApplicationDataStatus.DENIED.status){
+                dataCategoryDesc = "Dados Negados"
+                dataCategoryDescTextColor = Color(0xFFCF1322)
+                dataCategoryDescBgTextColor = Color(0x1BFF0000)
+            }
+            if(uiState.application.applicationDataState.state == ApplicationDataStatus.TO_REVIEW.status){
+                dataCategoryDesc = "Por Rever"
+                dataCategoryDescTextColor = Color(0xFFDAA210)
+                dataCategoryDescBgTextColor = Color(0x43DAA210)
+            }
+
+            if (uiState.application.applicationDataState.state != ApplicationDataStatus.DENIED.status) {
+                CategoryBox(
+                    title = "Dados Pessoais",
+                    description = dataCategoryDesc,
+                    descriptionTextColor = dataCategoryDescTextColor,
+                    descriptionBgTextColor = dataCategoryDescBgTextColor
+                ) {
+                    ReadOnlyField("Nome Completo", uiState.application.name)
                     Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                        Box(Modifier.weight(1f)) { ReadOnlyField(label = "Tipo de Curso", value = uiState.academicData.typeCourse) }
-                        Box(Modifier.weight(1f)) { ReadOnlyField(label = "Numero de Estudante", value = uiState.academicData.studenNumber)}
+                        Box(Modifier.weight(1f)) {
+                            ReadOnlyField(
+                                "Email",
+                                uiState.application.email
+                            )
+                        }
+                        Box(Modifier.weight(1f)) {
+                            ReadOnlyField(
+                                label = "Ano Letivo",
+                                value = uiState.application.schoolYear.toString()
+                            )
+                        }
+                    }
+                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        Box(Modifier.weight(1f)) {
+                            ReadOnlyField(
+                                label = "CC",
+                                value = uiState.application.cc
+                            )
+                        }
+                        Box(Modifier.weight(1f)) {
+                            ReadOnlyField(
+                                label = "Data Nasc.",
+                                value = uiState.application.birthDate
+                            )
+                        }
+                    }
+                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        Box(Modifier.weight(1f)) {
+                            ReadOnlyField(
+                                "Numero de Telemovel",
+                                uiState.application.phoneNumber
+                            )
+                        }
+                        Box(Modifier.weight(1f)) {
+                            ReadOnlyField(
+                                "Tipo de Pedido",
+                                uiState.application.requestType
+                            )
+                        }
+                    }
+                }
+                if(uiState.application.academicData != null){
+                    CategoryBox(title = "Dados Académicos", bgColor = Color.White) {
+                        ReadOnlyField("Curso", uiState.application.academicData.course)
+                        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                            Box(Modifier.weight(1f)) { ReadOnlyField(label = "Tipo de Curso", value = uiState.application.academicData.typeCourse) }
+                            Box(Modifier.weight(1f)) { ReadOnlyField(label = "Numero de Estudante", value = uiState.application.academicData.studenNumber)}
+                        }
                     }
                 }
             }
+            else {
+                CategoryBox(
+                    title = "Dados Pessoais",
+                    description = dataCategoryDesc,
+                    descriptionTextColor = dataCategoryDescTextColor,
+                    descriptionBgTextColor = dataCategoryDescBgTextColor
+                ) {
+                    ApplicationForm(
+                        modifier = Modifier,
+                        name = uiState.application.name,
+                        birthDate = uiState.application.birthDate,
+                        cc = uiState.application.cc,
+                        phoneNumber = uiState.application.phoneNumber,
+                        schoolYear = if (uiState.application.schoolYear == 0) "" else uiState.application.schoolYear.toString(),
+                        requestType = uiState.application.requestType,
+                        isStudent = uiState.application.academicData != null,
+                        academicCourseType = uiState.application.academicData?.typeCourse ?: "",
+                        academicCourseName = uiState.application.academicData?.course ?: "",
+                        academicStudentNumber = uiState.application.academicData?.studenNumber ?: "",
+                        onNameChange = onNameUpdate,
+                        onBirthDateChange = onBirthDateUpdate,
+                        onCcChange = onCcUpdate,
+                        onPhoneChange = onPhoneUpdate,
+                        onYearChange = onYearUpdate,
+                        onRequestTypeChange = onRequestTypeUpdate,
+                        onAcademicTypeChange = onTypeCourseUpdate,
+                        onAcademicCourseChange = onCourseUpdate,
+                        onAcademicNumberChange = onStudentNumberUpdate,
+                        isAdmin = true
+                    )
+                }
+                Button(
+                    onClick = onApplicationUpdate,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Text("Continuar", fontWeight = FontWeight.Bold)
+                }
+            }
         }
-
         ExpandableSection(
             title = "Meus Documentos",
             icon = Icons.Outlined.Person,
@@ -347,6 +478,7 @@ fun ApplicationStateViewContent(
         }
     }
 }
+
 
 
 @Composable
@@ -531,7 +663,9 @@ fun TimelineStep(number: String, label: String, isActive: Boolean, isCompleted: 
 fun CategoryBox(
     title: String,
     description: String? = null,
-    bgColor: Color,
+    descriptionTextColor: Color = Color.Black,
+    descriptionBgTextColor: Color = Color.White,
+    bgColor: Color = Color.White,
     content: @Composable ColumnScope.() -> Unit
 ) {
     Card(
@@ -543,9 +677,22 @@ fun CategoryBox(
         Column(modifier = Modifier.padding(16.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(title, fontWeight = FontWeight.Bold, fontSize = 15.sp, color = Color(0xFF263238))
+                if(description != null){
+                    Surface(
+                        modifier = Modifier.padding(start = 15.dp),
+                        color = descriptionBgTextColor,
+                        shape = RoundedCornerShape(16.dp),
+                    ) {
+                        Text(
+                            text = description,
+                            color = descriptionTextColor,
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                        )
+                    }
+                }
             }
-            if(description != null)
-                Text(description, fontWeight = FontWeight.Normal, fontSize = 12.sp, color = Color.Red)
             Divider(modifier = Modifier.padding(vertical = 12.dp), color = Color(0xFFEEEEEE))
             content()
         }
@@ -662,20 +809,11 @@ fun BotaoUpload(onClick: () -> Unit) {
     }
 }
 
-@Composable
-fun ReadOnlyField(label: String, value: String) {
-    Column(modifier = Modifier.padding(bottom = 8.dp)) {
-        Text(label, fontSize = 11.sp, color = Color(0xFF78909C), fontWeight = FontWeight.Bold)
-        Text(value, fontSize = 14.sp, color = Color(0xFF263238))
-    }
-}
-
 @Preview(showBackground = true)
 @Composable
 fun ApplicationStatePreview(){
     SocialStoreTheme {
         val mockDocumentsList = listOf(
-            // CASO 1: Documento Aceite (Verde)
             DocumentReceiverModel(
                 id = 1,
                 path = "https://exemplo.com/docs/cc_frente.jpg",
@@ -692,19 +830,8 @@ fun ApplicationStatePreview(){
         val uiState = ApplicationState(
             isLoading = false,
             error = null,
-            application = ApplicationModel(
-                stateId = -1,
-                schoolYear = 0,
-                name = "",
-                birthDate = "",
-                cc = "",
-                phoneNumber = "",
-                email = "",
-                requestType = "",
-                academicId = null
-            ),
+            application = createEmptyApplication(),
             documentsBankStatements = mockDocumentsList,
-            academicData = AcademicModel(typeCourse = "", course = "", studenNumber = "")
         )
 
         SocialStoreScaffoldContent(navController = rememberNavController(), userRole = UserRole.DEFAULT, logout = {}) { paddingValues ->
@@ -716,7 +843,17 @@ fun ApplicationStatePreview(){
                 onSubmitFile = {},
                 documentsCompletedColor = Color(0x120FFC0B),
                 documentsWrongColor = Color(0x1BFF0000),
-                onDeleteApplication = {}
+                onDeleteApplication = {},
+                onNameUpdate = {},
+                onYearUpdate = {},
+                onBirthDateUpdate = {},
+                onCcUpdate = {},
+                onPhoneUpdate = {},
+                onRequestTypeUpdate = {},
+                onTypeCourseUpdate = {},
+                onCourseUpdate = {},
+                onStudentNumberUpdate = {},
+                onApplicationUpdate = {}
             )
         }
     }

@@ -11,17 +11,21 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Warning
-import androidx.compose.material3.AlertDialog
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -33,15 +37,17 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 
 @Composable
-fun AlertComponent(
+fun AlertInputComponent(
     show: Boolean,
     title: String,
+    message: String,
     icon: ImageVector,
     color: Color,
-    message: String,
-    onConfirm: () -> Unit,
+    onConfirm: (String) -> Unit,
     onDismiss: () -> Unit
 ) {
+    var text by remember { mutableStateOf("") }
+
     if (show) {
         Dialog(onDismissRequest = onDismiss) {
             Card(
@@ -58,9 +64,9 @@ fun AlertComponent(
                     verticalArrangement = Arrangement.Center
                 ) {
                     Icon(
-                        imageVector = icon, // Ou Delete
+                        imageVector = icon, // Mudei para ícone de edição
                         contentDescription = null,
-                        tint = color, // Vermelho suave
+                        tint = Color(0xFFFF5252),
                         modifier = Modifier.size(48.dp)
                     )
 
@@ -83,6 +89,22 @@ fun AlertComponent(
                         color = Color.Gray
                     )
 
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    OutlinedTextField(
+                        value = text,
+                        onValueChange = { text = it },
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp),
+                        singleLine = false,
+                        maxLines = 4,
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = color,
+                            focusedLabelColor = color,
+                            cursorColor = color
+                        )
+                    )
+
                     Spacer(modifier = Modifier.height(24.dp))
 
                     Row(
@@ -90,28 +112,30 @@ fun AlertComponent(
                         horizontalArrangement = Arrangement.SpaceEvenly
                     ) {
                         OutlinedButton(
-                            onClick = onDismiss,
+                            onClick = {
+                                onDismiss()
+                            },
                             shape = RoundedCornerShape(50),
                             border = BorderStroke(1.dp, Color.Gray),
-                            modifier = Modifier
-                                .weight(1f)
-                                .padding(end = 8.dp)
+                            modifier = Modifier.weight(1f).padding(end = 8.dp)
                         ) {
-                            Text("Não", color = Color.Gray)
+                            Text("Cancelar", color = Color.Gray)
                         }
 
                         Button(
                             onClick = {
-                                onConfirm()
+                                onConfirm(text)
                                 onDismiss()
                             },
+                            enabled = text.isNotBlank(),
                             shape = RoundedCornerShape(50),
-                            colors = ButtonDefaults.buttonColors(containerColor = color),
-                            modifier = Modifier
-                                .weight(1f)
-                                .padding(start = 8.dp)
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = color,
+                                disabledContainerColor = color.copy(alpha = 0.5f)
+                            ),
+                            modifier = Modifier.weight(1f).padding(start = 8.dp)
                         ) {
-                            Text("Sim", color = Color.White)
+                            Text("Enviar", color = Color.White)
                         }
                     }
                 }

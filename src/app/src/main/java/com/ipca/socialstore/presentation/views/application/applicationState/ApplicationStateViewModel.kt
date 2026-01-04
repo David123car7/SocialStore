@@ -5,9 +5,11 @@ import android.net.Uri
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.room.util.copy
 import com.ipca.socialstore.data.enums.DocumentType
 import com.ipca.socialstore.data.exceptions.AppError
 import com.ipca.socialstore.data.models.AcademicModel
+import com.ipca.socialstore.data.models.ApplicationDataStateModel
 import com.ipca.socialstore.data.models.ApplicationDocumentTypeModel
 import com.ipca.socialstore.data.models.ApplicationModel
 import com.ipca.socialstore.data.models.ApplicationStateModel
@@ -17,9 +19,12 @@ import com.ipca.socialstore.domain.appDocType.GetAppDocTypesUseCase
 import com.ipca.socialstore.domain.application.GetUserApplicationUseCase
 import com.ipca.socialstore.domain.applicationState.GetUserApplicationState
 import com.ipca.socialstore.domain.services.application.DeleteApplicationService
+import com.ipca.socialstore.domain.services.application.GetUserApplicationService
+import com.ipca.socialstore.domain.services.application.UpdateApplicationService
 import com.ipca.socialstore.domain.services.document.DeleteDocumentService
 import com.ipca.socialstore.domain.services.document.GetApplicationDocumentsService
 import com.ipca.socialstore.domain.services.document.UploadApplicationDocumentsService
+import com.ipca.socialstore.presentation.models.ApplicationModelReceiver
 import com.ipca.socialstore.presentation.models.DocumentReceiverModel
 import com.ipca.socialstore.presentation.utils.ErrorText
 import com.ipca.socialstore.presentation.utils.asUiText
@@ -33,9 +38,7 @@ data class ApplicationState(
     val error: ErrorText? = null,
     val isData: Boolean = true,
 
-    val application: ApplicationModel? = null,
-    val applicationState: ApplicationStateModel? = null,
-    val academicData: AcademicModel? = null,
+    val application: ApplicationModelReceiver = createEmptyApplication(),
 
     //Files selected
     val selectedBankStatements: List<Uri> = emptyList(),
@@ -59,115 +62,182 @@ data class ApplicationState(
 
 @HiltViewModel
 class ApplicationStateViewModel @Inject constructor(
-    private val getUserApplicationUseCase: GetUserApplicationUseCase,
-    private val getAcademicDataUseCase: GetAcademicDataUseCase,
-    private val getUserApplicationState: GetUserApplicationState,
+    private val getUserApplicationService: GetUserApplicationService,
     private val uploadApplicationDocumentsService: UploadApplicationDocumentsService,
     private val getApplicationDocumentsService: GetApplicationDocumentsService,
     private val deleteDocumentService: DeleteDocumentService,
     private val getAppDocTypesUseCase: GetAppDocTypesUseCase,
-    private val deleteApplicationService: DeleteApplicationService) : ViewModel(){
+    private val deleteApplicationService: DeleteApplicationService,
+    private val updateApplicationService: UpdateApplicationService) : ViewModel(){
 
     var uiState = mutableStateOf(ApplicationState())
 
     init {
-        if(uiState.value.application == null){
-            viewModelScope.launch {
-                uiState.value = uiState.value.copy(isLoading = true)
-                when(val applicationResult = getUserApplicationUseCase()){
-                    is ResultWrapper.Success -> {
-                        uiState.value = uiState.value.copy(
-                            application =  applicationResult.data,
-                            isLoading = false,
-                        )
-                        val applicationStateResult = getUserApplicationState(applicationId = uiState.value.application?.stateId!!)
-                        when(applicationStateResult){
-                            is ResultWrapper.Success -> {
-                                uiState.value = uiState.value.copy(
-                                    applicationState = applicationStateResult.data,
-                                    isLoading = false,
-                                )
-                                val applicationId = applicationResult.data.id!!
+        viewModelScope.launch {
+            val applicationResult = getUserApplicationService()
+            when(applicationResult){
+                is ResultWrapper.Success -> {
+                    uiState.value = uiState.value.copy(
+                        application = applicationResult.data,
+                        isLoading = false,
+                    )
+                    val docBankStatements = getDocuments(
+                        applicationId = applicationResult.data.id!!,
+                        documentType = DocumentType.BANK_STATEMENTS.folderName
+                    )
 
-                                val docBankStatements = getDocuments(
-                                    applicationId = applicationId,
-                                    documentType = DocumentType.BANK_STATEMENTS.folderName
-                                )
+                    val docIncomeProof = getDocuments(
+                        applicationId = applicationResult.data.id,
+                        documentType = DocumentType.INCOME_PROOF.folderName
+                    )
+                    val docOtherIncome = getDocuments(
+                        applicationId = applicationResult.data.id,
+                        documentType = DocumentType.OTHER_INCOME.folderName
+                    )
+                    val docPermanentExpenses = getDocuments(
+                        applicationId = applicationResult.data.id,
+                        documentType = DocumentType.PERMANENT_EXPENSES.folderName
+                    )
+                    val docInternationalSupport = getDocuments(
+                        applicationId = applicationResult.data.id,
+                        documentType = DocumentType.INTERNATIONAL_SUPPORT.folderName
+                    )
 
-                                val docIncomeProof = getDocuments(
-                                    applicationId = applicationId,
-                                    documentType = DocumentType.INCOME_PROOF.folderName
-                                )
-                                val docOtherIncome = getDocuments(
-                                    applicationId = applicationId,
-                                    documentType = DocumentType.OTHER_INCOME.folderName
-                                )
-                                val docPermanentExpenses = getDocuments(
-                                    applicationId = applicationId,
-                                    documentType = DocumentType.PERMANENT_EXPENSES.folderName
-                                )
-                                val docInternationalSupport = getDocuments(
-                                    applicationId = applicationId,
-                                    documentType = DocumentType.INTERNATIONAL_SUPPORT.folderName
-                                )
+                    uiState.value = uiState.value.copy(
+                        documentsBankStatements = docBankStatements,
+                        documentsOtherIncome = docOtherIncome,
+                        documentsIncomeProof = docIncomeProof,
+                        documentsInternationalSupport = docInternationalSupport,
+                        documentsPermanentExpenses = docPermanentExpenses
+                    )
+                    getAppDocTypeStates(applicationId = applicationResult.data.id)
+                }
+                is ResultWrapper.Error -> {
+                    uiState.value = uiState.value.copy(
+                        isLoading = false,
+                        error = applicationResult.error.asUiText()
+                    )
+                }
+            }
+        }
+    }
 
-                                uiState.value = uiState.value.copy(
-                                    documentsBankStatements = docBankStatements,
-                                    documentsOtherIncome = docOtherIncome,
-                                    documentsIncomeProof = docIncomeProof,
-                                    documentsInternationalSupport = docInternationalSupport,
-                                    documentsPermanentExpenses = docPermanentExpenses
-                                )
-                                getAppDocTypeStates(applicationId = applicationId)
-                            }
-                            is ResultWrapper.Error -> {
-                                uiState.value = uiState.value.copy(
-                                    isLoading = false,
-                                    error = applicationStateResult.error.asUiText()
-                                )
-                            }
-                        }
+    fun updateSchoolYear(value: String) {
+        val year = if (value.isBlank()) 0 else value.toIntOrNull() ?: return
+        uiState.value = uiState.value.copy(
+            application = uiState.value.application.copy(schoolYear = year)
+        )
+    }
 
-                        if(applicationResult.data.academicId != null){
-                            val academicResult = getAcademicDataUseCase(applicationResult.data.academicId)
-                            when(academicResult){
-                                is ResultWrapper.Success -> {
-                                    uiState.value = uiState.value.copy(
-                                        academicData = academicResult.data,
-                                        isLoading = false,
-                                    )
-                                }
-                                is ResultWrapper.Error -> {
-                                    uiState.value = uiState.value.copy(
-                                        isLoading = false,
-                                        error = academicResult.error.asUiText()
-                                    )
-                                }
-                            }
-                        }
-                    }
-                    is ResultWrapper.Error -> {
-                        uiState.value = uiState.value.copy(
-                            isLoading = false,
-                            error = applicationResult.error.asUiText()
-                        )
-                    }
+    fun updateName(value: String) {
+        uiState.value = uiState.value.copy(
+            application = uiState.value.application.copy(name = value)
+        )
+    }
+
+    fun updateBirthDate(value: String) {
+        uiState.value = uiState.value.copy(
+            application = uiState.value.application.copy(birthDate = value)
+        )
+    }
+
+    fun updateCc(value: String) {
+        uiState.value = uiState.value.copy(
+            application = uiState.value.application.copy(cc = value)
+        )
+    }
+
+    fun updatePhoneNumber(value: String) {
+        uiState.value = uiState.value.copy(
+            application = uiState.value.application.copy(phoneNumber = value)
+        )
+    }
+
+    fun updateRequestType(value: String) {
+        uiState.value = uiState.value.copy(
+            application = uiState.value.application.copy(requestType = value)
+        )
+    }
+
+    fun updateTypeCourse(value: String) {
+        val currentApp = uiState.value.application
+        currentApp.academicData?.let { currentAcademic ->
+            uiState.value = uiState.value.copy(
+                application = currentApp.copy(
+                    academicData = currentAcademic.copy(typeCourse = value)
+                )
+            )
+        }
+    }
+
+    fun updateCourse(value: String) {
+        val currentApp = uiState.value.application
+        currentApp.academicData?.let { currentAcademic ->
+            uiState.value = uiState.value.copy(
+                application = currentApp.copy(
+                    academicData = currentAcademic.copy(course = value)
+                )
+            )
+        }
+    }
+
+    fun updateStudentNumber(value: String) {
+        val currentApp = uiState.value.application
+        currentApp.academicData?.let { currentAcademic ->
+            uiState.value = uiState.value.copy(
+                application = currentApp.copy(
+                    academicData = currentAcademic.copy(studenNumber = value)
+                )
+            )
+        }
+    }
+
+    fun updateApplication(){
+        val application = ApplicationModel(
+            id = uiState.value.application.id,
+            name = uiState.value.application.name,
+            email = uiState.value.application.email,
+            phoneNumber = uiState.value.application.phoneNumber,
+            cc = uiState.value.application.cc,
+            createdAt = uiState.value.application.createdAt,
+            birthDate = uiState.value.application.birthDate,
+            requestType = uiState.value.application.requestType,
+            schoolYear = uiState.value.application.schoolYear,
+            stateId = uiState.value.application.applicationState.id!!,
+            academicId = uiState.value.application.academicData?.id,
+            dataStateId = uiState.value.application.applicationDataState.id!!
+        )
+
+        viewModelScope.launch {
+            uiState.value = uiState.value.copy(isLoading = true)
+            val updateApplicationResult = updateApplicationService(
+                application = application,
+                academicModel = uiState.value.application.academicData,
+                applicationDataStateId = uiState.value.application.applicationDataState.id!!)
+            when (updateApplicationResult) {
+                is ResultWrapper.Success -> {
+                    uiState.value = uiState.value.copy(
+                        isLoading = false,
+                    )
+                }
+                is ResultWrapper.Error -> {
+                    uiState.value = uiState.value.copy(
+                        isLoading = false,
+                        error = updateApplicationResult.error.asUiText()
+                    )
                 }
             }
         }
     }
 
     fun deleteApplication(){
-        if (uiState.value.application == null)
-            return
-
         viewModelScope.launch {
             uiState.value = uiState.value.copy(isLoading = true)
             val deleteAppResult =
                 deleteApplicationService(
-                    applicationId = uiState.value.application?.id!!,
-                    academicId = uiState.value.academicData?.id!!,
-                    applicationStateId = uiState.value.application?.stateId!!
+                    applicationId = uiState.value.application.id!!,
+                    academicId = uiState.value.application.academicData?.id,
+                    applicationStateId = uiState.value.application.applicationState.id!!
                 )
             when (deleteAppResult) {
                 is ResultWrapper.Success -> {
@@ -436,4 +506,31 @@ class ApplicationStateViewModel @Inject constructor(
         }
         return false
     }
+}
+
+fun createEmptyApplication(): ApplicationModelReceiver {
+    return ApplicationModelReceiver(
+        id = null,
+        schoolYear = 0,
+        name = "",
+        birthDate = "",
+        createdAt = "",
+        cc = "",
+        phoneNumber = "",
+        email = "",
+        requestType = "",
+
+        applicationState = ApplicationStateModel(
+            id = null,
+            state = ""
+        ),
+
+        applicationDataState = ApplicationDataStateModel(
+            id = null,
+            state = "",
+            message = null // String? -> null
+        ),
+
+        academicData = null
+    )
 }

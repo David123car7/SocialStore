@@ -19,7 +19,7 @@ data class CreateApplicationState(
     val error: ErrorText? = null,
     val isSuccess: Boolean = false,
     val isStudent: Boolean = false,
-    val application: ApplicationModel = ApplicationModel(schoolYear = 0, name = "", birthDate = "", cc = "", phoneNumber = "", email = "", requestType = "", stateId = -1, academicId = null),
+    val application: ApplicationModel = ApplicationModel(schoolYear = 0, name = "", birthDate = "", cc = "", phoneNumber = "", email = "", requestType = "", stateId = -1, academicId = null, createdAt = "", dataStateId = -1),
     val academicData: AcademicModel? = null,
     val selectedFiles: List<Uri> = emptyList(),
 )
