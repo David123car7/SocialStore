@@ -11,21 +11,24 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.ipca.socialstore.data.enums.UserRole
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountTree
+import androidx.compose.material.icons.filled.Assignment
+import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.FileOpen
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Preview
+import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.Storage
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.compose.rememberNavController
 import com.ipca.socialstore.presentation.routes.AdminRoutes
+import com.ipca.socialstore.presentation.routes.BeneficiaryRoutes
 import com.ipca.socialstore.presentation.routes.CandidateRoutes
 import com.ipca.socialstore.presentation.utils.NavigationLogic
 import com.ipca.socialstore.presentation.routes.DefaultRoutes
@@ -83,6 +86,9 @@ fun SocialStoreScaffoldContent(
             route = DefaultRoutes.ApplicationInfo,
             isVisible = userRole == UserRole.DEFAULT
         ),
+        BottomNavItem(
+            icon = Icons.Default.Assignment,
+            route = AdminRoutes.SchedulingManagement,
         BottomNavItem( //ApplicationInfo
             icon = Icons.Default.AccountTree,
             route = AdminRoutes.ListApplications,
@@ -97,6 +103,21 @@ fun SocialStoreScaffoldContent(
             icon = Icons.Default.Storage,
             route = AdminRoutes.GetStock,
             isVisible = userRole == UserRole.ADMIN
+        ),
+        BottomNavItem( //stock
+            icon = Icons.Default.Schedule,
+            route = AdminRoutes.SchedulingMainPage,
+            isVisible = userRole == UserRole.ADMIN
+        ),
+        BottomNavItem( //stock
+            icon = Icons.Default.Home,
+            route = BeneficiaryRoutes.BeneficiaryHome,
+            isVisible = userRole == UserRole.BENEFICIARY
+        ),
+        BottomNavItem( //stock
+            icon = Icons.Default.Schedule,
+            route = BeneficiaryRoutes.BeneficiaryScheduling,
+            isVisible = userRole == UserRole.BENEFICIARY
         ),
     )
 
@@ -130,6 +151,15 @@ fun SocialStoreScaffoldContent(
                         }) { Text("Entrar", fontWeight = FontWeight.Bold)}
                     }
                     else {
+                        if (userRole == UserRole.ADMIN){
+                            IconButton(onClick = {navController.navigate(AdminRoutes.NotificationHistory)}) {
+                                Icon(
+                                    imageVector = Icons.Default.Notifications,
+                                    contentDescription = "Notificações",
+                                    tint = Color.Gray
+                                )
+                            }
+                        }
                         IconButton(onClick = {}) {
                             Icon(
                                 imageVector = Icons.Default.Person,
@@ -162,7 +192,29 @@ fun SocialStoreScaffoldContent(
                     }
                 }
             }
+            if (userRole == UserRole.BENEFICIARY){
+                NavigationBar() {
+                    allNavItems.forEach { item ->
+                        if (item.isVisible) {
+                            NavigationBarItem(
+                                icon = { Icon(imageVector = item.icon, contentDescription = "") },
+                                selected = currentRoute == BeneficiaryRoutes.BeneficiaryHome,
+                                onClick = {
+                                    NavigationLogic.navigateTo(
+                                        navController = navController,
+                                        userRole = userRole,
+                                        route = item.route
+                                    )
+                                }
+                            )
+                        }
+                    }
+                }
+            }
+
         }
+
+
     ) { paddingValues ->
         content(paddingValues)
     }
@@ -174,7 +226,7 @@ fun SocialStoreScaffoldGuestPreview() {
     SocialStoreTheme {
         SocialStoreScaffoldContent(
             navController = rememberNavController(),
-            userRole = UserRole.CANDIDATE,
+            userRole = UserRole.BENEFICIARY,
             logout = {}
         ) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {

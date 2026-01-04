@@ -36,10 +36,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.ipca.socialstore.data.enums.UserRole
 import com.ipca.socialstore.presentation.ui.theme.SocialStoreTheme
 
 @Composable
-fun BenificiaryHomeView(modifier: Modifier){
+fun BeneficiaryHomeView(modifier: Modifier, userRole : UserRole){
     BenificiaryHomeContent(modifier = modifier)
 }
 

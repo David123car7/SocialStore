@@ -40,7 +40,7 @@ class ExpirationDateWorker @AssistedInject constructor(
             }
             is ResultWrapper.Error -> {
                 Log.e("WORKER_TEST", "Erro na busca: ${result.error}")
-                Result.retry() // Tenta novamente se for erro de rede
+                Result.retry()
             }
         }
     }

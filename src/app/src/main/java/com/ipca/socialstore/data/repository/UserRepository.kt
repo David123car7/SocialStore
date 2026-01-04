@@ -97,6 +97,16 @@ class UserRepository @Inject constructor(private val supabase: SupabaseClient, p
         }
     }
 
+    suspend fun getUserBeneficiaryId(uid : String) : ResultWrapper<Int>{
+        return try {
+            val user = getUser(uid = uid) ?: return ResultWrapper.Error(AppError.UserNotFound)
+            user.beneficiaryId ?: return ResultWrapper.Error(AppError.ApplicationDontExists)
+            ResultWrapper.Success(user.beneficiaryId)
+        }
+        catch (e: Exception) {
+            ResultWrapper.Error(exceptionMapper.map(e))
+        }
+    }
     //Must be private
     private suspend fun getUser(uid: String): UserModel?{
         val user = supabase.from(DatabaseTables.USER).select(columns = Columns.list()){

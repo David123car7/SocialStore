@@ -3,16 +3,12 @@ package com.ipca.socialstore.domain.scheduling
 import com.ipca.socialstore.data.exceptions.ExceptionMapper
 import com.ipca.socialstore.data.models.BeneficiaryModel
 import com.ipca.socialstore.data.models.ItemModel
-import com.ipca.socialstore.data.models.NotificationSchedulingModel
-import com.ipca.socialstore.data.models.SchedulingDateModel
 import com.ipca.socialstore.data.models.SchedulingModel
 import com.ipca.socialstore.data.repository.SchedulingRepository
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
 import com.ipca.socialstore.domain.beneficiary.ExistBeneficiaryUseCase
-import com.ipca.socialstore.domain.notificationScheduling.CreateNotificationUseCase
-import com.ipca.socialstore.domain.schedulingDate.CreateSchedulingDateCreateUseCase
 import javax.inject.Inject
-
+/*
 class CreateSchedulingUseCase @Inject constructor(
     private val existBeneficiaryUseCase: ExistBeneficiaryUseCase,
     private val createSchedulingDateCreateUseCase: CreateSchedulingDateCreateUseCase,
@@ -59,3 +55,5 @@ class CreateSchedulingUseCase @Inject constructor(
 
     }
 }
+
+ */
