@@ -1,15 +1,11 @@
 package com.ipca.socialstore
 
-import AdminDashboardMockup
-import ApplicationFormScreenMockup
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -20,7 +16,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.ipca.socialstore.Work.StockWorkManager
 import com.ipca.socialstore.presentation.views.authentication.login.LoginView
 import com.ipca.socialstore.presentation.main.MainViewModel
 import com.ipca.socialstore.presentation.views.authentication.register.RegisterView
@@ -29,16 +24,21 @@ import com.ipca.socialstore.presentation.views.campaign.listAll.ListAllCampaigns
 import com.ipca.socialstore.presentation.views.donation.create.CreateDonationView
 import com.ipca.socialstore.presentation.views.item.CreateItemView
 import com.ipca.socialstore.presentation.routes.AdminRoutes
+import com.ipca.socialstore.presentation.routes.BeneficiaryRoutes
 import com.ipca.socialstore.presentation.routes.CandidateRoutes
 import com.ipca.socialstore.presentation.routes.DefaultRoutes
 import com.ipca.socialstore.presentation.routes.GeneralRoutes
 import com.ipca.socialstore.presentation.ui.SocialStoreScaffold
-import com.ipca.socialstore.presentation.views.Scheduling.CreateSchedulingView
+import com.ipca.socialstore.presentation.views.Scheduling.create.CreateSchedulingView
 import com.ipca.socialstore.presentation.views.stock.List.GetAllStockView
 import com.ipca.socialstore.presentation.views.stock.List.ListAllStockViewModel
 import com.ipca.socialstore.presentation.views.stock.List.StockItemDetailView
 import com.ipca.socialstore.presentation.ui.theme.SocialStoreTheme
 import com.ipca.socialstore.presentation.utils.NavigationLogic
+import com.ipca.socialstore.presentation.views.Scheduling.listAllSchedulingUser.ListAllSchedulingUserView
+import com.ipca.socialstore.presentation.views.Scheduling.mainPage.SchedulingMainPageView
+import com.ipca.socialstore.presentation.views.Scheduling.management.SchedulingManagementView
+import com.ipca.socialstore.presentation.views.Scheduling.management.SchedulingManagementViewModel
 import com.ipca.socialstore.presentation.views.application.applicationInfo.ApplicationInfoView
 import com.ipca.socialstore.presentation.views.application.applicationState.ApplicationStateView
 import com.ipca.socialstore.presentation.views.application.applicationStateAdmin.AplicationStateAdminView
@@ -46,7 +46,9 @@ import com.ipca.socialstore.presentation.views.application.applicationStateAdmin
 import com.ipca.socialstore.presentation.views.application.createApplication.CreateApplicationView
 import com.ipca.socialstore.presentation.views.application.listApplications.ListApplicationsView
 import com.ipca.socialstore.presentation.views.authentication.resetPassword.ResetPasswordView
+import com.ipca.socialstore.presentation.views.beneficiary.BeneficiaryManagementView
 import com.ipca.socialstore.presentation.views.home.adminHome.AdminHomeView
+import com.ipca.socialstore.presentation.views.home.beneficiaryHome.BeneficiaryHomeView
 import com.ipca.socialstore.presentation.views.home.defaultHomeView.DefaultHomeView
 import com.ipca.socialstore.presentation.views.home.testHome.TestHomeView
 import com.ipca.socialstore.presentation.views.notification.NotificationHistoryView
@@ -95,6 +97,12 @@ class MainActivity : ComponentActivity() {
                             ApplicationInfoView(
                                 modifier = Modifier.padding(innerPadding),
                                 navController = navController,
+                                userRole = mainState.userRole
+                            )
+                        }
+                        composable<BeneficiaryRoutes.BeneficiaryHome>{
+                            BeneficiaryHomeView(
+                                modifier = Modifier,
                                 userRole = mainState.userRole
                             )
                         }
@@ -148,6 +156,26 @@ class MainActivity : ComponentActivity() {
                         }
                         composable <AdminRoutes.NotificationHistory>{
                             NotificationHistoryView(modifier = Modifier.padding(innerPadding), navController = navController)
+                        }
+                        composable <AdminRoutes.SchedulingMainPage>{
+                            SchedulingMainPageView(modifier = Modifier.padding(innerPadding), navController = navController)
+                        }
+                        composable <AdminRoutes.SchedulingManagement>{
+                            SchedulingManagementView(modifier = Modifier.padding(innerPadding), navController = navController)
+                        }
+                        composable(
+                            route = AdminRoutes.BeneficiaryManagement::class.qualifiedName!! + "/{beneficiaryId}",
+                            arguments = listOf(
+                                navArgument("beneficiaryId") { type = NavType.StringType }
+                            )
+                        ) {
+                            BeneficiaryManagementView(
+                                modifier = Modifier.padding(innerPadding),
+                                navController = navController
+                            )
+                        }
+                        composable <BeneficiaryRoutes.BeneficiaryScheduling>{
+                            ListAllSchedulingUserView(modifier = Modifier.padding(innerPadding), navController = navController)
                         }
                     }
 

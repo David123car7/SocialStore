@@ -16,4 +16,7 @@ data class UserModel(
 
     @SerialName("application_id")
     val applicationId: Int?,
+
+    @SerialName("beneficiary_id")
+    val beneficiaryId : Int?,
 )

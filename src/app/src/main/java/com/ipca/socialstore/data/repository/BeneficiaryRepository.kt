@@ -4,6 +4,7 @@ import com.ipca.socialstore.data.enums.DatabaseTables
 import com.ipca.socialstore.data.exceptions.AppError
 import com.ipca.socialstore.data.exceptions.ExceptionMapper
 import com.ipca.socialstore.data.helpers.from
+import com.ipca.socialstore.data.models.BeneficiaryModel
 import com.ipca.socialstore.data.models.TableIdModel
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
 import io.github.jan.supabase.SupabaseClient
@@ -27,5 +28,50 @@ class BeneficiaryRepository  @Inject constructor(private val supabase : Supabase
             ResultWrapper.Error(exceptionMapper.map(e))
         }
     }
+
+    suspend fun getAllBeneficiary() : ResultWrapper<List<BeneficiaryModel>>{
+        return try {
+            val result = supabase.from(DatabaseTables.BENEFICIARY)
+                .select()
+                .decodeList<BeneficiaryModel>()
+            ResultWrapper.Success(result)
+        }catch (e : Exception){
+            return ResultWrapper.Error(exceptionMapper.map(e))
+        }
+    }
+
+    suspend fun getListBeneficiaryById(id : List<Int>) : ResultWrapper<List<BeneficiaryModel>>{
+        return try {
+            val result = supabase.from(DatabaseTables.BENEFICIARY)
+                .select {
+                    filter {
+                        isIn("id",id)
+                    }
+                }
+                .decodeList<BeneficiaryModel>()
+            ResultWrapper.Success(result)
+        }catch (e : Exception){
+            return ResultWrapper.Error(exceptionMapper.map(e))
+        }
+    }
+
+    suspend fun getBeneficiaryById(id : Int) : ResultWrapper<BeneficiaryModel>{
+        return try {
+            val result = supabase.from(DatabaseTables.BENEFICIARY)
+                .select {
+                    filter {
+                        eq("id",id)
+                    }
+                }
+                .decodeSingleOrNull<BeneficiaryModel>()
+            if (result == null) {
+                return ResultWrapper.Error(error = AppError.DataNotFound)
+            }
+            ResultWrapper.Success(result)
+        }catch (e : Exception){
+            return ResultWrapper.Error(exceptionMapper.map(e))
+        }
+    }
+
 }
 

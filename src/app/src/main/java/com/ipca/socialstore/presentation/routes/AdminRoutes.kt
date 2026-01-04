@@ -48,5 +48,12 @@ sealed class AdminRoutes {
     @Serializable
     object NotificationHistory : AdminRoutes()
 
+    @Serializable
+    object SchedulingMainPage : AdminRoutes()
 
+    @Serializable
+    object SchedulingManagement : AdminRoutes()
+
+    @Serializable
+    object BeneficiaryManagement : AdminRoutes()
 }

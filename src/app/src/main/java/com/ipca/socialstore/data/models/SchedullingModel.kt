@@ -8,13 +8,15 @@ data class SchedulingModel(
 
     val id: Int? = null,
 
-    @SerialName("schedulingDate_id")
-    val dateId : Int? = null,
-
-    @SerialName("notification_Id")
-    val notificationId : Int? = null,
+    @SerialName("scheduling_date")
+    val schedulingDate : String,
 
     @SerialName("beneficiary_id")
-    val beneficiaryId : Int? = null
+    val beneficiaryId : Int,
+
+    @SerialName("state")
+    val state : String
+
+
 )
 
