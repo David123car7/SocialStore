@@ -27,7 +27,6 @@ import com.ipca.socialstore.presentation.routes.CandidateRoutes
 import com.ipca.socialstore.presentation.routes.DefaultRoutes
 import com.ipca.socialstore.presentation.routes.GeneralRoutes
 import com.ipca.socialstore.presentation.ui.SocialStoreScaffold
-import com.ipca.socialstore.presentation.views.Scheduling.create.CreateSchedulingView
 import com.ipca.socialstore.presentation.views.stock.List.GetAllStockView
 import com.ipca.socialstore.presentation.views.stock.List.ListAllStockViewModel
 import com.ipca.socialstore.presentation.views.stock.List.StockItemDetailView
@@ -37,8 +36,6 @@ import com.ipca.socialstore.presentation.views.Scheduling.cancelByUser.Justifica
 import com.ipca.socialstore.presentation.views.Scheduling.listAllSchedulingUser.ListAllSchedulingUserView
 import com.ipca.socialstore.presentation.views.Scheduling.mainPage.SchedulingMainPageView
 import com.ipca.socialstore.presentation.views.Scheduling.management.SchedulingManagementView
-
-import com.ipca.socialstore.presentation.views.Scheduling.management.SchedulingManagementViewModel
 import com.ipca.socialstore.presentation.views.Scheduling.schedulingConfirmation.SchedulingConfirmationView
 import com.ipca.socialstore.presentation.views.application.applicationInfo.ApplicationInfoView
 import com.ipca.socialstore.presentation.views.application.applicationState.ApplicationStateView

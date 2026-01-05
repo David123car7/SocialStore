@@ -1,5 +1,6 @@
 package com.ipca.socialstore.domain.beneficiary
 
+import android.util.Log
 import com.ipca.socialstore.data.models.BeneficiaryModel
 import com.ipca.socialstore.data.repository.BeneficiaryRepository
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper

@@ -188,7 +188,8 @@ fun SchedulingConfirmationPreview() {
         id = 4,
         name = "Diogo",
         birthDate = "1995-08-20",
-        academicId = 2
+        academicId = 2,
+        phoneNumber = ""
     )
 
     // 2. Simulando o Agendamento Ativo ('accept')

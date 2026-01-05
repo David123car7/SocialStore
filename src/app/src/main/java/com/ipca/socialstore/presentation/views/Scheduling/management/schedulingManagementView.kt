@@ -43,9 +43,6 @@ fun SchedulingManagementView(
 ){
     val viewModel : SchedulingManagementViewModel = hiltViewModel()
     val uiState by viewModel.uiState
-    LaunchedEffect(Unit) {
-        viewModel.getAllBeneficiaries()
-    }
 
     SchedulingManagementContent(
         modifier = modifier,
@@ -149,13 +146,15 @@ fun SchedulingManagementPreview() {
             id = 4,
             name = "Diogo",
             birthDate = "1995-08-20",
-            academicId = 2
+            academicId = 2,
+            phoneNumber = ""
         ),
         BeneficiaryModel(
             id = 3,
             name = "David",
             birthDate = "1990-05-15",
-            academicId = 1
+            academicId = 1,
+            phoneNumber = ""
         )
     )
 
