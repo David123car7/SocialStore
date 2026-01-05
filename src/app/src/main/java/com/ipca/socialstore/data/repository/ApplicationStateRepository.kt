@@ -30,16 +30,20 @@ class ApplicationStateRepository @Inject constructor(
     }
 
     suspend fun updateApplicationState(applicationState: ApplicationStateModel): ResultWrapper<Int> {
-        if(applicationState.id == null)
-            return ResultWrapper.Error(AppError.UnknownError("Appllication State Id Null"))
-
+        val id = applicationState.id
+            ?: return ResultWrapper.Error(AppError.UnknownError("Application State Id Null"))
         return try {
-            supabaseClient.from(DatabaseTables.APPLICATION_STATE).update(applicationState) {
-                filter {
-                    eq("id", applicationState.id!!)
-                }
+            val result = supabaseClient.from(DatabaseTables.APPLICATION_STATE)
+                .update(applicationState) {
+                    filter {
+                        eq("id", id)
+                    }
+                    select(columns = Columns.list("id"))
+                }.decodeSingleOrNull<TableIdModel>()
+            if (result == null) {
+                return ResultWrapper.Error(AppError.DataNotFound)
             }
-            ResultWrapper.Success(applicationState.id)
+            ResultWrapper.Success(result.id)
         } catch (e: Exception) {
             ResultWrapper.Error(exceptionMapper.map(e))
         }

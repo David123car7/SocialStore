@@ -1,15 +1,13 @@
 package com.ipca.socialstore.presentation.views.notification
 
-import android.view.View
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ipca.socialstore.Work.ExpirationDateWorker
 import com.ipca.socialstore.data.models.NotificationScheduledModel
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
 import com.ipca.socialstore.domain.notificationSchedule.GetAllNotificationsUseCase
-import com.ipca.socialstore.presentation.utils.ErrorText
-import com.ipca.socialstore.presentation.utils.asUiText
+import com.ipca.socialstore.presentation.utils.errors.ErrorText
+import com.ipca.socialstore.presentation.utils.errors.asUiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject

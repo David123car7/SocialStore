@@ -46,7 +46,7 @@ import androidx.navigation.compose.rememberNavController
 import com.ipca.socialstore.data.enums.UserRole
 import com.ipca.socialstore.data.models.CampaignModel
 import com.ipca.socialstore.presentation.routes.DefaultRoutes
-import com.ipca.socialstore.presentation.utils.NavigationLogic
+import com.ipca.socialstore.presentation.utils.navigation.NavigationLogic
 import com.ipca.socialstore.presentation.routes.GeneralRoutes
 import com.ipca.socialstore.presentation.ui.theme.SocialStoreTheme
 import com.ipca.socialstore.presentation.ui.SocialStoreScaffold

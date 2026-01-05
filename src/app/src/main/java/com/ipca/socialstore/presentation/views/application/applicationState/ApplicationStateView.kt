@@ -36,7 +36,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -55,6 +55,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -63,10 +64,11 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.ipca.socialstore.data.enums.ApplicationDataStatus
 import com.ipca.socialstore.data.enums.ApplicationDocumentTypeState
-import com.ipca.socialstore.data.enums.ApplicationStatus
+import com.ipca.socialstore.data.enums.ApplicationStates
 import com.ipca.socialstore.data.enums.DocumentStatus
 import com.ipca.socialstore.data.enums.DocumentType
 import com.ipca.socialstore.data.enums.UserRole
+import com.ipca.socialstore.data.models.ApplicationDocumentTypeModel
 import com.ipca.socialstore.presentation.models.DocumentReceiverModel
 import com.ipca.socialstore.presentation.ui.SocialStoreScaffoldContent
 import com.ipca.socialstore.presentation.ui.components.AlertComponent
@@ -74,10 +76,10 @@ import com.ipca.socialstore.presentation.ui.components.ButtonTracedComponent
 import com.ipca.socialstore.presentation.ui.components.ExpandableSection
 import com.ipca.socialstore.presentation.ui.components.ReadOnlyField
 import com.ipca.socialstore.presentation.ui.components.WarningComponent
-import com.ipca.socialstore.presentation.ui.theme.GreenIPCA
 import com.ipca.socialstore.presentation.ui.theme.SocialStoreTheme
-import com.ipca.socialstore.presentation.utils.getFileNameFromUri
-import com.ipca.socialstore.presentation.views.application.status.TimelineLine
+import com.ipca.socialstore.presentation.utils.files.getFileNameFromUri
+import com.ipca.socialstore.presentation.utils.ui.getApplicationDataStateViewData
+import com.ipca.socialstore.presentation.utils.ui.getApplicationDocumentTypeStateViewData
 
 @Composable
 fun ApplicationStateView(modifier: Modifier, navController: NavController, userRole: UserRole){
@@ -107,11 +109,19 @@ fun ApplicationStateView(modifier: Modifier, navController: NavController, userR
         onDeleteFile = { doc, uri, folderName ->
             applicationStateViewModel.removeFile(uri = uri, document = doc, folderName = folderName)
         },
-        onSubmitFile = {folderName -> applicationStateViewModel.submitFiles(folderName = folderName, context = context)},
-        documentsCompletedColor = Color(0x120FFC0B),
-        documentsWrongColor = Color(0x1BFF0000),
+        onSubmitFile = { docTypeStateId, type, msg, folderName ->
+            applicationStateViewModel.submitFile(
+                folderName = folderName,
+                type = type,
+                msg = msg,
+                docTypeStateId = docTypeStateId,
+                context = context
+            )
+        },
         onDeleteApplication = { applicationStateViewModel.deleteApplication()},
-        onApplicationUpdate = applicationStateViewModel::updateApplication
+        onApplicationUpdate = {
+            applicationStateViewModel.updateApplication()
+        }
     )
 
     LaunchedEffect(uiState.error) {
@@ -126,12 +136,10 @@ fun ApplicationStateView(modifier: Modifier, navController: NavController, userR
 fun ApplicationStateViewContent(
     modifier: Modifier,
     uiState: ApplicationState,
-    documentsCompletedColor: Color,
-    documentsWrongColor: Color,
     onDeleteFile:(document: DocumentReceiverModel?, uri: Uri?, folderName: String) -> Unit,
     onAddSelectedFile:(folderName: String, uri: Uri?) -> Unit,
     onDeleteApplication:() -> Unit,
-    onSubmitFile:(folderName: String) -> Unit,
+    onSubmitFile:(docTypeStateId: Int, type: String, msg: String, folderName: String) -> Unit,
     onNameUpdate: (String) -> Unit,
     onYearUpdate: (String) -> Unit,
     onBirthDateUpdate: (String) -> Unit,
@@ -141,7 +149,7 @@ fun ApplicationStateViewContent(
     onTypeCourseUpdate: (String) -> Unit,
     onCourseUpdate: (String) -> Unit,
     onStudentNumberUpdate: (String) -> Unit,
-    onApplicationUpdate:() ->Unit
+    onApplicationUpdate:() ->Unit,
     ){
 
     var isDataExpanded by remember { mutableStateOf(true) }
@@ -206,38 +214,20 @@ fun ApplicationStateViewContent(
         ) {
             if (uiState.application.applicationDataState.state == ApplicationDataStatus.DENIED.status){
                 WarningComponent(
-                    tittle = "Correção Necessár00ia.",
+                    tittle = "Correção Necessária.",
                     message = uiState.application.applicationDataState.message ?: "",
                     bgColor = Color(0xFFFFCCC7),
                     mainColor = Color(0xFFCF1322),
                     icon = Icons.Default.Warning
                 )
             }
-            var dataCategoryDesc: String = ""
-            var dataCategoryDescTextColor: Color = Color.Black
-            var dataCategoryDescBgTextColor: Color = Color.White
-            if(uiState.application.applicationDataState.state == ApplicationDataStatus.ACCEPTED.status){
-                dataCategoryDesc = "Dados Aceites"
-                dataCategoryDescTextColor = GreenIPCA
-                dataCategoryDescBgTextColor = Color(0x120FFC0B)
-            }
-            if(uiState.application.applicationDataState.state == ApplicationDataStatus.DENIED.status){
-                dataCategoryDesc = "Dados Negados"
-                dataCategoryDescTextColor = Color(0xFFCF1322)
-                dataCategoryDescBgTextColor = Color(0x1BFF0000)
-            }
-            if(uiState.application.applicationDataState.state == ApplicationDataStatus.TO_REVIEW.status){
-                dataCategoryDesc = "Por Rever"
-                dataCategoryDescTextColor = Color(0xFFDAA210)
-                dataCategoryDescBgTextColor = Color(0x43DAA210)
-            }
-
+            val uiData = getApplicationDataStateViewData(uiState.application.applicationDataState.state)
             if (uiState.application.applicationDataState.state != ApplicationDataStatus.DENIED.status) {
                 CategoryBox(
                     title = "Dados Pessoais",
-                    description = dataCategoryDesc,
-                    descriptionTextColor = dataCategoryDescTextColor,
-                    descriptionBgTextColor = dataCategoryDescBgTextColor
+                    description = uiData.text,
+                    descriptionTextColor = uiData.textColor,
+                    descriptionBgTextColor = uiData.bgColor
                 ) {
                     ReadOnlyField("Nome Completo", uiState.application.name)
                     Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -284,7 +274,12 @@ fun ApplicationStateViewContent(
                     }
                 }
                 if(uiState.application.academicData != null){
-                    CategoryBox(title = "Dados Académicos", bgColor = Color.White) {
+                    CategoryBox(
+                        title = "Dados Académicos",
+                        description = uiData.text,
+                        descriptionTextColor = uiData.textColor,
+                        descriptionBgTextColor = uiData.bgColor
+                    ) {
                         ReadOnlyField("Curso", uiState.application.academicData.course)
                         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                             Box(Modifier.weight(1f)) { ReadOnlyField(label = "Tipo de Curso", value = uiState.application.academicData.typeCourse) }
@@ -296,9 +291,9 @@ fun ApplicationStateViewContent(
             else {
                 CategoryBox(
                     title = "Dados Pessoais",
-                    description = dataCategoryDesc,
-                    descriptionTextColor = dataCategoryDescTextColor,
-                    descriptionBgTextColor = dataCategoryDescBgTextColor
+                    description = uiData.text,
+                    descriptionTextColor = uiData.textColor,
+                    descriptionBgTextColor = uiData.bgColor
                 ) {
                     ApplicationForm(
                         modifier = Modifier,
@@ -321,7 +316,8 @@ fun ApplicationStateViewContent(
                         onAcademicTypeChange = onTypeCourseUpdate,
                         onAcademicCourseChange = onCourseUpdate,
                         onAcademicNumberChange = onStudentNumberUpdate,
-                        isAdmin = true
+                        isAdmin = true,
+                        onIsStudentUpdate = {}
                     )
                 }
                 Button(
@@ -341,125 +337,61 @@ fun ApplicationStateViewContent(
             isExpanded = isDocsExpanded,
             onExpandChange = { isDocsExpanded = it }
         ) {
-            var bankStatementsBgColor = Color.White
-            var bankStatementsTittle = "Extratos Bancários"
-            var addBankStatementButton = true
-            if(uiState.bankStatementDocsState?.state == ApplicationDocumentTypeState.COMPLETED.state){
-                bankStatementsBgColor = documentsCompletedColor
-                bankStatementsTittle += " (Completo)"
-                addBankStatementButton = false
-            }
-            else if(uiState.bankStatementDocsState?.state == ApplicationDocumentTypeState.SOMETHING_WRONG.state){
-                bankStatementsBgColor = documentsWrongColor
-            }
-
             DocumentsList(
                 documentsList = uiState.documentsBankStatements,
+                documentsState = uiState.bankStatementDocsState,
                 files = uiState.selectedBankStatements,
-                fileType = DocumentType.BANK_STATEMENTS.folderName,
-                tittle = bankStatementsTittle,
-                description = uiState.bankStatementDocsState?.description,
-                bgColor = bankStatementsBgColor,
-                showAddFileButton = addBankStatementButton,
+                tittle = "Extratos Bancários",
+                description = uiState.bankStatementDocsState.description,
+                bgColor = Color.White,
                 filePicker = bankStatementsFilesPicker,
                 onDeleteFile = onDeleteFile,
                 onSubmitFile = onSubmitFile
             )
 
-            var incomeProofBgColor = Color.White
-            var incomeProofTittle = "Comprovativos de Rendimento"
-            var addIncomeProofButton = true
-            if(uiState.incomeProofDocsState?.state == ApplicationDocumentTypeState.COMPLETED.state){
-                incomeProofBgColor = documentsCompletedColor
-                incomeProofTittle += " (Completo)"
-                addIncomeProofButton = false
-            }
-            else if(uiState.incomeProofDocsState?.state == ApplicationDocumentTypeState.SOMETHING_WRONG.state){
-                incomeProofBgColor = documentsWrongColor
-            }
-
             DocumentsList(
                 documentsList = uiState.documentsIncomeProof,
+                documentsState = uiState.incomeProofDocsState,
                 files = uiState.selectedIncomeProof,
-                fileType = DocumentType.INCOME_PROOF.folderName,
-                tittle = incomeProofTittle,
-                description = uiState.incomeProofDocsState?.description,
-                bgColor = incomeProofBgColor,
-                showAddFileButton = addIncomeProofButton,
+                tittle = "Comprovativos de Rendimento",
+                description = uiState.incomeProofDocsState.description,
+                bgColor = Color.White,
                 filePicker = incomeProofFilesPicker,
                 onDeleteFile = onDeleteFile,
                 onSubmitFile = onSubmitFile
             )
 
-            var otherIncomeBgColor = Color.White
-            var otherIncomeTittle = "Outros Rendimentos"
-            var addOtherIncomeButton = true
-            if(uiState.otherIncomeDocsState?.state == ApplicationDocumentTypeState.COMPLETED.state){
-                otherIncomeBgColor = documentsCompletedColor
-                otherIncomeTittle += " (Completo)"
-                addOtherIncomeButton = false
-            }
-            else if(uiState.otherIncomeDocsState?.state == ApplicationDocumentTypeState.SOMETHING_WRONG.state){
-                otherIncomeBgColor = documentsWrongColor
-            }
-
             DocumentsList(
                 documentsList = uiState.documentsOtherIncome,
+                documentsState = uiState.otherIncomeDocsState,
                 files = uiState.selectedOtherIncome,
-                tittle = otherIncomeTittle,
-                description = uiState.otherIncomeDocsState?.description,
-                fileType = DocumentType.OTHER_INCOME.folderName,
-                bgColor = otherIncomeBgColor,
-                showAddFileButton = addOtherIncomeButton,
+                tittle = "Outros Rendimentos",
+                description = uiState.otherIncomeDocsState.description,
+                bgColor = Color.White,
                 filePicker = otherIncomeFilesPicker,
                 onDeleteFile = onDeleteFile,
                 onSubmitFile = onSubmitFile
             )
 
-            var permanentExpensesBgColor = Color.White
-            var permanentExpensesTittle = "Despesas Permanentes"
-            var addPermanentExpensesButton = true
-            if(uiState.permanentExpensesDocsState?.state == ApplicationDocumentTypeState.COMPLETED.state){
-                permanentExpensesBgColor = documentsCompletedColor
-                permanentExpensesTittle += " (Completo)"
-                addPermanentExpensesButton = false
-            }
-            else if(uiState.permanentExpensesDocsState?.state == ApplicationDocumentTypeState.SOMETHING_WRONG.state){
-                permanentExpensesBgColor = documentsWrongColor
-            }
-
             DocumentsList(
                 documentsList = uiState.documentsPermanentExpenses,
+                documentsState = uiState.permanentExpensesDocsState,
                 files = uiState.selectedPermanentExpenses,
-                tittle = permanentExpensesTittle,
-                description = uiState.permanentExpensesDocsState?.description,
-                fileType = DocumentType.PERMANENT_EXPENSES.folderName,
-                bgColor = permanentExpensesBgColor,
-                showAddFileButton = addPermanentExpensesButton,
+                tittle = "Despesas Permanentes",
+                description = uiState.permanentExpensesDocsState.description,
+                bgColor = Color.White,
                 filePicker = permanentExpensesFilesPicker,
                 onDeleteFile = onDeleteFile,
                 onSubmitFile = onSubmitFile
             )
-            var internationalSupportBgColor = Color.White
-            var internationalSupportTittle = "Apoio Internacional"
-            var addInternationalSupportButton = true
-            if(uiState.internationalSupportDocsState?.state == ApplicationDocumentTypeState.COMPLETED.state){
-                internationalSupportBgColor = documentsCompletedColor
-                internationalSupportTittle += " (Completo)"
-                addInternationalSupportButton = false
-            }
-            else if(uiState.internationalSupportDocsState?.state == ApplicationDocumentTypeState.SOMETHING_WRONG.state){
-                internationalSupportBgColor = documentsWrongColor
-            }
 
             DocumentsList(
                 documentsList = uiState.documentsInternationalSupport,
+                documentsState = uiState.internationalSupportDocsState,
                 files = uiState.selectedInternationalSupport,
-                tittle = internationalSupportTittle,
-                description = uiState.internationalSupportDocsState?.description,
-                fileType = DocumentType.INTERNATIONAL_SUPPORT.folderName,
-                bgColor = internationalSupportBgColor,
-                showAddFileButton = addInternationalSupportButton,
+                tittle = "Apoio Internacional",
+                description = uiState.internationalSupportDocsState.description,
+                bgColor = Color.White,
                 filePicker = internationalSupportFilesPicker,
                 onDeleteFile = onDeleteFile,
                 onSubmitFile = onSubmitFile
@@ -479,21 +411,37 @@ fun ApplicationStateViewContent(
     }
 }
 
-
-
 @Composable
 fun DocumentsList(
     documentsList: List<DocumentReceiverModel>,
+    documentsState: ApplicationDocumentTypeModel,
     files: List<Uri>,
     tittle: String,
     description: String? = null,
-    fileType: String,
     bgColor: Color,
-    showAddFileButton: Boolean,
     filePicker: ManagedActivityResultLauncher<String, Uri?>,
     onDeleteFile:(document: DocumentReceiverModel?, uri: Uri?, folderName: String) -> Unit,
-    onSubmitFile:(folderName: String) -> Unit){
-    CategoryBox(title = tittle, bgColor = bgColor, description = description) {
+    onSubmitFile:(docTypeStateId: Int, type: String, msg: String, folderName: String) -> Unit){
+
+    val uiData = getApplicationDocumentTypeStateViewData(documentsState.state)
+
+    CategoryBox(
+        title = tittle,
+        bgColor = bgColor,
+        description = uiData.text,
+        descriptionTextColor = uiData.textColor,
+        descriptionBgTextColor = uiData.bgColor
+    ) {
+        if(documentsState.state == ApplicationDocumentTypeState.SOMETHING_WRONG.state) {
+            WarningComponent(
+                tittle = "Correção Necessária.",
+                message = documentsState.description,
+                bgColor = Color(0xFFFFCCC7),
+                mainColor = Color(0xFFCF1322),
+                icon = Icons.Default.Warning
+            )
+        }
+
         Column(
             modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(8.dp) // Espaço entre documentos
@@ -530,7 +478,7 @@ fun DocumentsList(
                         date = doc.createdAt,
                         imageVector = icon,
                         canDelete = canDelete,
-                        onDeleteFile = { onDeleteFile(doc, null, fileType) },
+                        onDeleteFile = { onDeleteFile(doc, null, documentsState.type) },
                         errorMessage = doc.description,
                     )
                 }
@@ -544,15 +492,31 @@ fun DocumentsList(
                         statusColor = Color.Magenta,
                         bgColor = Color(0xFFF5F7FA),
                         canDelete = true,
-                        onDeleteFile = { onDeleteFile(null, file, fileType) },
+                        onDeleteFile = { onDeleteFile(null, file, documentsState.type) },
                         imageVector = Icons.Default.Star,
                     )
                 }
             }
-            if(showAddFileButton)
+            if(documentsState.type != ApplicationDocumentTypeState.COMPLETED.state)
                 ButtonTracedComponent(modifier = Modifier,label = "Adicionar Ficheiros", color = Color.Gray, onClick = {filePicker.launch("application/pdf")})
-            if(files.isNotEmpty())
-                BotaoUpload(onClick = {onSubmitFile(fileType)})
+            if(files.isNotEmpty()){
+                Button(
+                    onClick = { onSubmitFile(documentsState.id!!, documentsState.type, "", documentsState.type) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp),
+                    shape = RoundedCornerShape(6.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFF878787),
+                        contentColor = Color.White
+                    ),
+                    elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
+                ) {
+                    Text(
+                        text = "Enviar Ficheiros",
+                    )
+                }
+            }
         }
     }
 }
@@ -561,12 +525,12 @@ fun DocumentsList(
 fun StatusTimelineHeader(state: String) {
     Card(
         colors = CardDefaults.cardColors(containerColor = Color.White),
-        border = if(state == ApplicationStatus.CORRECTION.status) BorderStroke(1.dp, Color.Black) else BorderStroke(1.dp, Color.LightGray), //depois corrigir a cor
+        border = if(state == ApplicationStates.CORRECTION.status) BorderStroke(1.dp, Color.Black) else BorderStroke(1.dp, Color.LightGray), //depois corrigir a cor
         elevation = CardDefaults.cardElevation(0.dp),
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(modifier = Modifier.padding(20.dp)) {
-            if(state == ApplicationStatus.PENDING.status){
+            if(state == ApplicationStates.PENDING.status){
                 TimelineComponent(
                     label = "Submetido",
                     description = "A candidatura foi submetida.",
@@ -575,7 +539,7 @@ fun StatusTimelineHeader(state: String) {
                     color = Color(0xFFFBC02D)
                 )
             }
-            else if(state == ApplicationStatus.CORRECTION.status){
+            else if(state == ApplicationStates.CORRECTION.status){
                 TimelineComponent(
                     label = "Correção",
                     description = "A candidatura precisa de ser corrigida.",
@@ -584,7 +548,7 @@ fun StatusTimelineHeader(state: String) {
                     color = Color(0xFF1976D2)
                 )
             }
-            else if(state == ApplicationStatus.APPROVED.status){
+            else if(state == ApplicationStates.APPROVED.status){
                 TimelineComponent(
                     label = "Aceite",
                     description = "Candidatura aprovada.",
@@ -593,7 +557,7 @@ fun StatusTimelineHeader(state: String) {
                     color = Color(0xFF43A047)
                 )
             }
-            else if(state == ApplicationStatus.REJECTED.status){
+            else if(state == ApplicationStates.REJECTED.status){
                 TimelineComponent(
                     label = "Recusado",
                     description = "Candidatura não aceite.",
@@ -629,9 +593,7 @@ fun TimelineComponent(label: String, description: String, icon: ImageVector, ste
         verticalAlignment = Alignment.CenterVertically
     ) {
         TimelineStep("1", "Submetido", true, step >= 1, color)
-        TimelineLine(step >= 2, color)
         TimelineStep("2", "Em Análise", step >= 2, step > 2, color)
-        TimelineLine(step >= 3, color)
         TimelineStep("3", "Decisão", step >= 3, step == 3, color)
     }
 }
@@ -675,9 +637,23 @@ fun CategoryBox(
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(title, fontWeight = FontWeight.Bold, fontSize = 15.sp, color = Color(0xFF263238))
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth() // Ensure Row fills width
+            ) {
+                // 1. Title takes available space (weight 1f) and truncates if needed
+                Text(
+                    text = title,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 15.sp,
+                    color = Color(0xFF263238),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f)
+                )
+
                 if(description != null){
+                    // 2. Surface keeps its natural size, pushed to the right
                     Surface(
                         modifier = Modifier.padding(start = 15.dp),
                         color = descriptionBgTextColor,
@@ -688,12 +664,14 @@ fun CategoryBox(
                             color = descriptionTextColor,
                             style = MaterialTheme.typography.labelSmall,
                             fontWeight = FontWeight.Bold,
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                            maxLines = 1, // Optional: ensure status doesn't break lines
+                            overflow = TextOverflow.Ellipsis
                         )
                     }
                 }
             }
-            Divider(modifier = Modifier.padding(vertical = 12.dp), color = Color(0xFFEEEEEE))
+            HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp), color = Color(0xFFEEEEEE)) // Updated to HorizontalDivider for Material3
             content()
         }
     }
@@ -789,26 +767,6 @@ fun DocumentRowState(status: String, imageVector: ImageVector, color: Color){
     }
 }
 
-@Composable
-fun BotaoUpload(onClick: () -> Unit) {
-    Button(
-        onClick = onClick,
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(50.dp),
-        shape = RoundedCornerShape(6.dp),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = Color(0xFF878787),
-            contentColor = Color.White
-        ),
-        elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
-    ) {
-        Text(
-            text = "Enviar Ficheiros",
-        )
-    }
-}
-
 @Preview(showBackground = true)
 @Composable
 fun ApplicationStatePreview(){
@@ -840,9 +798,7 @@ fun ApplicationStatePreview(){
                 uiState = uiState,
                 onAddSelectedFile = { folderName, uri -> {}},
                 onDeleteFile = {folderName, uri, document -> {}},
-                onSubmitFile = {},
-                documentsCompletedColor = Color(0x120FFC0B),
-                documentsWrongColor = Color(0x1BFF0000),
+                onSubmitFile = {docTypeStateId, type,msg, folderName  -> {}},
                 onDeleteApplication = {},
                 onNameUpdate = {},
                 onYearUpdate = {},

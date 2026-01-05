@@ -1,4 +1,4 @@
-package com.ipca.socialstore.domain.profile
+package com.ipca.socialstore.domain.usecases.user
 
 import com.ipca.socialstore.data.enums.UserRole
 import com.ipca.socialstore.data.repository.UserRepository

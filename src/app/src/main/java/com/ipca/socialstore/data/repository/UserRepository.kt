@@ -83,6 +83,20 @@ class UserRepository @Inject constructor(private val supabase: SupabaseClient, p
         }
     }
 
+    suspend fun setBeneficiaryId(uid: String, beneficiaryId: Int): ResultWrapper<String>{
+        return try {
+            val user = getUser(uid = uid) ?: return ResultWrapper.Error(AppError.UserNotFound)
+            val newUser = user.copy(beneficiaryId = beneficiaryId)
+            supabase.from(DatabaseTables.USER).update(newUser) {
+                filter { eq("id", uid) }
+            }
+            ResultWrapper.Success(uid)
+        }
+        catch (e: Exception) {
+            ResultWrapper.Error(exceptionMapper.map(e))
+        }
+    }
+
     suspend fun setUserApplicationId(uid: String, id: Int?): ResultWrapper<String>{
         return try {
             val user = getUser(uid = uid) ?: return ResultWrapper.Error(AppError.UserNotFound)

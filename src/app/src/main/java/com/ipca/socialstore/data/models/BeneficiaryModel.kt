@@ -6,9 +6,10 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class BeneficiaryModel(
     val id : Int? = null,
-
     @SerialName("name")
     val name : String,
+    @SerialName("phone_number")
+    val phoneNumber : String,
     @SerialName("birth_date")
     val birthDate : String,
     @SerialName("academic_id")

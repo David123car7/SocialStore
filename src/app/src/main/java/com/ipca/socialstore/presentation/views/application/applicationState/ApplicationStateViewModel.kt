@@ -5,19 +5,19 @@ import android.net.Uri
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.room.util.copy
+import com.ipca.socialstore.data.enums.ApplicationDataStatus
+import com.ipca.socialstore.data.enums.ApplicationDocumentTypeState
+import com.ipca.socialstore.data.enums.ApplicationStates
 import com.ipca.socialstore.data.enums.DocumentType
 import com.ipca.socialstore.data.exceptions.AppError
-import com.ipca.socialstore.data.models.AcademicModel
 import com.ipca.socialstore.data.models.ApplicationDataStateModel
 import com.ipca.socialstore.data.models.ApplicationDocumentTypeModel
 import com.ipca.socialstore.data.models.ApplicationModel
 import com.ipca.socialstore.data.models.ApplicationStateModel
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
-import com.ipca.socialstore.domain.academic.GetAcademicDataUseCase
 import com.ipca.socialstore.domain.appDocType.GetAppDocTypesUseCase
-import com.ipca.socialstore.domain.application.GetUserApplicationUseCase
-import com.ipca.socialstore.domain.applicationState.GetUserApplicationState
+import com.ipca.socialstore.domain.appDocType.UpdateAppDocTypeUseCase
+import com.ipca.socialstore.domain.applicationState.UpdateApplicationStateUseCase
 import com.ipca.socialstore.domain.services.application.DeleteApplicationService
 import com.ipca.socialstore.domain.services.application.GetUserApplicationService
 import com.ipca.socialstore.domain.services.application.UpdateApplicationService
@@ -26,9 +26,10 @@ import com.ipca.socialstore.domain.services.document.GetApplicationDocumentsServ
 import com.ipca.socialstore.domain.services.document.UploadApplicationDocumentsService
 import com.ipca.socialstore.presentation.models.ApplicationModelReceiver
 import com.ipca.socialstore.presentation.models.DocumentReceiverModel
-import com.ipca.socialstore.presentation.utils.ErrorText
-import com.ipca.socialstore.presentation.utils.asUiText
-import com.ipca.socialstore.presentation.utils.getFileNameFromUri
+import com.ipca.socialstore.presentation.utils.errors.ErrorText
+import com.ipca.socialstore.presentation.utils.errors.asUiText
+import com.ipca.socialstore.presentation.utils.files.getFileNameFromUri
+import com.ipca.socialstore.presentation.views.application.applicationStateAdmin.createEmptyDocumentTypeModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -53,11 +54,11 @@ data class ApplicationState(
     val documentsPermanentExpenses: List<DocumentReceiverModel> = emptyList(),
     val documentsInternationalSupport: List<DocumentReceiverModel> = emptyList(),
 
-    val bankStatementDocsState: ApplicationDocumentTypeModel? = null,
-    val incomeProofDocsState: ApplicationDocumentTypeModel? = null,
-    val otherIncomeDocsState: ApplicationDocumentTypeModel? = null,
-    val permanentExpensesDocsState: ApplicationDocumentTypeModel? = null,
-    val internationalSupportDocsState: ApplicationDocumentTypeModel? = null,
+    val bankStatementDocsState: ApplicationDocumentTypeModel = createEmptyDocumentTypeModel(),
+    val incomeProofDocsState: ApplicationDocumentTypeModel = createEmptyDocumentTypeModel(),
+    val otherIncomeDocsState: ApplicationDocumentTypeModel = createEmptyDocumentTypeModel(),
+    val permanentExpensesDocsState: ApplicationDocumentTypeModel = createEmptyDocumentTypeModel(),
+    val internationalSupportDocsState: ApplicationDocumentTypeModel = createEmptyDocumentTypeModel(),
     )
 
 @HiltViewModel
@@ -68,11 +69,19 @@ class ApplicationStateViewModel @Inject constructor(
     private val deleteDocumentService: DeleteDocumentService,
     private val getAppDocTypesUseCase: GetAppDocTypesUseCase,
     private val deleteApplicationService: DeleteApplicationService,
-    private val updateApplicationService: UpdateApplicationService) : ViewModel(){
+    private val updateApplicationService: UpdateApplicationService,
+    private val updateAppDocTypeUseCase: UpdateAppDocTypeUseCase,
+    private val updateApplicationStateUseCase: UpdateApplicationStateUseCase) : ViewModel(){
 
     var uiState = mutableStateOf(ApplicationState())
 
     init {
+        viewModelScope.launch {
+            getApplication()
+        }
+    }
+
+    fun getApplication(){
         viewModelScope.launch {
             val applicationResult = getUserApplicationService()
             when(applicationResult){
@@ -81,36 +90,7 @@ class ApplicationStateViewModel @Inject constructor(
                         application = applicationResult.data,
                         isLoading = false,
                     )
-                    val docBankStatements = getDocuments(
-                        applicationId = applicationResult.data.id!!,
-                        documentType = DocumentType.BANK_STATEMENTS.folderName
-                    )
-
-                    val docIncomeProof = getDocuments(
-                        applicationId = applicationResult.data.id,
-                        documentType = DocumentType.INCOME_PROOF.folderName
-                    )
-                    val docOtherIncome = getDocuments(
-                        applicationId = applicationResult.data.id,
-                        documentType = DocumentType.OTHER_INCOME.folderName
-                    )
-                    val docPermanentExpenses = getDocuments(
-                        applicationId = applicationResult.data.id,
-                        documentType = DocumentType.PERMANENT_EXPENSES.folderName
-                    )
-                    val docInternationalSupport = getDocuments(
-                        applicationId = applicationResult.data.id,
-                        documentType = DocumentType.INTERNATIONAL_SUPPORT.folderName
-                    )
-
-                    uiState.value = uiState.value.copy(
-                        documentsBankStatements = docBankStatements,
-                        documentsOtherIncome = docOtherIncome,
-                        documentsIncomeProof = docIncomeProof,
-                        documentsInternationalSupport = docInternationalSupport,
-                        documentsPermanentExpenses = docPermanentExpenses
-                    )
-                    getAppDocTypeStates(applicationId = applicationResult.data.id)
+                    getApplicationDocuments(applicationId = uiState.value.application.id!!)
                 }
                 is ResultWrapper.Error -> {
                     uiState.value = uiState.value.copy(
@@ -119,6 +99,41 @@ class ApplicationStateViewModel @Inject constructor(
                     )
                 }
             }
+        }
+    }
+
+    fun getApplicationDocuments(applicationId: Int){
+        viewModelScope.launch {
+            val docBankStatements = getDocuments(
+                applicationId = applicationId,
+                documentType = DocumentType.BANK_STATEMENTS.folderName
+            )
+
+            val docIncomeProof = getDocuments(
+                applicationId = applicationId,
+                documentType = DocumentType.INCOME_PROOF.folderName
+            )
+            val docOtherIncome = getDocuments(
+                applicationId = applicationId,
+                documentType = DocumentType.OTHER_INCOME.folderName
+            )
+            val docPermanentExpenses = getDocuments(
+                applicationId = applicationId,
+                documentType = DocumentType.PERMANENT_EXPENSES.folderName
+            )
+            val docInternationalSupport = getDocuments(
+                applicationId = applicationId,
+                documentType = DocumentType.INTERNATIONAL_SUPPORT.folderName
+            )
+
+            uiState.value = uiState.value.copy(
+                documentsBankStatements = docBankStatements,
+                documentsOtherIncome = docOtherIncome,
+                documentsIncomeProof = docIncomeProof,
+                documentsInternationalSupport = docInternationalSupport,
+                documentsPermanentExpenses = docPermanentExpenses
+            )
+            getAppDocTypeStates(applicationId = applicationId)
         }
     }
 
@@ -210,15 +225,26 @@ class ApplicationStateViewModel @Inject constructor(
 
         viewModelScope.launch {
             uiState.value = uiState.value.copy(isLoading = true)
+            val applicationDataState = ApplicationDataStateModel(
+                id = uiState.value.application.applicationDataState.id!!,
+                state = ApplicationDataStatus.TO_REVIEW.status,
+                message = ""
+            )
             val updateApplicationResult = updateApplicationService(
                 application = application,
                 academicModel = uiState.value.application.academicData,
-                applicationDataStateId = uiState.value.application.applicationDataState.id!!)
+                applicationDataState = applicationDataState
+            )
             when (updateApplicationResult) {
                 is ResultWrapper.Success -> {
                     uiState.value = uiState.value.copy(
                         isLoading = false,
                     )
+                    updateApplicationDataStateLocal(dataState = applicationDataState)
+
+                    if(checkUpdateApplicationState()){
+                        updateApplicationState(ApplicationStates.PENDING.status)
+                    }
                 }
                 is ResultWrapper.Error -> {
                     uiState.value = uiState.value.copy(
@@ -230,6 +256,13 @@ class ApplicationStateViewModel @Inject constructor(
         }
     }
 
+    fun updateApplicationDataStateLocal(dataState: ApplicationDataStateModel) {
+        uiState.value = uiState.value.copy(
+            application = uiState.value.application.copy(
+                applicationDataState = dataState
+            )
+        )
+    }
     fun deleteApplication(){
         viewModelScope.launch {
             uiState.value = uiState.value.copy(isLoading = true)
@@ -275,18 +308,56 @@ class ApplicationStateViewModel @Inject constructor(
         return emptyList()
     }
 
+    suspend fun getDocuments2(applicationId: Int,documentType: String) {
+        uiState.value = uiState.value.copy(isLoading = true)
+        val documentsResult = getApplicationDocumentsService(applicationId = applicationId, documentType = documentType)
+        when(documentsResult){
+            is ResultWrapper.Success -> {
+                val newState = when (documentType) {
+                    DocumentType.BANK_STATEMENTS.folderName -> uiState.value.copy(documentsBankStatements = documentsResult.data)
+                    DocumentType.INCOME_PROOF.folderName -> uiState.value.copy(documentsIncomeProof = documentsResult.data)
+                    DocumentType.OTHER_INCOME.folderName -> uiState.value.copy(documentsOtherIncome = documentsResult.data)
+                    DocumentType.PERMANENT_EXPENSES.folderName -> uiState.value.copy(documentsPermanentExpenses = documentsResult.data)
+                    DocumentType.INTERNATIONAL_SUPPORT.folderName -> uiState.value.copy(documentsInternationalSupport = documentsResult.data)
+                    else -> uiState.value
+                }
+
+                uiState.value = newState.copy(
+                    isLoading = false,
+                )
+            }
+            is ResultWrapper.Error -> {
+                uiState.value = uiState.value.copy(
+                    isLoading = false,
+                    error = documentsResult.error.asUiText()
+                )
+            }
+        }
+    }
+
     suspend fun getAppDocTypeStates(applicationId: Int) {
         uiState.value = uiState.value.copy(isLoading = true)
         when(val appDocTypesResult = getAppDocTypesUseCase(applicationId = applicationId)){
             is ResultWrapper.Success -> {
                 val typesList = appDocTypesResult.data
+
                 uiState.value = uiState.value.copy(
                     isLoading = false,
-                    permanentExpensesDocsState = typesList.find { it.type == DocumentType.PERMANENT_EXPENSES.folderName },
-                    incomeProofDocsState = typesList.find { it.type == DocumentType.INCOME_PROOF.folderName },
-                    bankStatementDocsState = typesList.find { it.type == DocumentType.BANK_STATEMENTS.folderName },
-                    otherIncomeDocsState = typesList.find { it.type == DocumentType.OTHER_INCOME.folderName },
+
+                    permanentExpensesDocsState = typesList.find { it.type == DocumentType.PERMANENT_EXPENSES.folderName }
+                        ?: createEmptyDocumentTypeModel(),
+
+                    incomeProofDocsState = typesList.find { it.type == DocumentType.INCOME_PROOF.folderName }
+                        ?: createEmptyDocumentTypeModel(),
+
+                    bankStatementDocsState = typesList.find { it.type == DocumentType.BANK_STATEMENTS.folderName }
+                        ?: createEmptyDocumentTypeModel(),
+
+                    otherIncomeDocsState = typesList.find { it.type == DocumentType.OTHER_INCOME.folderName }
+                        ?: createEmptyDocumentTypeModel(),
+
                     internationalSupportDocsState = typesList.find { it.type == DocumentType.INTERNATIONAL_SUPPORT.folderName }
+                        ?: createEmptyDocumentTypeModel()
                 )
             }
             is ResultWrapper.Error -> {
@@ -453,7 +524,7 @@ class ApplicationStateViewModel @Inject constructor(
         }
     }
 
-    fun submitFiles(folderName: String, context: Context) {
+    fun submitFile(docTypeStateId: Int, type: String, msg: String, folderName: String, context: Context) {
         viewModelScope.launch {
             uiState.value = uiState.value.copy(isLoading = true, error = null)
 
@@ -473,6 +544,14 @@ class ApplicationStateViewModel @Inject constructor(
                         uiState.value = uiState.value.copy(
                             isLoading = false,
                         )
+                        getDocuments2(applicationId = uiState.value.application.id!!, documentType = folderName)
+                        resetSelectedFiles(folderName = folderName)
+                        updateApplicationDocumentTypeState(
+                            id = docTypeStateId,
+                            state = ApplicationDocumentTypeState.TO_REVIEW.state,
+                            type = type,
+                            message = msg
+                        )
                     }
                     is ResultWrapper.Error -> {
                         uiState.value = uiState.value.copy(
@@ -482,9 +561,134 @@ class ApplicationStateViewModel @Inject constructor(
                     }
                 }
             }
-
             uiState.value = uiState.value.copy(isLoading = false)
         }
+    }
+
+    fun resetSelectedFiles(folderName: String) {
+        val newState = when (folderName) {
+            DocumentType.BANK_STATEMENTS.folderName -> uiState.value.copy(selectedBankStatements = emptyList())
+            DocumentType.INCOME_PROOF.folderName -> uiState.value.copy(selectedIncomeProof = emptyList())
+            DocumentType.OTHER_INCOME.folderName -> uiState.value.copy(selectedOtherIncome = emptyList())
+            DocumentType.PERMANENT_EXPENSES.folderName -> uiState.value.copy(selectedPermanentExpenses = emptyList())
+            DocumentType.INTERNATIONAL_SUPPORT.folderName -> uiState.value.copy(selectedInternationalSupport = emptyList())
+            else -> uiState.value
+        }
+
+        uiState.value = newState
+    }
+
+    fun updateApplicationDocumentTypeState(id: Int, state: String, type: String,message: String) {
+        val appDocType = ApplicationDocumentTypeModel(
+            id = id,
+            state = state,
+            description = message,
+            type = type,
+            applicationId = uiState.value.application.id!!
+        )
+        viewModelScope.launch {
+            uiState.value = uiState.value.copy(isLoading = true)
+            val result = updateAppDocTypeUseCase(appDocType)
+            when(result){
+                is ResultWrapper.Success -> {
+                    uiState.value = uiState.value.copy(
+                        isLoading = false,
+                    )
+                    updateApplicationDocumentTypeStateLocal(appDocType = appDocType)
+
+                    if(checkUpdateApplicationState()){
+                        updateApplicationState(ApplicationStates.PENDING.status)
+                    }
+                }
+                is ResultWrapper.Error -> {
+                    uiState.value = uiState.value.copy(
+                        isLoading = false,
+                        error = result.error.asUiText()
+                    )
+                }
+            }
+        }
+    }
+
+    fun updateApplicationDocumentTypeStateLocal(appDocType: ApplicationDocumentTypeModel) {
+        val currentUiState = uiState.value
+        val newState = when (appDocType.type) {
+            DocumentType.BANK_STATEMENTS.folderName -> {
+                currentUiState.copy(bankStatementDocsState = appDocType)
+            }
+            DocumentType.INCOME_PROOF.folderName -> {
+                currentUiState.copy(incomeProofDocsState = appDocType)
+            }
+            DocumentType.OTHER_INCOME.folderName -> {
+                currentUiState.copy(otherIncomeDocsState = appDocType)
+            }
+            DocumentType.PERMANENT_EXPENSES.folderName -> {
+                currentUiState.copy(permanentExpensesDocsState = appDocType)
+            }
+            DocumentType.INTERNATIONAL_SUPPORT.folderName -> {
+                currentUiState.copy(internationalSupportDocsState = appDocType)
+            }
+            else -> currentUiState
+        }
+
+        uiState.value = newState
+    }
+
+    fun updateApplicationState(state: String) {
+        val applicationState = ApplicationStateModel(
+            id = uiState.value.application.applicationState.id, state = state
+        )
+        viewModelScope.launch {
+            uiState.value = uiState.value.copy(isLoading = true)
+            val result = updateApplicationStateUseCase(applicationState = applicationState)
+            when(result){
+                is ResultWrapper.Success -> {
+                    uiState.value = uiState.value.copy(
+                        isLoading = false,
+                    )
+                    updateApplicationStateLocal(applicationState = applicationState)
+                }
+                is ResultWrapper.Error -> {
+                    uiState.value = uiState.value.copy(
+                        isLoading = false,
+                        error = result.error.asUiText()
+                    )
+                }
+            }
+        }
+    }
+
+    fun updateApplicationStateLocal(applicationState: ApplicationStateModel) {
+        uiState.value = uiState.value.copy(
+            application = uiState.value.application.copy(
+                applicationState = applicationState
+            )
+        )
+    }
+
+    //checks if the application state can be updated
+    fun checkUpdateApplicationState(): Boolean {
+        val state = uiState.value
+
+        if(state.application.applicationDataState.state == ApplicationDataStatus.DENIED.status)
+            return false
+
+        if(state.bankStatementDocsState.state == ApplicationDocumentTypeState.SOMETHING_WRONG.state)
+            return false
+
+        if(state.incomeProofDocsState.state == ApplicationDocumentTypeState.SOMETHING_WRONG.state)
+            return false
+
+        if(state.otherIncomeDocsState.state == ApplicationDocumentTypeState.SOMETHING_WRONG.state)
+            return false
+
+        if(state.permanentExpensesDocsState.state == ApplicationDocumentTypeState.SOMETHING_WRONG.state)
+            return false
+
+        if(state.internationalSupportDocsState.state == ApplicationDocumentTypeState.SOMETHING_WRONG.state)
+            return false
+
+        return true
     }
 
     fun clearError(){

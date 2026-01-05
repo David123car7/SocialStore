@@ -8,7 +8,7 @@ import com.ipca.socialstore.data.models.DonationModel
 import com.ipca.socialstore.data.models.ItemModel
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
 import com.ipca.socialstore.domain.services.donation.AddDonationService
-import com.ipca.socialstore.presentation.utils.ErrorText
+import com.ipca.socialstore.presentation.utils.errors.ErrorText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject

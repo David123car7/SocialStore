@@ -1,28 +1,33 @@
 package com.ipca.socialstore.presentation.views.application.applicationStateAdmin
 
 import android.net.Uri
-import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ipca.socialstore.data.enums.ApplicationDataStatus
 import com.ipca.socialstore.data.enums.DocumentType
 import com.ipca.socialstore.data.enums.StorageBucket
 import com.ipca.socialstore.data.models.ApplicationDataStateModel
 import com.ipca.socialstore.data.models.ApplicationDocumentTypeModel
+import com.ipca.socialstore.data.models.ApplicationModel
+import com.ipca.socialstore.data.models.ApplicationStateModel
+import com.ipca.socialstore.data.models.DocumentStateModel
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
 import com.ipca.socialstore.domain.appDocType.GetAppDocTypesUseCase
+import com.ipca.socialstore.domain.appDocType.UpdateAppDocTypeUseCase
 import com.ipca.socialstore.domain.application.UpdateApplicationDataStateUseCase
-import com.ipca.socialstore.domain.services.application.GetAllAplicationsService
+import com.ipca.socialstore.domain.applicationState.UpdateApplicationStateUseCase
+import com.ipca.socialstore.domain.documentState.UpdateDocumentStateUseCase
+import com.ipca.socialstore.domain.services.application.AcceptApplicationService
+import com.ipca.socialstore.domain.services.application.DenyApplicationService
 import com.ipca.socialstore.domain.services.application.GetUserApplicationService
 import com.ipca.socialstore.domain.services.document.GetApplicationDocumentsService
 import com.ipca.socialstore.domain.storage.DownloadFileUseCase
 import com.ipca.socialstore.presentation.models.ApplicationModelReceiver
 import com.ipca.socialstore.presentation.models.DocumentReceiverModel
-import com.ipca.socialstore.presentation.utils.ErrorText
-import com.ipca.socialstore.presentation.utils.FileSaveManager
-import com.ipca.socialstore.presentation.utils.asUiText
+import com.ipca.socialstore.presentation.utils.errors.ErrorText
+import com.ipca.socialstore.presentation.utils.files.FileSaveManager
+import com.ipca.socialstore.presentation.utils.errors.asUiText
 import com.ipca.socialstore.presentation.views.application.applicationState.createEmptyApplication
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -32,17 +37,18 @@ import javax.inject.Inject
 
 data class ApplicationAdminState(
     val application: ApplicationModelReceiver = createEmptyApplication(),
+
     val documentsBankStatements: List<DocumentReceiverModel> = emptyList(),
     val documentsIncomeProof: List<DocumentReceiverModel> = emptyList(),
     val documentsOtherIncome: List<DocumentReceiverModel> = emptyList(),
     val documentsPermanentExpenses: List<DocumentReceiverModel> = emptyList(),
     val documentsInternationalSupport: List<DocumentReceiverModel> = emptyList(),
 
-    val bankStatementDocsState: ApplicationDocumentTypeModel? = null,
-    val incomeProofDocsState: ApplicationDocumentTypeModel? = null,
-    val otherIncomeDocsState: ApplicationDocumentTypeModel? = null,
-    val permanentExpensesDocsState: ApplicationDocumentTypeModel? = null,
-    val internationalSupportDocsState: ApplicationDocumentTypeModel? = null,
+    val bankStatementDocsState: ApplicationDocumentTypeModel = createEmptyDocumentTypeModel(),
+    val incomeProofDocsState: ApplicationDocumentTypeModel = createEmptyDocumentTypeModel(),
+    val otherIncomeDocsState: ApplicationDocumentTypeModel = createEmptyDocumentTypeModel(),
+    val permanentExpensesDocsState: ApplicationDocumentTypeModel = createEmptyDocumentTypeModel(),
+    val internationalSupportDocsState: ApplicationDocumentTypeModel = createEmptyDocumentTypeModel(),
 
     val isLoading: Boolean = false,
     val error: ErrorText? = null,
@@ -56,6 +62,11 @@ class ApplicationStateAdminViewModel @Inject constructor(
     private val getAppDocTypesUseCase: GetAppDocTypesUseCase,
     private val downloadFileUseCase: DownloadFileUseCase,
     private val fileSaveManager: FileSaveManager,
+    private val updateDocumentStateUseCase: UpdateDocumentStateUseCase,
+    private val updateAppDocTypeUseCase: UpdateAppDocTypeUseCase,
+    private val updateApplicationStateUseCase: UpdateApplicationStateUseCase,
+    private val acceptApplicationService: AcceptApplicationService,
+    private val denyApplicationService: DenyApplicationService,
     savedStateHandle: SavedStateHandle) : ViewModel(){
     var uiState = mutableStateOf(ApplicationAdminState())
     sealed class DownloadEvent {
@@ -77,7 +88,7 @@ class ApplicationStateAdminViewModel @Inject constructor(
         }
     }
 
-    fun getApplication(applicationId: Int?){
+    fun getApplication(applicationId: Int?) {
         if(applicationId == null) return
         viewModelScope.launch {
             val applicationResult = getUserApplicationService(appId = applicationId)
@@ -111,6 +122,7 @@ class ApplicationStateAdminViewModel @Inject constructor(
                     uiState.value = uiState.value.copy(
                         isLoading = false,
                     )
+                    updateApplicationDataStateLocal(dataState = applicationDataStateModel)
                 }
                 is ResultWrapper.Error -> {
                     uiState.value = uiState.value.copy(
@@ -120,6 +132,170 @@ class ApplicationStateAdminViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    fun acceptApplication(){
+        viewModelScope.launch {
+            uiState.value = uiState.value.copy(isLoading = true)
+            val app = ApplicationModel(
+                name = uiState.value.application.name,
+                schoolYear = uiState.value.application.schoolYear,
+                cc = uiState.value.application.cc,
+                phoneNumber = uiState.value.application.phoneNumber,
+                email = uiState.value.application.email,
+                requestType = uiState.value.application.requestType,
+                academicId = uiState.value.application.academicData?.id,
+                birthDate = uiState.value.application.birthDate,
+                stateId = uiState.value.application.applicationState.id!!,
+                createdAt = uiState.value.application.createdAt,
+                dataStateId = uiState.value.application.applicationDataState.id!!,
+            )
+            val result = acceptApplicationService(app)
+            when(result){
+                is ResultWrapper.Success -> {
+                    uiState.value = uiState.value.copy(
+                        isLoading = false,
+                    )
+                }
+                is ResultWrapper.Error -> {
+                    uiState.value = uiState.value.copy(
+                        isLoading = false,
+                        error = result.error.asUiText()
+                    )
+                }
+            }
+        }
+    }
+
+    fun denyApplication(){
+        viewModelScope.launch {
+            uiState.value = uiState.value.copy(isLoading = true)
+            val result = denyApplicationService(
+                applicationId = uiState.value.application.id!!,
+                appStateId = uiState.value.application.applicationState.id!!
+            )
+            when(result){
+                is ResultWrapper.Success -> {
+                    uiState.value = uiState.value.copy(
+                        isLoading = false,
+                    )
+                }
+                is ResultWrapper.Error -> {
+                    uiState.value = uiState.value.copy(
+                        isLoading = false,
+                        error = result.error.asUiText()
+                    )
+                }
+            }
+        }
+    }
+
+    fun updateApplicationDataStateLocal(dataState: ApplicationDataStateModel) {
+        uiState.value = uiState.value.copy(
+            application = uiState.value.application.copy(
+                applicationDataState = dataState
+            )
+        )
+    }
+
+    fun updateApplicationState(state: String) {
+        val applicationState = ApplicationStateModel(
+            id = uiState.value.application.applicationState.id, state = state
+        )
+        viewModelScope.launch {
+            uiState.value = uiState.value.copy(isLoading = true)
+            val result = updateApplicationStateUseCase(applicationState = applicationState)
+            when(result){
+                is ResultWrapper.Success -> {
+                    uiState.value = uiState.value.copy(
+                        isLoading = false,
+                    )
+                }
+                is ResultWrapper.Error -> {
+                    uiState.value = uiState.value.copy(
+                        isLoading = false,
+                        error = result.error.asUiText()
+                    )
+                }
+            }
+        }
+    }
+
+    fun updateDocumentState(documentId: Int, folderName: String,state: String, message: String) {
+        val documentState = DocumentStateModel(id = documentId, state = state, description = message)
+        viewModelScope.launch {
+            uiState.value = uiState.value.copy(isLoading = true)
+            val result = updateDocumentStateUseCase(documentState)
+            when(result){
+                is ResultWrapper.Success -> {
+                    uiState.value = uiState.value.copy(
+                        isLoading = false,
+                    )
+                    getDocuments2(
+                        applicationId = uiState.value.application.id!!,
+                        documentType = folderName
+                    )
+                }
+                is ResultWrapper.Error -> {
+                    uiState.value = uiState.value.copy(
+                        isLoading = false,
+                        error = result.error.asUiText()
+                    )
+                }
+            }
+        }
+    }
+
+    fun updateApplicationDocumentTypeState(id: Int, state: String, type: String,message: String) {
+        val appDocType = ApplicationDocumentTypeModel(
+            id = id,
+            state = state,
+            description = message,
+            type = type,
+            applicationId = uiState.value.application.id!!
+        )
+        viewModelScope.launch {
+            uiState.value = uiState.value.copy(isLoading = true)
+            val result = updateAppDocTypeUseCase(appDocType)
+            when(result){
+                is ResultWrapper.Success -> {
+                    uiState.value = uiState.value.copy(
+                        isLoading = false,
+                    )
+                    updateApplicationDocumentTypeStateLocal(appDocType = appDocType)
+                }
+                is ResultWrapper.Error -> {
+                    uiState.value = uiState.value.copy(
+                        isLoading = false,
+                        error = result.error.asUiText()
+                    )
+                }
+            }
+        }
+    }
+
+    fun updateApplicationDocumentTypeStateLocal(appDocType: ApplicationDocumentTypeModel) {
+        val currentUiState = uiState.value
+        val newState = when (appDocType.type) {
+            DocumentType.BANK_STATEMENTS.folderName -> {
+                currentUiState.copy(bankStatementDocsState = appDocType)
+            }
+            DocumentType.INCOME_PROOF.folderName -> {
+                currentUiState.copy(incomeProofDocsState = appDocType)
+            }
+            DocumentType.OTHER_INCOME.folderName -> {
+                currentUiState.copy(otherIncomeDocsState = appDocType)
+            }
+            DocumentType.PERMANENT_EXPENSES.folderName -> {
+                currentUiState.copy(permanentExpensesDocsState = appDocType)
+            }
+            DocumentType.INTERNATIONAL_SUPPORT.folderName -> {
+                currentUiState.copy(internationalSupportDocsState = appDocType)
+            }
+            else -> currentUiState
+        }
+
+        uiState.value = newState
     }
 
     fun getApplicationDocuments(applicationId: Int){
@@ -177,6 +353,33 @@ class ApplicationStateAdminViewModel @Inject constructor(
         return emptyList()
     }
 
+    suspend fun getDocuments2(applicationId: Int,documentType: String) {
+        uiState.value = uiState.value.copy(isLoading = true)
+        val documentsResult = getApplicationDocumentsService(applicationId = applicationId, documentType = documentType)
+        when(documentsResult){
+            is ResultWrapper.Success -> {
+                val newState = when (documentType) {
+                    DocumentType.BANK_STATEMENTS.folderName -> uiState.value.copy(documentsBankStatements = documentsResult.data)
+                    DocumentType.INCOME_PROOF.folderName -> uiState.value.copy(documentsIncomeProof = documentsResult.data)
+                    DocumentType.OTHER_INCOME.folderName -> uiState.value.copy(documentsOtherIncome = documentsResult.data)
+                    DocumentType.PERMANENT_EXPENSES.folderName -> uiState.value.copy(documentsPermanentExpenses = documentsResult.data)
+                    DocumentType.INTERNATIONAL_SUPPORT.folderName -> uiState.value.copy(documentsInternationalSupport = documentsResult.data)
+                    else -> uiState.value
+                }
+
+                uiState.value = newState.copy(
+                    isLoading = false,
+                )
+            }
+            is ResultWrapper.Error -> {
+                uiState.value = uiState.value.copy(
+                    isLoading = false,
+                    error = documentsResult.error.asUiText()
+                )
+            }
+        }
+    }
+
     fun downloadDocument(fileName: String, filePath: String) {
         viewModelScope.launch {
             _downloadEvent.send(DownloadEvent.Loading)
@@ -204,7 +407,6 @@ class ApplicationStateAdminViewModel @Inject constructor(
                 } else {
                     _downloadEvent.send(DownloadEvent.Error("Falha ao gravar ficheiro."))
                 }
-                // Cleanup
                 pendingFileBytes = null
             } else {
                 _downloadEvent.send(DownloadEvent.Error("Ficheiro perdido. Tente novamente."))
@@ -214,16 +416,28 @@ class ApplicationStateAdminViewModel @Inject constructor(
 
     suspend fun getAppDocTypeStates(applicationId: Int) {
         uiState.value = uiState.value.copy(isLoading = true)
+
         when(val appDocTypesResult = getAppDocTypesUseCase(applicationId = applicationId)){
             is ResultWrapper.Success -> {
                 val typesList = appDocTypesResult.data
+
                 uiState.value = uiState.value.copy(
                     isLoading = false,
-                    permanentExpensesDocsState = typesList.find { it.type == DocumentType.PERMANENT_EXPENSES.folderName },
-                    incomeProofDocsState = typesList.find { it.type == DocumentType.INCOME_PROOF.folderName },
-                    bankStatementDocsState = typesList.find { it.type == DocumentType.BANK_STATEMENTS.folderName },
-                    otherIncomeDocsState = typesList.find { it.type == DocumentType.OTHER_INCOME.folderName },
+
+                    permanentExpensesDocsState = typesList.find { it.type == DocumentType.PERMANENT_EXPENSES.folderName }
+                        ?: createEmptyDocumentTypeModel(),
+
+                    incomeProofDocsState = typesList.find { it.type == DocumentType.INCOME_PROOF.folderName }
+                        ?: createEmptyDocumentTypeModel(),
+
+                    bankStatementDocsState = typesList.find { it.type == DocumentType.BANK_STATEMENTS.folderName }
+                        ?: createEmptyDocumentTypeModel(),
+
+                    otherIncomeDocsState = typesList.find { it.type == DocumentType.OTHER_INCOME.folderName }
+                        ?: createEmptyDocumentTypeModel(),
+
                     internationalSupportDocsState = typesList.find { it.type == DocumentType.INTERNATIONAL_SUPPORT.folderName }
+                        ?: createEmptyDocumentTypeModel()
                 )
             }
             is ResultWrapper.Error -> {
@@ -234,4 +448,14 @@ class ApplicationStateAdminViewModel @Inject constructor(
             }
         }
     }
+}
+
+fun createEmptyDocumentTypeModel(): ApplicationDocumentTypeModel {
+    return ApplicationDocumentTypeModel(
+        id = null,
+        applicationId = -1,
+        type = "",
+        state = "",
+        description = null
+    )
 }

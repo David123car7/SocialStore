@@ -9,6 +9,7 @@ import com.ipca.socialstore.data.repository.AuthRepository
 import com.ipca.socialstore.data.repository.UserRepository
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
 import com.ipca.socialstore.presentation.models.ApplicationModelReceiver
+import com.ipca.socialstore.presentation.utils.getRequestTypeDisplayLabel
 import javax.inject.Inject
 
 class GetUserApplicationService @Inject constructor(
@@ -66,7 +67,7 @@ class GetUserApplicationService @Inject constructor(
                 cc = application.cc,
                 createdAt = application.createdAt,
                 birthDate = application.birthDate,
-                requestType = application.requestType,
+                requestType = getRequestTypeDisplayLabel(application.requestType),
                 applicationState = state,
                 applicationDataState = dataState,
                 academicData = academicData

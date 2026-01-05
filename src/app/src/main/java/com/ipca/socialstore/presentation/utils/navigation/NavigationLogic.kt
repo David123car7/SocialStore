@@ -1,4 +1,4 @@
-package com.ipca.socialstore.presentation.utils
+package com.ipca.socialstore.presentation.utils.navigation
 
 import androidx.navigation.NavController
 import com.ipca.socialstore.data.enums.UserRole

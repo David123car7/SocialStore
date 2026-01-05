@@ -1,8 +1,5 @@
 package com.ipca.socialstore.presentation.views.application.listApplications
 
-import android.widget.Toast
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -28,23 +25,22 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.ipca.socialstore.data.enums.ApplicationStatus
+import com.ipca.socialstore.data.enums.ApplicationStates
 import com.ipca.socialstore.data.enums.UserRole
 import com.ipca.socialstore.presentation.models.ApplicationModelReceiver
 import com.ipca.socialstore.presentation.routes.AdminRoutes
 import com.ipca.socialstore.presentation.ui.theme.GreenIPCA
+import com.ipca.socialstore.presentation.utils.ui.getApplicationStateViewData
 
 @Composable
 fun ListApplicationsView(modifier: Modifier, navController: NavController, userRole: UserRole){
@@ -73,13 +69,14 @@ fun ListApplicationsContent(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         items(uiState.applications) { application ->
+            val ui = getApplicationStateViewData(state = application.applicationState.state)
             CandidateCard(
                 candidateName = application.name,
                 createdAt = application.createdAt,
-                status = application.applicationState.state,
-                bgColor = getApplicationBGColor(applicationStatus = application.applicationState.state) ?: Color.White,
-                textColor = getApplicationTextColor(applicationStatus = application.applicationState.state) ?: Color.White,
-                onDetailsClick = { onAppSelected(application) },
+                status = ui.text,
+                statusBgColor = ui.bgColor,
+                statusTextColor = ui.textColor,
+                onDetailsClick = {onAppSelected(application)},
             )
         }
     }
@@ -90,8 +87,8 @@ fun CandidateCard(
     candidateName: String,
     createdAt: String,
     status: String,
-    bgColor: Color,
-    textColor: Color,
+    statusBgColor: Color,
+    statusTextColor: Color,
     onDetailsClick: () -> Unit,
 ) {
     Card(
@@ -114,13 +111,13 @@ fun CandidateCard(
                     fontWeight = FontWeight.Bold
                 )
                 Surface(
-                    color = bgColor,
+                    color = statusBgColor,
                     shape = RoundedCornerShape(16.dp),
                     modifier = Modifier.padding(start = 8.dp)
                 ) {
                     Text(
                         text = status,
-                        color = textColor,
+                        color = statusTextColor,
                         style = MaterialTheme.typography.labelSmall,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
@@ -168,29 +165,29 @@ fun CandidateCardPreview(){
             candidateName = "David Amorim Carvalho",
             createdAt = "19/08/2025",
             status = "Por Aceitar",
-            bgColor = Color(0xFFFFCCC7),
-            textColor = Color(0xFFCF1322),
+            statusBgColor = Color(0xFFFFCCC7),
+            statusTextColor = Color(0xFFCF1322),
             onDetailsClick = {},
         )
     }
 }
 
 fun getApplicationBGColor(applicationStatus: String): Color?{
-    if(applicationStatus == ApplicationStatus.APPROVED.status)
+    if(applicationStatus == ApplicationStates.APPROVED.status)
         return Color(0xFFD6F5D6)
-    else if(applicationStatus == ApplicationStatus.REJECTED.status)
+    else if(applicationStatus == ApplicationStates.REJECTED.status)
         return Color(0xFFFFCCC7)
-    else if(applicationStatus == ApplicationStatus.PENDING.status)
+    else if(applicationStatus == ApplicationStates.PENDING.status)
         return Color(0xFFFFEebb)
     return null
 }
 
 fun getApplicationTextColor(applicationStatus: String): Color?{
-    if(applicationStatus == ApplicationStatus.APPROVED.status)
+    if(applicationStatus == ApplicationStates.APPROVED.status)
         return Color(0xFF237804)
-    else if(applicationStatus == ApplicationStatus.REJECTED.status)
+    else if(applicationStatus == ApplicationStates.REJECTED.status)
         return Color(0xFFCF1322)
-    else if(applicationStatus == ApplicationStatus.PENDING.status)
+    else if(applicationStatus == ApplicationStates.PENDING.status)
         return Color(0xFFD48806)
     return null
 }
