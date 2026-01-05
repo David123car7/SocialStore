@@ -76,7 +76,7 @@ fun CreateDonationViewContent(
 
         ) {
             TextField(
-                value = uiState.donation.donationDate,
+                value = uiState.donation.date,
                 label = { Text("Data da Campanha") },
                 modifier = Modifier.padding(8.dp),
                 onValueChange = { value -> onUpdateDate(value) }

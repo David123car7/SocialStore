@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class DonationState(
-    val donation : DonationModel = DonationModel(donationDate = "", campaignId = null),
+    val donation : DonationModel = DonationModel(date = "", campaignId = null, name = ""),
     val item : ItemModel = ItemModel(name = "", itemType = ""),
     val donationItem : DonationItemModel = DonationItemModel(itemId = 0, donationId = 0),
     val expirationDate: String = "",
@@ -53,7 +53,7 @@ class CreateDonationViewModel @Inject constructor(private val addDonationService
     //region Donations
     fun updateDonationDate(date : String){
         val donation = uiState.value.donation.copy(
-            donationDate = date
+            date = date
         )
         uiState.value = uiState.value.copy(
             donation = donation

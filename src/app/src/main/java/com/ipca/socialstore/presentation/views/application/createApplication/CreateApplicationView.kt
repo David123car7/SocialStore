@@ -95,7 +95,7 @@ fun CreateApplicationView(modifier: Modifier, navController: NavController, user
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CreateApplicationViewContent(
-    modifier: Modifier = Modifier,
+    modifier: Modifier,
     uiState: CreateApplicationState,
 
     // --- Actions/Callbacks ---
