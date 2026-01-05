@@ -156,7 +156,7 @@ class SchedulingMainPageViewModel @Inject constructor(
         )
 
         viewModelScope.launch {
-            println(uiState.value.newScheduling)
+            println("EStou AQui ${uiState.value.newScheduling}")
             val result = createSchedulingServiceUseCase(uiState.value.newScheduling)
             when(result){
                 is ResultWrapper.Success ->{
