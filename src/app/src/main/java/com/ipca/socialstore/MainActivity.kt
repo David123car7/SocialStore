@@ -19,8 +19,6 @@ import androidx.navigation.navArgument
 import com.ipca.socialstore.presentation.views.authentication.login.LoginView
 import com.ipca.socialstore.presentation.main.MainViewModel
 import com.ipca.socialstore.presentation.views.authentication.register.RegisterView
-import com.ipca.socialstore.presentation.views.campaign.create.CreateCampaingView
-import com.ipca.socialstore.presentation.views.campaign.listAll.ListAllCampaignsView
 import com.ipca.socialstore.presentation.views.donation.create.CreateDonationView
 import com.ipca.socialstore.presentation.views.item.CreateItemView
 import com.ipca.socialstore.presentation.routes.AdminRoutes
@@ -46,6 +44,7 @@ import com.ipca.socialstore.presentation.views.application.createApplication.Cre
 import com.ipca.socialstore.presentation.views.application.listApplications.ListApplicationsView
 import com.ipca.socialstore.presentation.views.authentication.resetPassword.ResetPasswordView
 import com.ipca.socialstore.presentation.views.beneficiary.BeneficiaryManagementView
+import com.ipca.socialstore.presentation.views.campaigns.CampaignsListView
 import com.ipca.socialstore.presentation.views.home.adminHome.AdminHomeView
 import com.ipca.socialstore.presentation.views.home.beneficiaryHome.BeneficiaryHomeView
 import com.ipca.socialstore.presentation.views.home.defaultHomeView.DefaultHomeView
@@ -58,7 +57,6 @@ class MainActivity : ComponentActivity() {
 
     private val mainViewModel: MainViewModel by viewModels()
     private val stockViewModel: ListAllStockViewModel by viewModels()
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -128,11 +126,8 @@ class MainActivity : ComponentActivity() {
                         composable<AdminRoutes.ListApplications>{
                             ListApplicationsView(modifier = Modifier.padding(innerPadding), navController = navController, userRole = mainState.userRole)
                         }
-                        composable<AdminRoutes.CreateCampaign>{
-                            CreateCampaingView(modifier = Modifier.padding(innerPadding))
-                        }
-                        composable<AdminRoutes.ListAllCampaign>{
-                            ListAllCampaignsView(modifier = Modifier.padding(innerPadding), navController = navController)
+                        composable<AdminRoutes.CampaignList>{
+                            CampaignsListView(modifier = Modifier.padding(innerPadding), navController = navController)
                         }
                         composable <AdminRoutes.CreateItem>{
                             CreateItemView(modifier = Modifier.padding(innerPadding), navController = navController)
@@ -200,6 +195,13 @@ class MainActivity : ComponentActivity() {
                             navController = navController,
                             userRole = mainState.userRole,
                             route = GeneralRoutes.Home
+                        )
+                    }
+
+                    LaunchedEffect(mainState.userRole) {
+                        NavigationLogic.resetNavigation(
+                            navController = navController,
+                            userRole = mainState.userRole,
                         )
                     }
                 }

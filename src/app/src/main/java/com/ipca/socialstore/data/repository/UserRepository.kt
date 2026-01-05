@@ -29,7 +29,7 @@ class UserRepository @Inject constructor(private val supabase: SupabaseClient, p
                 @SerialName("role") val role: UserRole
             )
 
-            val user = supabase.from(DatabaseTables.USER)
+        val user = supabase.from(DatabaseTables.USER)
                 .select (columns = Columns.list("role")) {
                     filter { eq("id", userId) }
                 }

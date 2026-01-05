@@ -17,7 +17,7 @@ sealed class AdminRoutes {
     object CreateCampaign : AdminRoutes()
 
     @Serializable
-    object ListAllCampaign : AdminRoutes()
+    object CampaignList : AdminRoutes()
 
     // --- Items ---
     @Serializable

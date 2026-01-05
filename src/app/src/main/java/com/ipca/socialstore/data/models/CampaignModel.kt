@@ -17,10 +17,12 @@ data class CampaignModel(
     @SerialName("category")
     val category : String,
 
-    @SerialName("date")
-    val date : String
-)
+    @SerialName("ongoing")
+    val onGoing : Boolean,
 
-fun CampaignModel.isValid() : Boolean{
-    return this.name.isNotEmpty()
-}
+    @SerialName("start_date")
+    val startDate : String,
+
+    @SerialName("end_date")
+    val endDate : String
+)

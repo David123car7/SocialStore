@@ -13,6 +13,7 @@ import com.ipca.socialstore.data.enums.UserRole
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Accessibility
 import androidx.compose.material.icons.filled.Assignment
+import androidx.compose.material.icons.filled.Camera
 import androidx.compose.material.icons.filled.FileOpen
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Notifications
@@ -93,6 +94,11 @@ fun SocialStoreScaffoldContent(
         BottomNavItem(
             icon = Icons.Default.Assignment,
             route = AdminRoutes.SchedulingManagement,
+            isVisible = userRole == UserRole.ADMIN
+        ),
+        BottomNavItem(
+            icon = Icons.Filled.Camera,
+            route = AdminRoutes.CampaignList,
             isVisible = userRole == UserRole.ADMIN
         ),
         BottomNavItem( //stock
