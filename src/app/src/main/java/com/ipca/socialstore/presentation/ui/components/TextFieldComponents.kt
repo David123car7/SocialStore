@@ -10,6 +10,7 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.RemoveRedEye
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -93,7 +94,7 @@ fun TextFieldPasswordComponent(modifier: Modifier, password: String, onPasswordU
         label = { Text("Palavra-passe") },
         leadingIcon = { Icon(Icons.Default.Lock, null) },
         trailingIcon = {
-            val image = if (passwordVisible) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder //must change this icons
+            val image = if (passwordVisible) Icons.Outlined.RemoveRedEye else Icons.Outlined.RemoveRedEye
             IconButton(onClick = { passwordVisible = !passwordVisible }) {
                 Icon(imageVector = image, contentDescription = null)
             }

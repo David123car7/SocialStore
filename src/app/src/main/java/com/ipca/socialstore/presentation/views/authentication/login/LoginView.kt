@@ -14,6 +14,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults.buttonColors
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -41,6 +43,9 @@ import com.ipca.socialstore.presentation.routes.GeneralRoutes
 import com.ipca.socialstore.presentation.ui.components.ErrorTextComponent
 import com.ipca.socialstore.presentation.ui.components.TextFieldPasswordComponent
 import com.ipca.socialstore.presentation.ui.components.TextFieldStringComponent
+import com.ipca.socialstore.presentation.ui.theme.GreenIPCA
+import com.ipca.socialstore.presentation.ui.theme.IconBgColor
+import com.ipca.socialstore.presentation.ui.theme.IconTint
 import com.ipca.socialstore.presentation.ui.theme.SocialStoreTheme
 
 @Composable
@@ -100,7 +105,7 @@ fun LoginViewContent(modifier: Modifier,
             Surface(
                 modifier = Modifier.size(80.dp),
                 shape = RoundedCornerShape(20.dp),
-                color = MaterialTheme.colorScheme.primaryContainer
+                color = IconBgColor
             ) {
                 Icon(
                     imageVector = Icons.Default.ShoppingCart,
@@ -108,7 +113,7 @@ fun LoginViewContent(modifier: Modifier,
                     modifier = Modifier
                         .padding(16.dp)
                         .fillMaxSize(),
-                    tint = MaterialTheme.colorScheme.primary
+                    tint = IconTint
                 )
             }
 
@@ -116,7 +121,7 @@ fun LoginViewContent(modifier: Modifier,
                 text = "Social Store",
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary
+                color = GreenIPCA
             )
 
             Text(
@@ -150,7 +155,8 @@ fun LoginViewContent(modifier: Modifier,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp),
-                shape = RoundedCornerShape(12.dp)
+                shape = RoundedCornerShape(12.dp),
+                colors = buttonColors(GreenIPCA)
             ) {
                 Text("Entrar", fontSize = 16.sp, fontWeight = FontWeight.Bold)
             }
@@ -162,7 +168,7 @@ fun LoginViewContent(modifier: Modifier,
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text("Ainda não tem conta?", style = MaterialTheme.typography.bodyMedium)
                 TextButton(onClick = onClickRegister) {
-                    Text("Criar Conta", fontWeight = FontWeight.Bold)
+                    Text("Criar Conta", color = GreenIPCA, fontWeight = FontWeight.Bold)
                 }
             }
         }

@@ -1,8 +1,12 @@
 package com.ipca.socialstore.presentation.ui
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -24,7 +28,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.compose.rememberNavController
 import com.ipca.socialstore.presentation.routes.AdminRoutes
@@ -34,6 +40,8 @@ import com.ipca.socialstore.presentation.utils.navigation.NavigationLogic
 import com.ipca.socialstore.presentation.routes.DefaultRoutes
 import com.ipca.socialstore.presentation.routes.GeneralRoutes
 import com.ipca.socialstore.presentation.ui.theme.SocialStoreTheme
+import com.ipca.socialstore.presentation.ui.theme.GreenIPCA
+import com.ipca.socialstore.R
 
 data class BottomNavItem(
     val icon: ImageVector,
@@ -125,21 +133,26 @@ fun SocialStoreScaffoldContent(
 
     Scaffold(
         topBar = {
-            CenterAlignedTopAppBar(
+            CenterAlignedTopAppBar(colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                containerColor = GreenIPCA,
+                titleContentColor = Color.White,
+            ),
                 navigationIcon = {
                     if (userRole != UserRole.GUEST) {
                         TextButton(onClick = {
                             logout()
                         }) {
-                            Text("Sair", color = MaterialTheme.colorScheme.error, fontWeight = FontWeight.Bold)
+                            Text("Sair", color = Color.White, fontWeight = FontWeight.Bold)
                         }
                     }
                 },
                 title = {
-                    Text(
-                        "Social Store",
-                        fontWeight = FontWeight.Bold,
-                        style = MaterialTheme.typography.titleMedium
+                    Image(
+                        painter = painterResource(id = R.drawable.saslogo),
+                        contentDescription = "SASLogo",
+                        modifier = Modifier
+                            .height(63.dp)
+                            .padding(20.dp),
                     )
                 },
                 actions = {
@@ -150,7 +163,7 @@ fun SocialStoreScaffoldContent(
                                 userRole = userRole,
                                 route = GeneralRoutes.Login
                             )
-                        }) { Text("Entrar", fontWeight = FontWeight.Bold)}
+                        }) { Text("Entrar", fontWeight = FontWeight.Bold, color = Color.White)}
                     }
                     else {
                         if (userRole == UserRole.ADMIN){
@@ -166,7 +179,7 @@ fun SocialStoreScaffoldContent(
                             Icon(
                                 imageVector = Icons.Default.Person,
                                 contentDescription = "Perfil",
-                                tint = MaterialTheme.colorScheme.primary
+                                tint = Color.White
                             )
                         }
                     }
