@@ -57,4 +57,5 @@ sealed class AdminRoutes {
 
     @Serializable
     object BeneficiaryManagement : AdminRoutes()
+
 }

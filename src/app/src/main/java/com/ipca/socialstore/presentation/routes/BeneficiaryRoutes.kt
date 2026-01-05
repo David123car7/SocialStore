@@ -12,4 +12,7 @@ sealed class BeneficiaryRoutes {
 
     @Serializable
     object JustifyScheduling : BeneficiaryRoutes()
+
+    @Serializable
+    object SchedulingConfirmation : BeneficiaryRoutes()
 }
