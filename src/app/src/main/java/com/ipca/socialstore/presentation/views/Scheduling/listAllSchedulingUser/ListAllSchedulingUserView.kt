@@ -187,9 +187,9 @@ fun ListAllSchedulingUserPreview() {
     val mockBeneficiary = BeneficiaryModel(
         id = 3,
         name = "David",
-        createdAt = "2024-01-01",
         birthDate = "1990-05-15",
-        addressId = 1
+        academicId = 1,
+        phoneNumber = "954525458"
     )
 
     val mockScheduling = listOf(

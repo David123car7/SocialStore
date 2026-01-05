@@ -1,4 +1,4 @@
-package com.ipca.socialstore.presentation.utils
+package com.ipca.socialstore.presentation.utils.files
 
 import android.content.Context
 import android.net.Uri

@@ -1,4 +1,4 @@
-package com.ipca.socialstore.presentation.utils
+package com.ipca.socialstore.presentation.utils.errors
 
 import android.content.Context
 import androidx.annotation.StringRes

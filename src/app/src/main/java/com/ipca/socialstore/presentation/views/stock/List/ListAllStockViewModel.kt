@@ -1,6 +1,5 @@
 package com.ipca.socialstore.presentation.views.stock.List
 
-import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -9,16 +8,13 @@ import com.ipca.socialstore.data.models.StockModel
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
 import com.ipca.socialstore.domain.services.ListAllItemsStockService
 import com.ipca.socialstore.domain.stock.AddItemStockUseCase
-import com.ipca.socialstore.domain.stock.AddStockUseCase
 import com.ipca.socialstore.domain.stock.RemoveStockUseCase
 import com.ipca.socialstore.domain.stock.SetStockQuantityUseCase
-import com.ipca.socialstore.domain.stock.UpdateQuantityInStockByDateUseCase
-import com.ipca.socialstore.presentation.utils.ErrorText
-import com.ipca.socialstore.presentation.utils.asUiText
+import com.ipca.socialstore.presentation.utils.errors.ErrorText
+import com.ipca.socialstore.presentation.utils.errors.asUiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlin.collections.count
 
 data class GetStockState(
     val stock : List<StockModel>? = null,

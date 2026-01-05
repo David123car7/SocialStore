@@ -1,12 +1,7 @@
-package com.ipca.socialstore.presentation.utils
+package com.ipca.socialstore.presentation.utils.files
 
-import android.content.ContentValues
 import android.content.Context
 import android.net.Uri
-import android.os.Build
-import android.os.Environment
-import android.provider.MediaStore
-import androidx.annotation.RequiresApi
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton

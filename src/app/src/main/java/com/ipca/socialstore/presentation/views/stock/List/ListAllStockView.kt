@@ -9,33 +9,27 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.* // Importações de Material3
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.ipca.socialstore.data.models.ItemModel
 import com.ipca.socialstore.presentation.ui.components.SearchBarContent
 import com.ipca.socialstore.presentation.models.StockReceiverModel
 import com.ipca.socialstore.presentation.routes.AdminRoutes
-import com.ipca.socialstore.presentation.utils.ErrorText
+import com.ipca.socialstore.presentation.utils.errors.ErrorText
 import kotlin.collections.mutableMapOf
 
 import com.ipca.socialstore.presentation.ui.theme.SocialStoreTheme
-import com.ipca.socialstore.presentation.views.item.CreateItemView
-import dagger.assisted.Assisted
 
 @Composable
 fun GetAllStockView(modifier: Modifier, navController: NavController, viewModel: ListAllStockViewModel){

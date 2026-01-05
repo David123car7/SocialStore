@@ -1,17 +1,15 @@
 package com.ipca.socialstore.presentation.views.application.applicationStateAdmin
 
 import android.net.Uri
-import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ipca.socialstore.data.enums.ApplicationDataStatus
-import com.ipca.socialstore.data.enums.ApplicationDocumentTypeState
 import com.ipca.socialstore.data.enums.DocumentType
 import com.ipca.socialstore.data.enums.StorageBucket
 import com.ipca.socialstore.data.models.ApplicationDataStateModel
 import com.ipca.socialstore.data.models.ApplicationDocumentTypeModel
+import com.ipca.socialstore.data.models.ApplicationModel
 import com.ipca.socialstore.data.models.ApplicationStateModel
 import com.ipca.socialstore.data.models.DocumentStateModel
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
@@ -27,9 +25,9 @@ import com.ipca.socialstore.domain.services.document.GetApplicationDocumentsServ
 import com.ipca.socialstore.domain.storage.DownloadFileUseCase
 import com.ipca.socialstore.presentation.models.ApplicationModelReceiver
 import com.ipca.socialstore.presentation.models.DocumentReceiverModel
-import com.ipca.socialstore.presentation.utils.ErrorText
-import com.ipca.socialstore.presentation.utils.FileSaveManager
-import com.ipca.socialstore.presentation.utils.asUiText
+import com.ipca.socialstore.presentation.utils.errors.ErrorText
+import com.ipca.socialstore.presentation.utils.files.FileSaveManager
+import com.ipca.socialstore.presentation.utils.errors.asUiText
 import com.ipca.socialstore.presentation.views.application.applicationState.createEmptyApplication
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -139,10 +137,20 @@ class ApplicationStateAdminViewModel @Inject constructor(
     fun acceptApplication(){
         viewModelScope.launch {
             uiState.value = uiState.value.copy(isLoading = true)
-            val result = acceptApplicationService(
-                applicationId = uiState.value.application.id!!,
-                appStateId = uiState.value.application.applicationState.id!!
+            val app = ApplicationModel(
+                name = uiState.value.application.name,
+                schoolYear = uiState.value.application.schoolYear,
+                cc = uiState.value.application.cc,
+                phoneNumber = uiState.value.application.phoneNumber,
+                email = uiState.value.application.email,
+                requestType = uiState.value.application.requestType,
+                academicId = uiState.value.application.academicData?.id,
+                birthDate = uiState.value.application.birthDate,
+                stateId = uiState.value.application.applicationState.id!!,
+                createdAt = uiState.value.application.createdAt,
+                dataStateId = uiState.value.application.applicationDataState.id!!,
             )
+            val result = acceptApplicationService(app)
             when(result){
                 is ResultWrapper.Success -> {
                     uiState.value = uiState.value.copy(

@@ -53,7 +53,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.ipca.socialstore.data.enums.ApplicationDataStatus
 import com.ipca.socialstore.data.enums.ApplicationDocumentTypeState
@@ -67,6 +66,8 @@ import com.ipca.socialstore.presentation.ui.components.AlertComponent
 import com.ipca.socialstore.presentation.ui.components.AlertInputComponent
 import com.ipca.socialstore.presentation.ui.components.ReadOnlyField
 import com.ipca.socialstore.presentation.ui.theme.GreenIPCA
+import com.ipca.socialstore.presentation.utils.ui.getApplicationDataStateViewData
+import com.ipca.socialstore.presentation.utils.ui.getApplicationDocumentTypeStateViewData
 import com.ipca.socialstore.presentation.views.application.applicationState.CategoryBox
 import kotlin.collections.forEach
 
@@ -384,30 +385,13 @@ fun ApplicationData(
         onDismiss = {showAlertAcceptDataBox = false}
     )
 
-    var dataCategoryDesc: String = ""
-    var dataCategoryDescTextColor: Color = Color.Black
-    var dataCategoryDescBgTextColor: Color = Color.White
-    if(application.applicationDataState.state == ApplicationDataStatus.ACCEPTED.status){
-        dataCategoryDesc = "Dados Aceites"
-        dataCategoryDescTextColor = GreenIPCA
-        dataCategoryDescBgTextColor = Color(0x120FFC0B)
-    }
-    if(application.applicationDataState.state == ApplicationDataStatus.DENIED.status){
-        dataCategoryDesc = "Dados Negados"
-        dataCategoryDescTextColor = Color(0xFFCF1322)
-        dataCategoryDescBgTextColor = Color(0x1BFF0000)
-    }
-    if(application.applicationDataState.state == ApplicationDataStatus.TO_REVIEW.status){
-        dataCategoryDesc = "Por Rever"
-        dataCategoryDescTextColor = Color(0xFFDAA210)
-        dataCategoryDescBgTextColor = Color(0x43DAA210)
-    }
+    val uiData = getApplicationDataStateViewData(application.applicationDataState.state)
 
     CategoryBox(
         title = "Dados Pessoais",
-        description = dataCategoryDesc,
-        descriptionTextColor = dataCategoryDescTextColor,
-        descriptionBgTextColor = dataCategoryDescBgTextColor) {
+        description = uiData.text,
+        descriptionTextColor = uiData.textColor,
+        descriptionBgTextColor = uiData.bgColor) {
         ReadOnlyField("Nome Completo", application.name)
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             Box(Modifier.weight(1f)) {
@@ -497,31 +481,14 @@ fun ApplicationDocuments(
         onDismiss = {showAlertAcceptDocsBox = false}
     )
 
-    var docCategoryDesc: String = ""
-    var docCategoryDescTextColor: Color = Color.Black
-    var docCategoryDescBgTextColor: Color = Color.White
-    if(documentsState.state == ApplicationDocumentTypeState.COMPLETED.state){
-        docCategoryDesc = "Completo"
-        docCategoryDescTextColor = GreenIPCA
-        docCategoryDescBgTextColor = Color(0x120FFC0B)
-    }
-    if(documentsState.state == ApplicationDocumentTypeState.SOMETHING_WRONG.state){
-        docCategoryDesc = "Incorreto"
-        docCategoryDescTextColor = Color(0xFFCF1322)
-        docCategoryDescBgTextColor = Color(0x1BFF0000)
-    }
-    if(documentsState.state == ApplicationDocumentTypeState.TO_REVIEW.state){
-        docCategoryDesc = "Por Rever"
-        docCategoryDescTextColor = Color(0xFFDAA210)
-        docCategoryDescBgTextColor = Color(0x43DAA210)
-    }
+    val uiData = getApplicationDocumentTypeStateViewData(state = documentsState.state )
 
     CategoryBox(
         title = tittle,
         bgColor = bgColor,
-        description = docCategoryDesc,
-        descriptionTextColor = docCategoryDescTextColor,
-        descriptionBgTextColor = docCategoryDescBgTextColor
+        description = uiData.text,
+        descriptionTextColor = uiData.textColor,
+        descriptionBgTextColor = uiData.bgColor
     ) {
         Column(
             modifier = Modifier.fillMaxWidth(),

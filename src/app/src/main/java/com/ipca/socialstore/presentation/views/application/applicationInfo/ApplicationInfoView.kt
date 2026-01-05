@@ -49,7 +49,7 @@ import com.ipca.socialstore.presentation.routes.DefaultRoutes
 import com.ipca.socialstore.presentation.ui.SocialStoreScaffold
 import com.ipca.socialstore.presentation.ui.SocialStoreScaffoldContent
 import com.ipca.socialstore.presentation.ui.theme.SocialStoreTheme
-import com.ipca.socialstore.presentation.utils.NavigationLogic
+import com.ipca.socialstore.presentation.utils.navigation.NavigationLogic
 
 @Composable
 fun ApplicationInfoView(modifier: Modifier, navController: NavController, userRole: UserRole){

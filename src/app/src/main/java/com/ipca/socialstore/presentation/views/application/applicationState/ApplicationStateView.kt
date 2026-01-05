@@ -76,9 +76,10 @@ import com.ipca.socialstore.presentation.ui.components.ButtonTracedComponent
 import com.ipca.socialstore.presentation.ui.components.ExpandableSection
 import com.ipca.socialstore.presentation.ui.components.ReadOnlyField
 import com.ipca.socialstore.presentation.ui.components.WarningComponent
-import com.ipca.socialstore.presentation.ui.theme.GreenIPCA
 import com.ipca.socialstore.presentation.ui.theme.SocialStoreTheme
-import com.ipca.socialstore.presentation.utils.getFileNameFromUri
+import com.ipca.socialstore.presentation.utils.files.getFileNameFromUri
+import com.ipca.socialstore.presentation.utils.ui.getApplicationDataStateViewData
+import com.ipca.socialstore.presentation.utils.ui.getApplicationDocumentTypeStateViewData
 
 @Composable
 fun ApplicationStateView(modifier: Modifier, navController: NavController, userRole: UserRole){
@@ -220,31 +221,13 @@ fun ApplicationStateViewContent(
                     icon = Icons.Default.Warning
                 )
             }
-            var dataCategoryDesc: String = ""
-            var dataCategoryDescTextColor: Color = Color.Black
-            var dataCategoryDescBgTextColor: Color = Color.White
-            if(uiState.application.applicationDataState.state == ApplicationDataStatus.ACCEPTED.status){
-                dataCategoryDesc = "Dados Aceites"
-                dataCategoryDescTextColor = GreenIPCA
-                dataCategoryDescBgTextColor = Color(0x120FFC0B)
-            }
-            if(uiState.application.applicationDataState.state == ApplicationDataStatus.DENIED.status){
-                dataCategoryDesc = "Dados Negados"
-                dataCategoryDescTextColor = Color(0xFFCF1322)
-                dataCategoryDescBgTextColor = Color(0x1BFF0000)
-            }
-            if(uiState.application.applicationDataState.state == ApplicationDataStatus.TO_REVIEW.status){
-                dataCategoryDesc = "Por Rever"
-                dataCategoryDescTextColor = Color(0xFFDAA210)
-                dataCategoryDescBgTextColor = Color(0x43DAA210)
-            }
-
+            val uiData = getApplicationDataStateViewData(uiState.application.applicationDataState.state)
             if (uiState.application.applicationDataState.state != ApplicationDataStatus.DENIED.status) {
                 CategoryBox(
                     title = "Dados Pessoais",
-                    description = dataCategoryDesc,
-                    descriptionTextColor = dataCategoryDescTextColor,
-                    descriptionBgTextColor = dataCategoryDescBgTextColor
+                    description = uiData.text,
+                    descriptionTextColor = uiData.textColor,
+                    descriptionBgTextColor = uiData.bgColor
                 ) {
                     ReadOnlyField("Nome Completo", uiState.application.name)
                     Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -293,9 +276,9 @@ fun ApplicationStateViewContent(
                 if(uiState.application.academicData != null){
                     CategoryBox(
                         title = "Dados Académicos",
-                        description = dataCategoryDesc,
-                        descriptionTextColor = dataCategoryDescTextColor,
-                        descriptionBgTextColor = dataCategoryDescBgTextColor
+                        description = uiData.text,
+                        descriptionTextColor = uiData.textColor,
+                        descriptionBgTextColor = uiData.bgColor
                     ) {
                         ReadOnlyField("Curso", uiState.application.academicData.course)
                         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -308,9 +291,9 @@ fun ApplicationStateViewContent(
             else {
                 CategoryBox(
                     title = "Dados Pessoais",
-                    description = dataCategoryDesc,
-                    descriptionTextColor = dataCategoryDescTextColor,
-                    descriptionBgTextColor = dataCategoryDescBgTextColor
+                    description = uiData.text,
+                    descriptionTextColor = uiData.textColor,
+                    descriptionBgTextColor = uiData.bgColor
                 ) {
                     ApplicationForm(
                         modifier = Modifier,
@@ -333,7 +316,8 @@ fun ApplicationStateViewContent(
                         onAcademicTypeChange = onTypeCourseUpdate,
                         onAcademicCourseChange = onCourseUpdate,
                         onAcademicNumberChange = onStudentNumberUpdate,
-                        isAdmin = true
+                        isAdmin = true,
+                        onIsStudentUpdate = {}
                     )
                 }
                 Button(
@@ -439,32 +423,14 @@ fun DocumentsList(
     onDeleteFile:(document: DocumentReceiverModel?, uri: Uri?, folderName: String) -> Unit,
     onSubmitFile:(docTypeStateId: Int, type: String, msg: String, folderName: String) -> Unit){
 
-    var docCategoryDesc: String = ""
-    var docCategoryDescTextColor: Color = Color.Black
-    var docCategoryDescBgTextColor: Color = Color.White
-
-    if(documentsState.state == ApplicationDocumentTypeState.COMPLETED.state){
-        docCategoryDesc = "Completo"
-        docCategoryDescTextColor = GreenIPCA
-        docCategoryDescBgTextColor = Color(0x120FFC0B)
-    }
-    if(documentsState.state == ApplicationDocumentTypeState.SOMETHING_WRONG.state){
-        docCategoryDesc = "Incorreto"
-        docCategoryDescTextColor = Color(0xFFCF1322)
-        docCategoryDescBgTextColor = Color(0x1BFF0000)
-    }
-    if(documentsState.state == ApplicationDocumentTypeState.TO_REVIEW.state){
-        docCategoryDesc = "Por Rever"
-        docCategoryDescTextColor = Color(0xFFDAA210)
-        docCategoryDescBgTextColor = Color(0x43DAA210)
-    }
+    val uiData = getApplicationDocumentTypeStateViewData(documentsState.state)
 
     CategoryBox(
         title = tittle,
         bgColor = bgColor,
-        description = docCategoryDesc,
-        descriptionTextColor = docCategoryDescTextColor,
-        descriptionBgTextColor = docCategoryDescBgTextColor
+        description = uiData.text,
+        descriptionTextColor = uiData.textColor,
+        descriptionBgTextColor = uiData.bgColor
     ) {
         if(documentsState.state == ApplicationDocumentTypeState.SOMETHING_WRONG.state) {
             WarningComponent(

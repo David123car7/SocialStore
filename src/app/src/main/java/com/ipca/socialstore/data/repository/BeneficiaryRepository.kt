@@ -5,6 +5,7 @@ import com.ipca.socialstore.data.exceptions.AppError
 import com.ipca.socialstore.data.exceptions.ExceptionMapper
 import com.ipca.socialstore.data.helpers.from
 import com.ipca.socialstore.data.models.BeneficiaryModel
+import com.ipca.socialstore.data.models.DocumentModel
 import com.ipca.socialstore.data.models.TableIdModel
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
 import io.github.jan.supabase.SupabaseClient
@@ -12,6 +13,17 @@ import io.github.jan.supabase.postgrest.query.Columns
 import javax.inject.Inject
 
 class BeneficiaryRepository  @Inject constructor(private val supabase : SupabaseClient, private val exceptionMapper: ExceptionMapper){
+    suspend fun createBeneficiary(beneficiary: BeneficiaryModel): ResultWrapper<Int> {
+        return try{
+            val result = supabase.from(DatabaseTables.BENEFICIARY).insert(beneficiary){
+                select(columns = Columns.list("id"))
+            }.decodeSingleOrNull<TableIdModel>()
+            if(result == null) return ResultWrapper.Error(AppError.DataNotCreated)
+            ResultWrapper.Success(result.id)
+        }catch (e: Exception){
+            return ResultWrapper.Error(exceptionMapper.map(e))
+        }
+    }
 
     suspend fun existBeneficiary(beneficiaryId : String) : ResultWrapper<Int> {
         return try {
@@ -72,6 +84,5 @@ class BeneficiaryRepository  @Inject constructor(private val supabase : Supabase
             return ResultWrapper.Error(exceptionMapper.map(e))
         }
     }
-
 }
 

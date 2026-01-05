@@ -31,6 +31,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.ipca.socialstore.data.enums.RequestType
 import com.ipca.socialstore.data.enums.TypeCourse
+import com.ipca.socialstore.presentation.ui.components.RequestTypeSelection
 import com.ipca.socialstore.presentation.ui.components.SocialStoreDropdown
 import com.ipca.socialstore.presentation.ui.components.TextFieldDateComponent
 import com.ipca.socialstore.presentation.ui.components.TextFieldStringComponent
@@ -71,6 +72,7 @@ fun ApplicationForm(
     onAcademicTypeChange: (String) -> Unit,
     onAcademicCourseChange: (String) -> Unit,
     onAcademicNumberChange: (String) -> Unit,
+    onIsStudentUpdate:(Boolean) -> Unit,
 ) {
     var isRequestTypeExpanded by remember { mutableStateOf(false) }
     var isCourseTypeExpanded by remember { mutableStateOf(false) }
@@ -148,14 +150,11 @@ fun ApplicationForm(
             onValueUpdate = onYearChange
         )
 
-        SocialStoreDropdown<RequestType>(
-            expanded = isRequestTypeExpanded,
-            onExpandedChange = { isRequestTypeExpanded = it },
-            selectedOption = RequestType.entries.find { it.label == requestType },
-            onOptionSelected = { newEnum -> onRequestTypeChange(newEnum.label) },
-            options = RequestType.entries,
-            label = "Tipo de Pedido",
-            getLabel = { it.label }
+        RequestTypeSelection(
+            currentSelectionString = requestType,
+            onSelectionChange = { newCombinedString ->
+                onRequestTypeChange(newCombinedString)
+            }
         )
 
         if(!isAdmin){
@@ -181,13 +180,16 @@ fun ApplicationForm(
                     )
                 }
                 Switch(
-                    checked = isStudent,
-                    onCheckedChange = {isStudentLocal = !isStudentLocal}
+                    checked = isStudentLocal,
+                    onCheckedChange = {
+                        isStudentLocal = !isStudentLocal
+                        onIsStudentUpdate(isStudentLocal)
+                    }
                 )
             }
         }
 
-        if (isStudent) {
+        if (isStudentLocal) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()

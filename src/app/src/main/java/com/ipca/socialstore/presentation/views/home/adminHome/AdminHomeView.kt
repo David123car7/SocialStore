@@ -29,7 +29,7 @@ import com.ipca.socialstore.data.enums.UserRole
 import com.ipca.socialstore.presentation.routes.AdminRoutes
 import com.ipca.socialstore.presentation.ui.components.DashboardCard
 import com.ipca.socialstore.presentation.ui.theme.SocialStoreTheme
-import com.ipca.socialstore.presentation.utils.NavigationLogic
+import com.ipca.socialstore.presentation.utils.navigation.NavigationLogic
 
 data class DashboardMenuItem(
     val id: Int,

@@ -40,6 +40,7 @@ import com.ipca.socialstore.data.enums.UserRole
 import com.ipca.socialstore.presentation.models.ApplicationModelReceiver
 import com.ipca.socialstore.presentation.routes.AdminRoutes
 import com.ipca.socialstore.presentation.ui.theme.GreenIPCA
+import com.ipca.socialstore.presentation.utils.ui.getApplicationStateViewData
 
 @Composable
 fun ListApplicationsView(modifier: Modifier, navController: NavController, userRole: UserRole){
@@ -68,12 +69,13 @@ fun ListApplicationsContent(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         items(uiState.applications) { application ->
+            val ui = getApplicationStateViewData(state = application.applicationState.state)
             CandidateCard(
                 candidateName = application.name,
                 createdAt = application.createdAt,
-                status = application.applicationState.state,
-                bgColor = getApplicationBGColor(applicationStatus = application.applicationState.state) ?: Color.White,
-                textColor = getApplicationTextColor(applicationStatus = application.applicationState.state) ?: Color.White,
+                status = ui.text,
+                statusBgColor = ui.bgColor,
+                statusTextColor = ui.textColor,
                 onDetailsClick = {onAppSelected(application)},
             )
         }
@@ -85,8 +87,8 @@ fun CandidateCard(
     candidateName: String,
     createdAt: String,
     status: String,
-    bgColor: Color,
-    textColor: Color,
+    statusBgColor: Color,
+    statusTextColor: Color,
     onDetailsClick: () -> Unit,
 ) {
     Card(
@@ -109,13 +111,13 @@ fun CandidateCard(
                     fontWeight = FontWeight.Bold
                 )
                 Surface(
-                    color = bgColor,
+                    color = statusBgColor,
                     shape = RoundedCornerShape(16.dp),
                     modifier = Modifier.padding(start = 8.dp)
                 ) {
                     Text(
                         text = status,
-                        color = textColor,
+                        color = statusTextColor,
                         style = MaterialTheme.typography.labelSmall,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
@@ -163,8 +165,8 @@ fun CandidateCardPreview(){
             candidateName = "David Amorim Carvalho",
             createdAt = "19/08/2025",
             status = "Por Aceitar",
-            bgColor = Color(0xFFFFCCC7),
-            textColor = Color(0xFFCF1322),
+            statusBgColor = Color(0xFFFFCCC7),
+            statusTextColor = Color(0xFFCF1322),
             onDetailsClick = {},
         )
     }

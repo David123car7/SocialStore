@@ -2,15 +2,11 @@ package com.ipca.socialstore.presentation.views.Scheduling.create
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.ipca.socialstore.data.models.BeneficiaryModel
-import com.ipca.socialstore.data.resultwrappers.ResultWrapper
 import com.ipca.socialstore.domain.beneficiary.GetAllBeneficiaryUseCase
-import com.ipca.socialstore.presentation.utils.ErrorText
-import com.ipca.socialstore.presentation.utils.asUiText
+import com.ipca.socialstore.presentation.utils.errors.ErrorText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
-import kotlinx.coroutines.launch
 
 
 data class CreateSchedulingState(

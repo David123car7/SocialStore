@@ -75,7 +75,7 @@ fun SchedulingManagementContent(
                 BeneficiaryCard(
                     item.name,
                     item.id.toString(),
-                    item.createdAt,
+                    "",
                     status = "Regular",
                     onClick = {onClick(item)}
                 )

@@ -31,7 +31,7 @@ import androidx.navigation.compose.rememberNavController
 import com.ipca.socialstore.presentation.routes.AdminRoutes
 import com.ipca.socialstore.presentation.routes.BeneficiaryRoutes
 import com.ipca.socialstore.presentation.routes.CandidateRoutes
-import com.ipca.socialstore.presentation.utils.NavigationLogic
+import com.ipca.socialstore.presentation.utils.navigation.NavigationLogic
 import com.ipca.socialstore.presentation.routes.DefaultRoutes
 import com.ipca.socialstore.presentation.routes.GeneralRoutes
 import com.ipca.socialstore.presentation.ui.theme.SocialStoreTheme
@@ -83,6 +83,11 @@ fun SocialStoreScaffoldContent(
             isVisible = userRole == UserRole.DEFAULT
         ),
         BottomNavItem(
+            icon = Icons.Filled.FileOpen,
+            route = CandidateRoutes.ApplicationState,
+            isVisible = userRole == UserRole.CANDIDATE
+        ),
+        BottomNavItem(
             icon = Icons.Default.Accessibility,
             route = AdminRoutes.ListApplications,
             isVisible = userRole == UserRole.ADMIN
@@ -92,7 +97,6 @@ fun SocialStoreScaffoldContent(
             route = AdminRoutes.SchedulingManagement,
             isVisible = userRole == UserRole.ADMIN
         ),
-
         BottomNavItem( //stock
             icon = Icons.Default.Storage,
             route = AdminRoutes.GetStock,

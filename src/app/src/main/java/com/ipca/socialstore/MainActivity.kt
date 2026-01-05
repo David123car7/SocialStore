@@ -34,7 +34,7 @@ import com.ipca.socialstore.presentation.views.stock.List.GetAllStockView
 import com.ipca.socialstore.presentation.views.stock.List.ListAllStockViewModel
 import com.ipca.socialstore.presentation.views.stock.List.StockItemDetailView
 import com.ipca.socialstore.presentation.ui.theme.SocialStoreTheme
-import com.ipca.socialstore.presentation.utils.NavigationLogic
+import com.ipca.socialstore.presentation.utils.navigation.NavigationLogic
 import com.ipca.socialstore.presentation.views.Scheduling.listAllSchedulingUser.ListAllSchedulingUserView
 import com.ipca.socialstore.presentation.views.Scheduling.mainPage.SchedulingMainPageView
 import com.ipca.socialstore.presentation.views.Scheduling.management.SchedulingManagementView

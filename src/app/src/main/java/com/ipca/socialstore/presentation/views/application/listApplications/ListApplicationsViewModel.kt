@@ -17,9 +17,9 @@ import com.ipca.socialstore.domain.services.document.GetApplicationDocumentsServ
 import com.ipca.socialstore.domain.storage.DownloadFileUseCase
 import com.ipca.socialstore.presentation.models.ApplicationModelReceiver
 import com.ipca.socialstore.presentation.models.DocumentReceiverModel
-import com.ipca.socialstore.presentation.utils.ErrorText
-import com.ipca.socialstore.presentation.utils.FileSaveManager
-import com.ipca.socialstore.presentation.utils.asUiText
+import com.ipca.socialstore.presentation.utils.errors.ErrorText
+import com.ipca.socialstore.presentation.utils.files.FileSaveManager
+import com.ipca.socialstore.presentation.utils.errors.asUiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
