@@ -62,13 +62,16 @@ import com.ipca.socialstore.data.enums.UserRole
 import com.ipca.socialstore.data.models.ApplicationDocumentTypeModel
 import com.ipca.socialstore.presentation.models.ApplicationModelReceiver
 import com.ipca.socialstore.presentation.models.DocumentReceiverModel
+import com.ipca.socialstore.presentation.routes.AdminRoutes
 import com.ipca.socialstore.presentation.ui.components.AlertComponent
 import com.ipca.socialstore.presentation.ui.components.AlertInputComponent
 import com.ipca.socialstore.presentation.ui.components.ReadOnlyField
 import com.ipca.socialstore.presentation.ui.theme.GreenIPCA
+import com.ipca.socialstore.presentation.utils.navigation.NavigationLogic
 import com.ipca.socialstore.presentation.utils.ui.getApplicationDataStateViewData
 import com.ipca.socialstore.presentation.utils.ui.getApplicationDocumentTypeStateViewData
 import com.ipca.socialstore.presentation.views.application.applicationState.CategoryBox
+import com.ipca.socialstore.presentation.views.application.applicationState.StatusTimelineHeader
 import kotlin.collections.forEach
 
 @Composable
@@ -109,6 +112,16 @@ fun AplicationStateAdminView(modifier: Modifier, navController: NavController, u
     LaunchedEffect(uiState.error) {
         if(uiState.error != null){
             Toast.makeText(context, uiState.error!!.asString(context = context), Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    LaunchedEffect(uiState.appStateUpdated) {
+        if (uiState.appStateUpdated){
+            NavigationLogic.navigateTo(
+                navController = navController,
+                route = AdminRoutes.ListApplications,
+                userRole = userRole
+            )
         }
     }
 
@@ -202,6 +215,8 @@ fun ApplicationStateAdminContent(
             var showAlertAcceptApplication by remember { mutableStateOf(false) }
             var showAlertDenyApplication by remember { mutableStateOf(false) }
             var documentSelected by remember { mutableStateOf<DocumentReceiverModel?>(null) }
+
+            StatusTimelineHeader(state = uiState.application.applicationState.state)
 
             AlertComponent(
                 show = showAlertAcceptDocument,
@@ -328,28 +343,31 @@ fun ApplicationStateAdminContent(
                     onUpdateTypeDocState(id, state, type, msg)
                 }
             )
-            Row(horizontalArrangement = Arrangement.SpaceEvenly) {
-                Button(
-                    onClick = {showAlertAcceptApplication = true},
-                    modifier = Modifier
-                        .padding(5.dp)
-                        .weight(1f)
-                        .height(40.dp),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(GreenIPCA)
-                ) {
-                    Text("Aceitar")
-                }
-                Button(
-                    onClick = { showAlertDenyApplication = true },
-                    modifier = Modifier
-                        .padding(5.dp)
-                        .weight(1f)
-                        .height(40.dp),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(Color(0xFFCF1322))
-                ) {
-                    Text("Rejeitar")
+            if(uiState.application.applicationState.state == ApplicationStates.PENDING.status
+                || uiState.application.applicationState.state == ApplicationStates.CORRECTION.status){
+                Row(horizontalArrangement = Arrangement.SpaceEvenly) {
+                    Button(
+                        onClick = { showAlertAcceptApplication = true },
+                        modifier = Modifier
+                            .padding(5.dp)
+                            .weight(1f)
+                            .height(40.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.buttonColors(GreenIPCA)
+                    ) {
+                        Text("Aceitar")
+                    }
+                    Button(
+                        onClick = { showAlertDenyApplication = true },
+                        modifier = Modifier
+                            .padding(5.dp)
+                            .weight(1f)
+                            .height(40.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.buttonColors(Color(0xFFCF1322))
+                    ) {
+                        Text("Rejeitar")
+                    }
                 }
             }
         }

@@ -39,11 +39,9 @@ import com.ipca.socialstore.presentation.views.Scheduling.cancelByUser.Justifica
 import com.ipca.socialstore.presentation.views.Scheduling.listAllSchedulingUser.ListAllSchedulingUserView
 import com.ipca.socialstore.presentation.views.Scheduling.mainPage.SchedulingMainPageView
 import com.ipca.socialstore.presentation.views.Scheduling.management.SchedulingManagementView
-import com.ipca.socialstore.presentation.views.Scheduling.management.SchedulingManagementViewModel
 import com.ipca.socialstore.presentation.views.application.applicationInfo.ApplicationInfoView
 import com.ipca.socialstore.presentation.views.application.applicationState.ApplicationStateView
 import com.ipca.socialstore.presentation.views.application.applicationStateAdmin.AplicationStateAdminView
-import com.ipca.socialstore.presentation.views.application.applicationStateAdmin.ApplicationStateAdminViewModel
 import com.ipca.socialstore.presentation.views.application.createApplication.CreateApplicationView
 import com.ipca.socialstore.presentation.views.application.listApplications.ListApplicationsView
 import com.ipca.socialstore.presentation.views.authentication.resetPassword.ResetPasswordView
@@ -73,11 +71,27 @@ class MainActivity : ComponentActivity() {
                 SocialStoreScaffold(navController = navController, userRole = mainState.userRole) { innerPadding ->
                     NavHost(navController = navController, startDestination = GeneralRoutes.Home){
                         composable<GeneralRoutes.Home>{
+                            mainViewModel.getUserRoleScope()
+
                             DefaultHomeView(
                                 modifier = Modifier.padding(innerPadding),
                                 navController = navController,
                                 userRole = mainState.userRole
                             )
+                        }
+                        composable<BeneficiaryRoutes.BeneficiaryHome>{
+                            mainViewModel.getUserRoleScope()
+
+
+                            BeneficiaryHomeView(
+                                modifier = Modifier,
+                                userRole = mainState.userRole
+                            )
+                        }
+                        composable<AdminRoutes.Home>{
+                            mainViewModel.getUserRoleScope()
+
+                            AdminHomeView(modifier = Modifier.padding(innerPadding), navController = navController, userRole = mainState.userRole)
                         }
                         composable<GeneralRoutes.TestHome>{
                             TestHomeView(modifier = Modifier.padding(innerPadding),
@@ -101,14 +115,8 @@ class MainActivity : ComponentActivity() {
                                 userRole = mainState.userRole
                             )
                         }
-                        composable<BeneficiaryRoutes.BeneficiaryHome>{
-                            BeneficiaryHomeView(
-                                modifier = Modifier,
-                                userRole = mainState.userRole
-                            )
-                        }
                         composable<DefaultRoutes.CreateApplication> {
-                            CreateApplicationView(modifier = Modifier.padding(innerPadding))
+                            CreateApplicationView(modifier = Modifier.padding(innerPadding), navController = navController, userRole = mainState.userRole)
                         }
                         composable<CandidateRoutes.ApplicationState> {
                             ApplicationStateView(modifier = Modifier.padding(innerPadding), navController = navController, userRole = mainState.userRole)
@@ -116,9 +124,6 @@ class MainActivity : ComponentActivity() {
                         composable<GeneralRoutes.ResetPassword>{
                             ResetPasswordView(modifier = Modifier.padding(innerPadding),
                                 navController = navController, userRole = mainState.userRole)
-                        }
-                        composable<AdminRoutes.AdminHome>{
-                            AdminHomeView(modifier = Modifier.padding(innerPadding), navController = navController, userRole = mainState.userRole)
                         }
                         composable<AdminRoutes.ListApplications>{
                             ListApplicationsView(modifier = Modifier.padding(innerPadding), navController = navController, userRole = mainState.userRole)
@@ -190,19 +195,11 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                     }
-
                     LaunchedEffect(mainState.isLoggedIn) {
                         NavigationLogic.navigateTo(
                             navController = navController,
                             userRole = mainState.userRole,
                             route = GeneralRoutes.Home
-                        )
-                    }
-
-                    LaunchedEffect(mainState.userRole) {
-                        NavigationLogic.resetNavigation(
-                            navController = navController,
-                            userRole = mainState.userRole,
                         )
                     }
                 }

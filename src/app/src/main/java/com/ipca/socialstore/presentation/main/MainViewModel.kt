@@ -37,6 +37,12 @@ class MainViewModel @Inject constructor(
         }
     }
 
+    fun getUserRoleScope(){
+        viewModelScope.launch {
+            getUserRole()
+        }
+    }
+
     suspend fun getUserRole(){
         val result = getUserRoleUseCase()
         when(result){

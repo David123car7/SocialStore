@@ -70,6 +70,7 @@ import com.ipca.socialstore.data.enums.DocumentType
 import com.ipca.socialstore.data.enums.UserRole
 import com.ipca.socialstore.data.models.ApplicationDocumentTypeModel
 import com.ipca.socialstore.presentation.models.DocumentReceiverModel
+import com.ipca.socialstore.presentation.routes.GeneralRoutes
 import com.ipca.socialstore.presentation.ui.SocialStoreScaffoldContent
 import com.ipca.socialstore.presentation.ui.components.AlertComponent
 import com.ipca.socialstore.presentation.ui.components.ButtonTracedComponent
@@ -78,6 +79,7 @@ import com.ipca.socialstore.presentation.ui.components.ReadOnlyField
 import com.ipca.socialstore.presentation.ui.components.WarningComponent
 import com.ipca.socialstore.presentation.ui.theme.SocialStoreTheme
 import com.ipca.socialstore.presentation.utils.files.getFileNameFromUri
+import com.ipca.socialstore.presentation.utils.navigation.NavigationLogic
 import com.ipca.socialstore.presentation.utils.ui.getApplicationDataStateViewData
 import com.ipca.socialstore.presentation.utils.ui.getApplicationDocumentTypeStateViewData
 
@@ -118,7 +120,9 @@ fun ApplicationStateView(modifier: Modifier, navController: NavController, userR
                 context = context
             )
         },
-        onDeleteApplication = { applicationStateViewModel.deleteApplication()},
+        onDeleteApplication = {
+            applicationStateViewModel.deleteApplication()
+        },
         onApplicationUpdate = {
             applicationStateViewModel.updateApplication()
         }
@@ -128,6 +132,16 @@ fun ApplicationStateView(modifier: Modifier, navController: NavController, userR
         if (uiState.error != null) {
             Toast.makeText(context, uiState.error!!.asString(context = context), Toast.LENGTH_SHORT).show()
             applicationStateViewModel.clearError()
+        }
+    }
+
+    LaunchedEffect(uiState.isAppDeleted) {
+        if (uiState.isAppDeleted){
+            NavigationLogic.navigateTo(
+                navController = navController,
+                route = GeneralRoutes.Home,
+                userRole = userRole
+            )
         }
     }
 }
