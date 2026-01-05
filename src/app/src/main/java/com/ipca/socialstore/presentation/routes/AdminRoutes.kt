@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 sealed class AdminRoutes {
     @Serializable
-    object AdminHome : AdminRoutes()
+    object Home : AdminRoutes()
 
     // --- Applications ---
     @Serializable

@@ -13,14 +13,12 @@ import com.ipca.socialstore.data.enums.UserRole
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Accessibility
 import androidx.compose.material.icons.filled.Assignment
-import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.FileOpen
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.Storage
-import androidx.compose.material.icons.filled.Warning
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
@@ -74,7 +72,7 @@ fun SocialStoreScaffoldContent(
         ),
         BottomNavItem( //AdminHome
             icon = Icons.Default.Home,
-            route = AdminRoutes.AdminHome,
+            route = AdminRoutes.Home,
             isVisible = userRole == UserRole.ADMIN
         ),
         BottomNavItem( //ApplicationInfo

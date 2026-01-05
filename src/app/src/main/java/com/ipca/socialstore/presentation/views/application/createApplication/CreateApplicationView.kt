@@ -24,6 +24,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,21 +36,26 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.ipca.socialstore.data.enums.RequestType
 import com.ipca.socialstore.data.enums.TypeCourse
+import com.ipca.socialstore.data.enums.UserRole
 import com.ipca.socialstore.data.models.AcademicModel
 import com.ipca.socialstore.data.models.ApplicationModel
+import com.ipca.socialstore.presentation.routes.DefaultRoutes
+import com.ipca.socialstore.presentation.routes.GeneralRoutes
 import com.ipca.socialstore.presentation.ui.components.SocialStoreDropdown
 import com.ipca.socialstore.presentation.ui.components.TextFieldDateComponent
 import com.ipca.socialstore.presentation.ui.components.TextFieldStringComponent
 import com.ipca.socialstore.presentation.ui.components.TextFieldValueComponent
 import com.ipca.socialstore.presentation.ui.theme.SocialStoreTheme
+import com.ipca.socialstore.presentation.utils.navigation.NavigationLogic
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
 @Composable
-fun CreateApplicationView(modifier: Modifier){
+fun CreateApplicationView(modifier: Modifier, navController: NavController, userRole: UserRole){
     val applicationViewModel: CreateApplicationViewModel = hiltViewModel()
     val uiState by applicationViewModel.uiState
 
@@ -74,6 +80,16 @@ fun CreateApplicationView(modifier: Modifier){
         onStudentNumberUpdate = applicationViewModel::updateStudentNumber,
         onSubmitApplication = applicationViewModel::createApplication
     )
+
+    LaunchedEffect(uiState.isSuccess) {
+        if(uiState.isSuccess){
+            NavigationLogic.navigateTo(
+                navController = navController,
+                userRole = userRole,
+                route = GeneralRoutes.Home
+            )
+        }
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

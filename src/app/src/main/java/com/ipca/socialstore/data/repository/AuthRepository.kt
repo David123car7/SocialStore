@@ -83,6 +83,7 @@ class AuthRepository @Inject constructor(
                 this.password = password
             }
             if(user == null) return ResultWrapper.Error(AppError.UserNotFound) //Maybe another type of error?
+            logout()
             ResultWrapper.Success(user.id)
         }
         catch (e: Exception) {

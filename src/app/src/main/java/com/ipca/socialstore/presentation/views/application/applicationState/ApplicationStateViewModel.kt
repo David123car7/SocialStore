@@ -38,6 +38,7 @@ data class ApplicationState(
     val isLoading: Boolean = false,
     val error: ErrorText? = null,
     val isData: Boolean = true,
+    val isAppDeleted: Boolean = false,
 
     val application: ApplicationModelReceiver = createEmptyApplication(),
 
@@ -276,6 +277,7 @@ class ApplicationStateViewModel @Inject constructor(
                 is ResultWrapper.Success -> {
                     uiState.value = uiState.value.copy(
                         isLoading = false,
+                        isAppDeleted = true,
                     )
                 }
                 is ResultWrapper.Error -> {

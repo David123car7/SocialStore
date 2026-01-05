@@ -52,6 +52,7 @@ data class ApplicationAdminState(
 
     val isLoading: Boolean = false,
     val error: ErrorText? = null,
+    val appStateUpdated: Boolean = false,
 )
 
 @HiltViewModel
@@ -155,6 +156,7 @@ class ApplicationStateAdminViewModel @Inject constructor(
                 is ResultWrapper.Success -> {
                     uiState.value = uiState.value.copy(
                         isLoading = false,
+                        appStateUpdated = true,
                     )
                 }
                 is ResultWrapper.Error -> {
@@ -178,6 +180,7 @@ class ApplicationStateAdminViewModel @Inject constructor(
                 is ResultWrapper.Success -> {
                     uiState.value = uiState.value.copy(
                         isLoading = false,
+                        appStateUpdated = true,
                     )
                 }
                 is ResultWrapper.Error -> {
