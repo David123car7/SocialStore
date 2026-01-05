@@ -72,7 +72,7 @@ class ListAllSchedulingUserViewModel @Inject constructor(
     fun selectListHistory(){
         val schedules = uiState.value.scheduling
         uiState.value = uiState.value.copy(
-            showList = schedules,
+            showList = schedules.filter { it.state!= "decline" },
         )
     }
 
@@ -80,6 +80,13 @@ class ListAllSchedulingUserViewModel @Inject constructor(
         val schedules = uiState.value.scheduling
         uiState.value = uiState.value.copy(
             showList = schedules.filter { it.state == "canceled" },
+        )
+    }
+
+    fun selectListInProgress(){
+        val schedules = uiState.value.scheduling
+        uiState.value = uiState.value.copy(
+            showList = schedules.filter { it.state == "in_Progress" },
         )
     }
 

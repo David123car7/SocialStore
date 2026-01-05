@@ -37,6 +37,9 @@ import com.ipca.socialstore.presentation.views.Scheduling.cancelByUser.Justifica
 import com.ipca.socialstore.presentation.views.Scheduling.listAllSchedulingUser.ListAllSchedulingUserView
 import com.ipca.socialstore.presentation.views.Scheduling.mainPage.SchedulingMainPageView
 import com.ipca.socialstore.presentation.views.Scheduling.management.SchedulingManagementView
+
+import com.ipca.socialstore.presentation.views.Scheduling.management.SchedulingManagementViewModel
+import com.ipca.socialstore.presentation.views.Scheduling.schedulingConfirmation.SchedulingConfirmationView
 import com.ipca.socialstore.presentation.views.application.applicationInfo.ApplicationInfoView
 import com.ipca.socialstore.presentation.views.application.applicationState.ApplicationStateView
 import com.ipca.socialstore.presentation.views.application.applicationStateAdmin.AplicationStateAdminView
@@ -158,9 +161,6 @@ class MainActivity : ComponentActivity() {
                         composable <AdminRoutes.SelectStock>{
                             StockItemDetailView(modifier = Modifier.padding(innerPadding), navController = navController, viewModel = stockViewModel)
                         }
-                        composable <AdminRoutes.CreateScheduling>{
-                            CreateSchedulingView(modifier = Modifier.padding(innerPadding), navController = navController)
-                        }
                         composable <AdminRoutes.NotificationHistory>{
                             NotificationHistoryView(modifier = Modifier.padding(innerPadding), navController = navController)
                         }
@@ -191,6 +191,28 @@ class MainActivity : ComponentActivity() {
                             )
                         ) {
                             JustificationScreenView(
+                                modifier = Modifier.padding(innerPadding),
+                                navController = navController
+                            )
+                        }
+                        composable(
+                            route = BeneficiaryRoutes.SchedulingConfirmation::class.qualifiedName!! + "/{schedulingId}",
+                            arguments = listOf(
+                                navArgument("schedulingId") { type = NavType.StringType }
+                            )
+                        ) {
+                            SchedulingConfirmationView(
+                                modifier = Modifier.padding(innerPadding),
+                                navController = navController
+                            )
+                        }
+                        composable(
+                            route = AdminRoutes.SchedulingMainPage::class.qualifiedName!! + "/{beneficiaryId}",
+                            arguments = listOf(
+                                navArgument("beneficiaryId") { type = NavType.StringType }
+                            )
+                        ) {
+                            SchedulingMainPageView(
                                 modifier = Modifier.padding(innerPadding),
                                 navController = navController
                             )

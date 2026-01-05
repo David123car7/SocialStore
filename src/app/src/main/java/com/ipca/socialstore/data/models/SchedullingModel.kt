@@ -20,6 +20,8 @@ data class SchedulingModel(
     @SerialName("reason")
     val reason : String?,
 
+    @SerialName("note")
+    val note : String?
 
 )
 

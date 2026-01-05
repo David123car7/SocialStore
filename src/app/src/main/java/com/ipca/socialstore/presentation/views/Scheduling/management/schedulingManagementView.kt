@@ -24,6 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
@@ -137,5 +138,41 @@ fun BeneficiaryCard(
                 )
             }
         }
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun SchedulingManagementPreview() {
+    val mockBeneficiaries = listOf(
+        BeneficiaryModel(
+            id = 4,
+            name = "Diogo",
+            birthDate = "1995-08-20",
+            academicId = 2
+        ),
+        BeneficiaryModel(
+            id = 3,
+            name = "David",
+            birthDate = "1990-05-15",
+            academicId = 1
+        )
+    )
+
+    // 2. Simular o estado da UI
+    val mockUiState = SchedulingManagementState(
+        beneficiaries = mockBeneficiaries,
+        filteredBeneficiaries = mockBeneficiaries, // Mostra todos inicialmente
+        isLoading = false
+    )
+
+    MaterialTheme {
+        // 3. Chamar o conteúdo da View
+        SchedulingManagementContent(
+            modifier = Modifier.padding(16.dp),
+            uiState = mockUiState,
+            onSearchBeneficiary = {},
+            onClick = {}
+        )
     }
 }
