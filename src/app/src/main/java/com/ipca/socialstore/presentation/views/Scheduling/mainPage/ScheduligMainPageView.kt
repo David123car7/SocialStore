@@ -84,6 +84,9 @@ fun SchedulingMainContent(
             onClickDay = { date ->
                 selectDate = date
                 onUpdateDate(date)
+                uiState.beneficiary?.id.let { id ->
+                    onUpdateBeneficiaryId(id!!)
+                }
                 showPopup = true
             }
         )

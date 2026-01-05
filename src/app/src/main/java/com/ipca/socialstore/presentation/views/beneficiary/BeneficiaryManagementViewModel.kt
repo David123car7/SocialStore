@@ -42,6 +42,7 @@ class BeneficiaryManagementViewModel @Inject constructor(
     init {
         fetchBeneficiary()
         fetchInfo()
+        println(beneficiaryId)
 
     }
 
