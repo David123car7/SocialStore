@@ -1,4 +1,4 @@
-package com.ipca.socialstore.presentation.views.campaign.listAll
+package com.ipca.socialstore.presentation.views.campaign.list
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -12,27 +12,24 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-data class GetAllCampaignsState(
+data class CampaignsListState(
     val campaigns : List<CampaignModel> = emptyList(),
     val isLoading : Boolean = false,
     val error : ErrorText? = null
 )
+
 @HiltViewModel
-class ListAllCampaignsViewModel @Inject constructor(private val getAllCampaignsUseCase: GetAllCampaignsUseCase): ViewModel(){
-
-    val uiState = mutableStateOf(GetAllCampaignsState())
-
+class CampaignsListViewModel @Inject constructor(private val getAllCampaignsUseCase: GetAllCampaignsUseCase): ViewModel(){
+    val uiState = mutableStateOf(CampaignsListState())
 
     fun getAllCampaigns(){
         viewModelScope.launch {
-            val result = getAllCampaignsUseCase()
-
-            when(result){
+            when(val result = getAllCampaignsUseCase()){
                 is ResultWrapper.Success ->{
                     uiState.value = uiState.value.copy(
                         isLoading = false,
                         error = null,
-                        campaigns = result.data!!
+                        campaigns = result.data
                     )
                 }
                 is ResultWrapper.Error -> {

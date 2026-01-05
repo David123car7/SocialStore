@@ -7,6 +7,6 @@ import javax.inject.Inject
 
 class GetAllCampaignsUseCase @Inject constructor(private val campaignRepository: CampaignRepository){
     suspend operator fun invoke() : ResultWrapper<List<CampaignModel>>{
-        return  campaignRepository.getAllCampaign()
+        return  campaignRepository.getAllCampaigns()
     }
 }

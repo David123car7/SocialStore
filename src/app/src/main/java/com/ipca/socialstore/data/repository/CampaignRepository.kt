@@ -15,7 +15,6 @@ import javax.inject.Inject
 class CampaignRepository @Inject constructor(
     private val supabase: SupabaseClient,
     val exceptionMapper: ExceptionMapper){
-
     suspend fun createCampaign(campaign : CampaignModel) : ResultWrapper<Int> {
         return try {
             val campaingResult = supabase.from(DatabaseTables.CAMPAIGN)
@@ -30,7 +29,7 @@ class CampaignRepository @Inject constructor(
         }
     }
 
-    suspend fun getAllCampaign() : ResultWrapper<List<CampaignModel>> {
+    suspend fun getAllCampaigns() : ResultWrapper<List<CampaignModel>> {
         return try {
             val campaigns = supabase.from(DatabaseTables.CAMPAIGN)
                 .select()

@@ -40,6 +40,7 @@ import com.ipca.socialstore.data.enums.UserRole
 import com.ipca.socialstore.presentation.models.ApplicationModelReceiver
 import com.ipca.socialstore.presentation.routes.AdminRoutes
 import com.ipca.socialstore.presentation.ui.theme.GreenIPCA
+import com.ipca.socialstore.presentation.ui.theme.gg
 import com.ipca.socialstore.presentation.utils.ui.getApplicationStateViewData
 
 @Composable
@@ -166,7 +167,7 @@ fun CandidateCardPreview(){
             createdAt = "19/08/2025",
             status = "Por Aceitar",
             statusBgColor = Color(0xFFFFCCC7),
-            statusTextColor = Color(0xFFCF1322),
+            statusTextColor = gg,
             onDetailsClick = {},
         )
     }

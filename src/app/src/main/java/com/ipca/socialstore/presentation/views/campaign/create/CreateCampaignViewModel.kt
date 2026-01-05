@@ -12,46 +12,24 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+data class CreateCampaignState(
+    val campaign: CampaignModel = createEmptyCampaign(),
 
-data class CampaignState(
-    val campaign : CampaignModel = CampaignModel(name = "", date = "", description = "", category = ""),
-    val isLoading : Boolean = false,
-    val error: ErrorText? = null,
-    val isCreated : Boolean  = false
+    var error : ErrorText? = null,
+    var isLoading : Boolean = false,
+    var isCreated : Boolean = false,
 )
 
 @HiltViewModel
-class CreateCampaignViewModel @Inject constructor(private val createCampaignUseCase: CreateCampaignUseCase) : ViewModel(){
-
-    val uiState = mutableStateOf(CampaignState())
-
-    fun updateCampaignName(name : String){
-        val campaign = uiState.value.campaign.copy(
-            name = name
-        )
-        uiState.value = uiState.value.copy(
-            campaign = campaign
-        )
-    }
-
-    fun updateDate(date: String){
-        val campaign = uiState.value.campaign.copy(
-            date = date
-        )
-        uiState.value = uiState.value.copy(
-            campaign = campaign
-        )
-    }
+class CreateCampaignViewModel @Inject constructor(
+    val createCampaignUseCase: CreateCampaignUseCase
+) : ViewModel(){
+    var uiState = mutableStateOf(CreateCampaignState())
 
     fun createCampaign(){
-
-        uiState.value = uiState.value.copy(
-            isLoading = true,
-            error = null,
-            isCreated = false
-        )
-
         viewModelScope.launch {
+            uiState.value = uiState.value.copy(isLoading = true)
+
             val result = createCampaignUseCase(uiState.value.campaign)
             when(result){
                 is ResultWrapper.Success -> {
@@ -63,11 +41,22 @@ class CreateCampaignViewModel @Inject constructor(private val createCampaignUseC
                 is ResultWrapper.Error -> {
                     uiState.value = uiState.value.copy(
                         isLoading = false,
-                        error = result.error.asUiText(),
-                        isCreated = false
+                        error = result.error.asUiText()
                     )
                 }
             }
         }
     }
+}
+
+fun createEmptyCampaign(): CampaignModel {
+    return CampaignModel(
+        id = null,
+        name = "",
+        description = "",
+        category = "",
+        onGoing = false, // Default to not started
+        startDate = "",  // Or use LocalDate.now().toString()
+        endDate = ""
+    )
 }

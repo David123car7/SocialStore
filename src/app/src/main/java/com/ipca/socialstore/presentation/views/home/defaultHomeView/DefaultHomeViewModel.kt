@@ -13,21 +13,27 @@ data class DefaultHomeState (
             name = "Natal Solidário",
             description = "Ajude-nos a compor 500 cabazes para as famílias mais carenciadas da comunidade académica.",
             category = "Alimentar",
-            date = "2025-12-25"
+            onGoing = true,
+            startDate = "",
+            endDate = ""
         ),
         CampaignModel(
             id = 2,
             name = "Kit Escolar 2026",
             description = "Recolha de cadernos, canetas e calculadoras para o segundo semestre.",
             category = "Educação",
-            date = "2026-02-10"
+            onGoing = true,
+            startDate = "",
+            endDate = ""
         ),
         CampaignModel(
             id = 3,
             name = "Inverno Quente",
             description = "Estamos a recolher casacos e mantas em bom estado.",
             category = "Vestuário",
-            date = "2025-11-30"
+            onGoing = true,
+            startDate = "",
+            endDate = ""
         )
     ),
     var isLoading : Boolean = false,
