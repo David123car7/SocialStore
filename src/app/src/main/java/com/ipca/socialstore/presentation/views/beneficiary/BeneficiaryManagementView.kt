@@ -16,9 +16,13 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -40,13 +44,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.ipca.socialstore.data.models.BeneficiaryModel
 import com.ipca.socialstore.presentation.ui.theme.SocialStoreTheme
 import kotlin.collections.forEachIndexed
+
 
 @Composable
 fun BeneficiaryManagementView(
@@ -142,7 +149,7 @@ fun BeneficiaryManagementContent(
 
                 Spacer(modifier = Modifier.height(16.dp))
                 Button(
-                    onClick = {},
+                    onClick = { /* Navegação */ },
                     modifier = Modifier.fillMaxWidth().height(45.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE0E0E0)),
                     shape = RoundedCornerShape(10.dp)
@@ -244,7 +251,7 @@ fun SchedulingItem(date: String, type: String) {
         Icon(Icons.Default.KeyboardArrowRight, null, tint = Color.Gray)
     }
 }
-
+/*
 @Preview(showBackground = true)
 @Composable
 fun Preview() {
@@ -253,8 +260,7 @@ fun Preview() {
             id = 12345,
             name = "Alice Pereira",
             birthDate = "12/05/2003",
-            academicId = 1,
-            phoneNumber = "dwadawdwa"
+            addressId = 1
         )
 
         val uiState = BeneficiaryManagementState(
@@ -269,3 +275,6 @@ fun Preview() {
         )
     }
 }
+
+
+ */

@@ -37,8 +37,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.ipca.socialstore.data.models.BeneficiaryModel
 import com.ipca.socialstore.data.models.SchedulingModel
+import com.ipca.socialstore.presentation.routes.AdminRoutes
+import com.ipca.socialstore.presentation.routes.BeneficiaryRoutes
 
 
 @Composable
@@ -55,6 +58,7 @@ fun ListAllSchedulingUserView(
     ListAllSchedulingUserContent(
         modifier = modifier,
         uiState = uiState,
+        navController = navController,
         onClickAccept = {viewModel.selectListAccept()},
         onClickHistory = {viewModel.selectListHistory()},
         onClickCancel = {viewModel.selectListCanceled()}
@@ -63,6 +67,7 @@ fun ListAllSchedulingUserView(
 @Composable
 fun ListAllSchedulingUserContent(
     modifier: Modifier,
+    navController : NavController,
     uiState : ListSchedulingUserState,
     onClickAccept : () -> Unit,
     onClickHistory : () -> Unit,
@@ -103,6 +108,7 @@ fun ListAllSchedulingUserContent(
             AssistChip(onClick = {onClickHistory()}, label = { Text("Histórico") })
 
             AssistChip(onClick = {onClickCancel()}, label = { Text("Cancelado(${uiState.cancel})") })
+
         }
 
         Text(
@@ -116,7 +122,16 @@ fun ListAllSchedulingUserContent(
             itemsIndexed(uiState.showList) { index, item ->
                 SchedulingTimelineItem(
                     item = item,
-                    isLast = index == uiState.scheduling.lastIndex
+                    isLast = index == uiState.scheduling.lastIndex,
+                    onNavigate = {item ->
+                        if (item.state == "accept"){
+
+                        }
+                        if (item.state == "canceled" || item.state == "justified"){
+                            val routeName = BeneficiaryRoutes.JustifyScheduling::class.qualifiedName
+                            navController.navigate("$routeName/${item.id}")
+                        }
+                    }
                 )
             }
         }
@@ -126,7 +141,8 @@ fun ListAllSchedulingUserContent(
 @Composable
 fun SchedulingTimelineItem(
     item: SchedulingModel,
-    isLast: Boolean
+    isLast: Boolean,
+    onNavigate: (SchedulingModel) -> Unit,
 ) {
 
     val isAccept = item.state == "accept"
@@ -141,7 +157,8 @@ fun SchedulingTimelineItem(
             modifier = Modifier
                 .padding(bottom = 16.dp)
                 .fillMaxWidth()
-                .clickable(onClick = {/*funcao que recebe o estado(just/confir -> rencaminha dif paginas*/}),
+                .clickable(
+                    onClick = {onNavigate(item)}),
             shape = RoundedCornerShape(12.dp),
             colors = CardDefaults.cardColors(containerColor = Color.White),
             elevation = CardDefaults.cardElevation(1.dp)
@@ -180,7 +197,7 @@ fun SchedulingTimelineItem(
 }
 
 
-
+/*
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun ListAllSchedulingUserPreview() {
@@ -193,9 +210,9 @@ fun ListAllSchedulingUserPreview() {
     )
 
     val mockScheduling = listOf(
-        SchedulingModel(id = 6, schedulingDate = "2026-01-24", beneficiaryId = 3, state = "accept"),
-        SchedulingModel(id = 2, schedulingDate = "2026-01-22", beneficiaryId = 3, state = "canceled"),
-        SchedulingModel(id = 4, schedulingDate = "2026-01-14", beneficiaryId = 3, state = "canceled")
+        SchedulingModel(id = 6, schedulingDate = "2026-01-24", beneficiaryId = 3, state = "accept", reason = null),
+        SchedulingModel(id = 2, schedulingDate = "2026-01-22", beneficiaryId = 3, state = "canceled", reason = null),
+        SchedulingModel(id = 4, schedulingDate = "2026-01-14", beneficiaryId = 3, state = "canceled", reason = null)
     )
 
     val mockUiState = ListSchedulingUserState(
@@ -209,9 +226,12 @@ fun ListAllSchedulingUserPreview() {
         ListAllSchedulingUserContent(
             modifier = Modifier,
             uiState = mockUiState,
+            navController = rememberNavController(),
             onClickHistory = {},
             onClickAccept = {},
             onClickCancel = {}
         )
     }
 }
+
+ */
