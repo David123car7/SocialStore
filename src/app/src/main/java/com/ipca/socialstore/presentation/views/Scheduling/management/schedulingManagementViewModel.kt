@@ -1,5 +1,6 @@
 package com.ipca.socialstore.presentation.views.Scheduling.management
 
+import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -24,7 +25,9 @@ class SchedulingManagementViewModel @Inject constructor(private val getAllBenefi
 
     val uiState = mutableStateOf(SchedulingManagementState())
 
-
+    init {
+        getAllBeneficiaries()
+    }
 
     fun getAllBeneficiaries(){
         uiState.value = uiState.value.copy(
@@ -48,6 +51,7 @@ class SchedulingManagementViewModel @Inject constructor(private val getAllBenefi
                         isLoading = false,
                         error = result.error.asUiText(),
                     )
+                    Log.d("App Debug", "GG: ${result.error}")
                 }
             }
         }

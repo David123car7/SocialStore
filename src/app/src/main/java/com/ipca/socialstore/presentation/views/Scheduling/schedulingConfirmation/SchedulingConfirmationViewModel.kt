@@ -14,7 +14,7 @@ import com.ipca.socialstore.domain.scheduling.GetSchedulingByIdUseCase
 import com.ipca.socialstore.domain.scheduling.UpdateNoteUseCase
 import com.ipca.socialstore.domain.scheduling.UpdateReasonUseCase
 import com.ipca.socialstore.domain.services.beneficiary.GetBeneficiaryBySchedulingIdServiceUseCase
-import com.ipca.socialstore.presentation.utils.ErrorText
+import com.ipca.socialstore.presentation.utils.errors.ErrorText
 import com.ipca.socialstore.presentation.views.mockups.Beneficiary
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch

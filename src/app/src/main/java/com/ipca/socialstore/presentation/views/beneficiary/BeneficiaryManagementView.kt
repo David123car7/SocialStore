@@ -340,7 +340,7 @@ fun PreviewManagement() {
         BeneficiaryManagementContent(
             modifier = Modifier,
             uiState = BeneficiaryManagementState(
-                beneficiary = BeneficiaryModel(4, "Diogo", "1995-08-20", 2),
+                beneficiary = BeneficiaryModel(4, "Diogo", "1995-08-20", "",1),
                 accept = 1,
                 cancel = 0,
                 note = "Entregar na porta lateral"

@@ -1,5 +1,6 @@
 package com.ipca.socialstore.data.repository
 
+import android.util.Log
 import com.ipca.socialstore.data.enums.DatabaseTables
 import com.ipca.socialstore.data.exceptions.AppError
 import com.ipca.socialstore.data.exceptions.ExceptionMapper
@@ -48,6 +49,7 @@ class BeneficiaryRepository  @Inject constructor(private val supabase : Supabase
                 .decodeList<BeneficiaryModel>()
             ResultWrapper.Success(result)
         }catch (e : Exception){
+            Log.d("App Debug", "Error: ${e}")
             return ResultWrapper.Error(exceptionMapper.map(e))
         }
     }

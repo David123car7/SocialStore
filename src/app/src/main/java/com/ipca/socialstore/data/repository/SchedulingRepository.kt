@@ -1,5 +1,6 @@
 package com.ipca.socialstore.data.repository
 
+import android.util.Log
 import com.ipca.socialstore.data.enums.DatabaseTables
 import com.ipca.socialstore.data.exceptions.AppError
 import com.ipca.socialstore.data.exceptions.ExceptionMapper
@@ -27,6 +28,7 @@ class SchedulingRepository @Inject constructor(
             if (scheduling == null) return ResultWrapper.Error(AppError.DataNotCreated)
             ResultWrapper.Success(scheduling)
         } catch (e: Exception) {
+            Log.d("App Debug", "KAZZIO $e}")
             ResultWrapper.Error(exceptionMapper.map(e))
         }
     }

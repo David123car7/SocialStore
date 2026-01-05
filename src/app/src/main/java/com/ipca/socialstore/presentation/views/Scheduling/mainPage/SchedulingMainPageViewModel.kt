@@ -4,23 +4,17 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ipca.socialstore.data.models.BeneficiaryModel
+import com.ipca.socialstore.data.models.SchedulingModel
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
-
-import com.ipca.socialstore.domain.scheduling.CancelSchedulingAdminUseCase
-import com.ipca.socialstore.domain.services.scheduling.GetSchedulingInfoByMonthUseCase
-import com.ipca.socialstore.presentation.models.SchedulingReceiverModel
 import com.ipca.socialstore.presentation.utils.errors.ErrorText
 import com.ipca.socialstore.presentation.utils.errors.asUiText
 import com.ipca.socialstore.domain.beneficiary.GetAllBeneficiaryUseCase
 import com.ipca.socialstore.domain.beneficiary.GetBeneficiaryByIdUseCase
 import com.ipca.socialstore.domain.scheduling.CancelSchedulingAdminUseCase
-import com.ipca.socialstore.domain.scheduling.GetSchedulingByMonthUseCase
 import com.ipca.socialstore.domain.services.scheduling.CreateSchedulingServiceUseCase
 import com.ipca.socialstore.domain.services.scheduling.GetSchedulingInfoByMonthUseCase
 import com.ipca.socialstore.presentation.models.SchedulingReceiverModel
-import com.ipca.socialstore.presentation.utils.ErrorText
-import com.ipca.socialstore.presentation.utils.asUiText
-import com.ipca.socialstore.presentation.views.mockups.Beneficiary
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
