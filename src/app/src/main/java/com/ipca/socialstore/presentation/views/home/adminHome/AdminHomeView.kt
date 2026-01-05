@@ -1,7 +1,6 @@
 package com.ipca.socialstore.presentation.views.home.adminHome
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -17,7 +16,6 @@ import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.ComposableOpenTarget
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -73,11 +71,9 @@ fun AdminHomeContent(modifier: Modifier, navigateTo:(route: Any) -> Unit){
         item(span = { GridItemSpan(2) }) {
             Text("Acesso Rápido", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
         }
-
         items(menuItems) { item ->
             DashboardCard(title = item.title, icon = item.icon, color = item.color, alertCount = item.alertCount, onClick = {})
         }
-
         item(span = { GridItemSpan(2) }) {
             Spacer(Modifier.height(16.dp))
             Text("Últimas Atividades", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)

@@ -1,30 +1,45 @@
-package com.ipca.socialstore.presentation.views.campaign.create
+package com.ipca.socialstore.presentation.views.campaign.edit
 
 import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ipca.socialstore.data.models.CampaignModel
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
-import com.ipca.socialstore.domain.campaign.CreateCampaignUseCase
+import com.ipca.socialstore.domain.campaign.GetCampaignByIdUseCase
+import com.ipca.socialstore.domain.campaign.UpdateCampaignUseCase
 import com.ipca.socialstore.presentation.utils.errors.ErrorText
 import com.ipca.socialstore.presentation.utils.errors.asUiText
+import com.ipca.socialstore.presentation.views.campaign.create.createEmptyCampaign
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-data class CreateCampaignState(
+data class EditCampaignState(
     val campaign: CampaignModel = createEmptyCampaign(),
 
     var error : ErrorText? = null,
     var isLoading : Boolean = false,
-    var isCreated : Boolean = false,
+    var isEdited : Boolean = false,
 )
 
 @HiltViewModel
-class CreateCampaignViewModel @Inject constructor(
-    val createCampaignUseCase: CreateCampaignUseCase
+class EditCampaignViewModel @Inject constructor(
+    val updateCampaignUseCase: UpdateCampaignUseCase,
+    val getCampaignByIdUseCase: GetCampaignByIdUseCase,
+    savedStateHandle: SavedStateHandle
 ) : ViewModel(){
-    var uiState = mutableStateOf(CreateCampaignState())
+    var uiState = mutableStateOf(EditCampaignState())
+
+    val campaignId: String? = savedStateHandle["campaign_id"]
+
+    init {
+        if(!campaignId.isNullOrEmpty()){
+            viewModelScope.launch {
+                getCampaign(campaignId.toInt())
+            }
+        }
+    }
 
     fun updateName(name: String) {
         uiState.value = uiState.value.copy(
@@ -56,16 +71,16 @@ class CreateCampaignViewModel @Inject constructor(
         )
     }
 
-    fun createCampaign(){
+    fun getCampaign(id: Int){
         viewModelScope.launch {
             uiState.value = uiState.value.copy(isLoading = true)
 
-            val result = createCampaignUseCase(uiState.value.campaign)
+            val result = getCampaignByIdUseCase(id = id)
             when(result){
                 is ResultWrapper.Success -> {
                     uiState.value = uiState.value.copy(
                         isLoading = false,
-                        isCreated = true
+                        campaign = result.data
                     )
                 }
                 is ResultWrapper.Error -> {
@@ -77,18 +92,26 @@ class CreateCampaignViewModel @Inject constructor(
             }
         }
     }
-}
 
-fun createEmptyCampaign(): CampaignModel {
-    return CampaignModel(
-        id = null,
-        name = "",
-        description = "",
-        category = "",
-        onGoing = false, // Default to not started
-        startDate = "",  // Or use LocalDate.now().toString()
-        endDate = "",
-        goal = 100,
-        currentDonations = 0
-    )
+    fun editCampaign(){
+        viewModelScope.launch {
+            uiState.value = uiState.value.copy(isLoading = true)
+
+            val result = updateCampaignUseCase(uiState.value.campaign)
+            when(result){
+                is ResultWrapper.Success -> {
+                    uiState.value = uiState.value.copy(
+                        isLoading = false,
+                        isEdited = true
+                    )
+                }
+                is ResultWrapper.Error -> {
+                    uiState.value = uiState.value.copy(
+                        isLoading = false,
+                        error = result.error.asUiText()
+                    )
+                }
+            }
+        }
+    }
 }

@@ -5,7 +5,9 @@ import com.ipca.socialstore.data.enums.UnknownError
 import com.ipca.socialstore.data.exceptions.AppError
 import com.ipca.socialstore.data.exceptions.ExceptionMapper
 import com.ipca.socialstore.data.helpers.from
+import com.ipca.socialstore.data.models.ApplicationModel
 import com.ipca.socialstore.data.models.CampaignModel
+import com.ipca.socialstore.data.models.DocumentStateModel
 import com.ipca.socialstore.data.models.TableIdModel
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
 import io.github.jan.supabase.SupabaseClient
@@ -25,6 +27,54 @@ class CampaignRepository @Inject constructor(
             ResultWrapper.Success(campaingResult.id)
         }
         catch (e : Exception){
+            ResultWrapper.Error(exceptionMapper.map(e))
+        }
+    }
+
+    suspend fun updateCampaign(campaign: CampaignModel): ResultWrapper<Int> {
+        val id = campaign.id
+            ?: return ResultWrapper.Error(AppError.UnknownError("Campaign Id Null"))
+        return try {
+            val result = supabase.from(DatabaseTables.CAMPAIGN)
+                .update(campaign) {
+                    filter {
+                        eq("id", id)
+                    }
+                    select(columns = Columns.list("id"))
+                }.decodeSingleOrNull<TableIdModel>()
+            if (result == null) {
+                return ResultWrapper.Error(AppError.DataNotFound)
+            }
+            ResultWrapper.Success(result.id)
+        } catch (e: Exception) {
+            ResultWrapper.Error(exceptionMapper.map(e))
+        }
+    }
+
+    suspend fun deleteCampaign(id: Int): ResultWrapper<Unit> {
+        return try {
+            supabase.from(DatabaseTables.CAMPAIGN).delete {
+                filter {
+                    eq("id", id)
+                }
+            }
+            ResultWrapper.Success(Unit)
+        } catch (e: Exception) {
+            return ResultWrapper.Error(exceptionMapper.map(e))
+        }
+    }
+
+    suspend fun getCampaignById(id: Int): ResultWrapper<CampaignModel> {
+        return try {
+            val campaign = supabase.from(DatabaseTables.CAMPAIGN)
+                .select {
+                    filter {
+                        eq("id", id)
+                    }
+                }
+                .decodeSingle<CampaignModel>()
+            ResultWrapper.Success(campaign)
+        } catch (e: Exception) {
             ResultWrapper.Error(exceptionMapper.map(e))
         }
     }

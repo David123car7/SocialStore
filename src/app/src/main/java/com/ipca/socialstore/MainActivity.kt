@@ -44,6 +44,8 @@ import com.ipca.socialstore.presentation.views.application.createApplication.Cre
 import com.ipca.socialstore.presentation.views.application.listApplications.ListApplicationsView
 import com.ipca.socialstore.presentation.views.authentication.resetPassword.ResetPasswordView
 import com.ipca.socialstore.presentation.views.beneficiary.BeneficiaryManagementView
+import com.ipca.socialstore.presentation.views.campaign.create.CreateCampaignView
+import com.ipca.socialstore.presentation.views.campaign.edit.CampaignEditView
 import com.ipca.socialstore.presentation.views.campaigns.CampaignsListView
 import com.ipca.socialstore.presentation.views.home.adminHome.AdminHomeView
 import com.ipca.socialstore.presentation.views.home.beneficiaryHome.BeneficiaryHomeView
@@ -70,7 +72,6 @@ class MainActivity : ComponentActivity() {
                     NavHost(navController = navController, startDestination = GeneralRoutes.Home){
                         composable<GeneralRoutes.Home>{
                             mainViewModel.getUserRoleScope()
-
                             DefaultHomeView(
                                 modifier = Modifier.padding(innerPadding),
                                 navController = navController,
@@ -79,8 +80,6 @@ class MainActivity : ComponentActivity() {
                         }
                         composable<BeneficiaryRoutes.BeneficiaryHome>{
                             mainViewModel.getUserRoleScope()
-
-
                             BeneficiaryHomeView(
                                 modifier = Modifier,
                                 userRole = mainState.userRole
@@ -88,7 +87,6 @@ class MainActivity : ComponentActivity() {
                         }
                         composable<AdminRoutes.Home>{
                             mainViewModel.getUserRoleScope()
-
                             AdminHomeView(modifier = Modifier.padding(innerPadding), navController = navController, userRole = mainState.userRole)
                         }
                         composable<GeneralRoutes.TestHome>{
@@ -127,7 +125,18 @@ class MainActivity : ComponentActivity() {
                             ListApplicationsView(modifier = Modifier.padding(innerPadding), navController = navController, userRole = mainState.userRole)
                         }
                         composable<AdminRoutes.CampaignList>{
-                            CampaignsListView(modifier = Modifier.padding(innerPadding), navController = navController)
+                            CampaignsListView(modifier = Modifier.padding(innerPadding), navController = navController, userRole = mainState.userRole)
+                        }
+                        composable(
+                            route = AdminRoutes.CampaignEdit::class.qualifiedName!! + "/{campaign_id}",
+                            arguments = listOf(
+                                navArgument("campaign_id") { type = NavType.StringType }
+                            )
+                        ) {
+                            CampaignEditView(modifier = Modifier.padding(innerPadding), navController = navController, userRole = mainState.userRole)
+                        }
+                        composable<AdminRoutes.CreateCampaign>{
+                            CreateCampaignView(modifier = Modifier.padding(innerPadding), navController = navController, userRole = mainState.userRole)
                         }
                         composable <AdminRoutes.CreateItem>{
                             CreateItemView(modifier = Modifier.padding(innerPadding), navController = navController)
@@ -137,9 +146,6 @@ class MainActivity : ComponentActivity() {
                         }
                         composable <AdminRoutes.GetStock>{
                             GetAllStockView(modifier = Modifier.padding(innerPadding), navController = navController, viewModel = stockViewModel)
-                        }
-                        composable <AdminRoutes.CreateDonation>{
-                            CreateDonationView(modifier = Modifier.padding(innerPadding), navController = navController)
                         }
                         composable(
                             route = AdminRoutes.ApplicationState::class.qualifiedName!! + "/{applicationId}",
