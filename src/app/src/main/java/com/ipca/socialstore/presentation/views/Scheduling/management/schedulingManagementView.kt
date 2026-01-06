@@ -18,7 +18,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,10 +30,6 @@ import androidx.navigation.NavController
 import com.ipca.socialstore.data.models.BeneficiaryModel
 import com.ipca.socialstore.presentation.routes.AdminRoutes
 import com.ipca.socialstore.presentation.ui.components.SearchBarContent
-import com.ipca.socialstore.presentation.views.Scheduling.mainPage.SchedulingMainPageViewModel
-import com.ipca.socialstore.presentation.views.beneficiary.BeneficiaryManagementContent
-import com.ipca.socialstore.presentation.views.mockups.Beneficiary
-import io.github.jan.supabase.realtime.Column
 
 @Composable
 fun SchedulingManagementView(

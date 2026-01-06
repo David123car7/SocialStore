@@ -1,4 +1,4 @@
-package com.ipca.socialstore.presentation.views.beneficiary
+package com.ipca.socialstore.presentation.views.beneficiary.managment
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
@@ -37,7 +37,6 @@ fun BeneficiaryManagementView(
         viewModel.fetchInfo()
     }
 
-    // O conteúdo principal que agora inclui o botão no fundo
     BeneficiaryManagementContent(
         modifier = modifier,
         uiState = uiState,
@@ -56,8 +55,6 @@ fun BeneficiaryManagementContent(
 ) {
     val beneficiary = uiState.beneficiary ?: return
     var expandedSection by remember { mutableStateOf<String?>(null) }
-
-    // Estado de scroll para permitir chegar ao botão no fundo
     val scrollState = rememberScrollState()
 
     Column(
@@ -68,7 +65,6 @@ fun BeneficiaryManagementContent(
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        // --- Cabeçalho ---
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.padding(bottom = 16.dp)
@@ -88,7 +84,6 @@ fun BeneficiaryManagementContent(
             }
         }
 
-        // --- Secção: Agendamentos ---
         ManagementSectionCard(
             title = "Agendamentos",
             icon = Icons.Default.DateRange,
@@ -129,7 +124,6 @@ fun BeneficiaryManagementContent(
             }
         }
 
-        // --- Secção: Faltas ---
         ManagementSectionCard(
             title = "Faltas / Justificações",
             icon = Icons.Default.Warning,
@@ -165,7 +159,6 @@ fun BeneficiaryManagementContent(
             }
         }
 
-        // --- Secção: Notas Próximo Agendamento ---
         ManagementSectionCard(
             title = "Notas Próximo Agendamento",
             icon = Icons.Default.Notifications,
@@ -185,7 +178,6 @@ fun BeneficiaryManagementContent(
             }
         }
 
-        //--- Agendamentos Por Confirmar/Recusados ---
         if (uiState.declined?.isNotEmpty() == true){
             println(uiState.declined)
             ManagementSectionCard(
@@ -214,8 +206,6 @@ fun BeneficiaryManagementContent(
             }
         }
 
-
-        // --- BOTÃO NO FUNDO DA PÁGINA ---
         Spacer(modifier = Modifier.height(12.dp))
         Button(
             onClick = onAddNewScheduling,
@@ -232,12 +222,9 @@ fun BeneficiaryManagementContent(
             }
         }
 
-        // Espaço extra para não ficar colado à barra de navegação
         Spacer(modifier = Modifier.height(24.dp))
     }
 }
-
-// --- Componentes Auxiliares ---
 
 @Composable
 fun ManagementSectionCard(
