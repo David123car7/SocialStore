@@ -5,7 +5,7 @@ import com.ipca.socialstore.data.repository.UserRepository
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
 import javax.inject.Inject
 
-class GetUserApplicationId @Inject constructor(
+class GetUserApplicationIdUseCase @Inject constructor(
     private  val authRepository: AuthRepository,
     private val userRepository: UserRepository) {
     suspend operator fun invoke(): ResultWrapper<Int> {

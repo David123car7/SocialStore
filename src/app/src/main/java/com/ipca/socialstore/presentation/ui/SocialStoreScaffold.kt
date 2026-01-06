@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -21,9 +20,7 @@ import androidx.compose.material.icons.filled.Camera
 import androidx.compose.material.icons.filled.FileOpen
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Schedule
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Storage
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -123,12 +120,12 @@ fun SocialStoreScaffoldContent(
         ),
         BottomNavItem( //stock
             icon = Icons.Default.Home,
-            route = BeneficiaryRoutes.BeneficiaryHome,
+            route = BeneficiaryRoutes.Home,
             isVisible = userRole == UserRole.BENEFICIARY
         ),
         BottomNavItem( //stock
             icon = Icons.Default.Schedule,
-            route = BeneficiaryRoutes.BeneficiaryScheduling,
+            route = BeneficiaryRoutes.Scheduling,
             isVisible = userRole == UserRole.BENEFICIARY
         ),
     )
@@ -209,7 +206,7 @@ fun SocialStoreScaffoldContent(
                         if (item.isVisible) {
                             NavigationBarItem(
                                 icon = { Icon(imageVector = item.icon, contentDescription = "") },
-                                selected = currentRoute == BeneficiaryRoutes.BeneficiaryHome,
+                                selected = currentRoute == BeneficiaryRoutes.Home,
                                 onClick = {
                                     NavigationLogic.navigateTo(
                                         navController = navController,

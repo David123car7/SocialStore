@@ -44,7 +44,10 @@ import com.ipca.socialstore.presentation.views.application.createApplication.Cre
 import com.ipca.socialstore.presentation.views.application.listApplications.ListApplicationsView
 import com.ipca.socialstore.presentation.views.authentication.resetPassword.ResetPasswordView
 import com.ipca.socialstore.presentation.views.basket.preparation.BasketPreparationView
+import com.ipca.socialstore.presentation.views.beneficiary.editProfile.BeneficiaryEditProfileView
+import com.ipca.socialstore.presentation.views.beneficiary.listDocuments.ListDocumentsView
 import com.ipca.socialstore.presentation.views.beneficiary.managment.BeneficiaryManagementView
+import com.ipca.socialstore.presentation.views.beneficiary.profile.BeneficiaryProfileView
 import com.ipca.socialstore.presentation.views.campaign.create.CreateCampaignView
 import com.ipca.socialstore.presentation.views.campaign.edit.CampaignEditView
 import com.ipca.socialstore.presentation.views.campaigns.CampaignsListView
@@ -79,10 +82,11 @@ class MainActivity : ComponentActivity() {
                                 userRole = mainState.userRole
                             )
                         }
-                        composable<BeneficiaryRoutes.BeneficiaryHome>{
+                        composable<BeneficiaryRoutes.Home>{
                             mainViewModel.getUserRoleScope()
                             BeneficiaryHomeView(
                                 modifier = Modifier.padding(innerPadding),
+                                navController = navController,
                                 userRole = mainState.userRole
                             )
                         }
@@ -179,8 +183,17 @@ class MainActivity : ComponentActivity() {
                                 navController = navController
                             )
                         }
-                        composable <BeneficiaryRoutes.BeneficiaryScheduling>{
+                        composable <BeneficiaryRoutes.Scheduling>{
                             ListAllSchedulingUserView(modifier = Modifier.padding(innerPadding), navController = navController)
+                        }
+                        composable<BeneficiaryRoutes.Documents>{
+                            ListDocumentsView(modifier = Modifier.padding(innerPadding), navController = navController, userRole = mainState.userRole)
+                        }
+                        composable <BeneficiaryRoutes.Profile>{
+                            BeneficiaryProfileView(modifier = Modifier.padding(innerPadding), navController = navController, userRole = mainState.userRole)
+                        }
+                        composable <BeneficiaryRoutes.EditProfile>{
+                            BeneficiaryEditProfileView(modifier = Modifier.padding(innerPadding), navController = navController, userRole = mainState.userRole)
                         }
                         composable(
                             route = BeneficiaryRoutes.JustifyScheduling::class.qualifiedName!! + "/{schedulingId}",

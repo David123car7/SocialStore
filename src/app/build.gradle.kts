@@ -109,6 +109,10 @@ dependencies {
     implementation("androidx.work:work-runtime-ktx:${work_version}")
     implementation("androidx.hilt:hilt-work:1.2.0")
     ksp("androidx.hilt:hilt-compiler:1.2.0")
+
+    //Android Room
+    implementation("androidx.room:room-runtime:2.8.4")
+    ksp("androidx.room:room-compiler:2.8.4")
 }
 
 

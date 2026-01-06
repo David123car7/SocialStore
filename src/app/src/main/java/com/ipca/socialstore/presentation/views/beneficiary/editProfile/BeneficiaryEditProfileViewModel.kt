@@ -1,37 +1,54 @@
-package com.ipca.socialstore.presentation.views.beneficiary.profile
+package com.ipca.socialstore.presentation.views.beneficiary.editProfile
 
 import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ipca.socialstore.data.exceptions.AppError
-import com.ipca.socialstore.data.models.AcademicModel
 import com.ipca.socialstore.data.models.BeneficiaryModel
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
-import com.ipca.socialstore.domain.academic.GetAcademicDataUseCase
+import com.ipca.socialstore.domain.beneficiary.GetBeneficiaryByIdUseCase
+import com.ipca.socialstore.domain.beneficiary.UpdateBeneficiaryUseCase
 import com.ipca.socialstore.domain.services.beneficiary.GetBeneficiaryByUidUseCase
 import com.ipca.socialstore.presentation.utils.errors.ErrorText
 import com.ipca.socialstore.presentation.utils.errors.asUiText
+import com.ipca.socialstore.presentation.views.beneficiary.profile.createEmptyBeneficiary
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-
-data class BeneficiaryProfileState(
+data class BeneficiaryEditProfileState(
     val beneficiary: BeneficiaryModel = createEmptyBeneficiary(),
-    val academicData: AcademicModel = createEmptyAcademic(),
     val isLoading : Boolean ?= false,
     val error : ErrorText? = null,
+    val isUpdated: Boolean = false
 )
 
 @HiltViewModel
-class BeneficiaryProfileViewModel @Inject constructor(
-    private val getBeneficiaryByUidUseCase: GetBeneficiaryByUidUseCase,
-    private val getAcademicDataUseCase: GetAcademicDataUseCase
-): ViewModel() {
-    val uiState = mutableStateOf(BeneficiaryProfileState())
+class BeneficiaryEditProfileViewModel @Inject constructor(
+    private val updateBeneficiaryUseCase: UpdateBeneficiaryUseCase,
+    private val getBeneficiaryByUidUseCase: GetBeneficiaryByUidUseCase): ViewModel() {
+    val uiState = mutableStateOf(BeneficiaryEditProfileState())
 
     init {
         getBeneficiary()
+    }
+
+    fun updateName(newName: String) {
+        uiState.value = uiState.value.copy(
+            beneficiary = uiState.value.beneficiary.copy(name = newName)
+        )
+    }
+
+    fun updatePhoneNumber(newPhoneNumber: String) {
+        uiState.value = uiState.value.copy(
+            beneficiary = uiState.value.beneficiary.copy(phoneNumber = newPhoneNumber)
+        )
+    }
+
+    fun updateBirthDate(newBirthDate: String) {
+        uiState.value = uiState.value.copy(
+            beneficiary = uiState.value.beneficiary.copy(birthDate = newBirthDate)
+        )
     }
 
     fun getBeneficiary(){
@@ -43,9 +60,6 @@ class BeneficiaryProfileViewModel @Inject constructor(
                         isLoading = false,
                         beneficiary = beneficiaryResult.data
                     )
-                    if(uiState.value.beneficiary.academicId != null){
-                        getAcademicData(academicId = uiState.value.beneficiary.academicId!!)
-                    }
                 }
                 is ResultWrapper.Error -> {
                     uiState.value = uiState.value.copy(
@@ -57,42 +71,24 @@ class BeneficiaryProfileViewModel @Inject constructor(
         }
     }
 
-    fun getAcademicData(academicId: Int){
+    fun updateBeneficiary(){
         viewModelScope.launch {
-            val academicResult = getAcademicDataUseCase(academicId = academicId)
-            when(academicResult){
+            val beneficiaryResult = updateBeneficiaryUseCase(beneficiary = uiState.value.beneficiary)
+            when(beneficiaryResult){
                 is ResultWrapper.Success -> {
                     uiState.value = uiState.value.copy(
                         isLoading = false,
-                        academicData = academicResult.data
+                        isUpdated = true,
                     )
                 }
                 is ResultWrapper.Error -> {
                     uiState.value = uiState.value.copy(
                         isLoading = false,
-                        error = academicResult.error.asUiText()
+                        isUpdated = true,
+                        error = beneficiaryResult.error.asUiText()
                     )
                 }
             }
         }
     }
-}
-
-fun createEmptyBeneficiary(): BeneficiaryModel {
-    return BeneficiaryModel(
-        id = null,
-        name = "",
-        phoneNumber = "",
-        birthDate = "",
-        academicId = null
-    )
-}
-
-fun createEmptyAcademic(): AcademicModel {
-    return AcademicModel(
-        id = null,
-        typeCourse = "",
-        course = "",
-        studenNumber = ""
-    )
 }

@@ -58,7 +58,7 @@ object NavigationLogic {
     fun resetNavigation(navController: NavController, userRole: UserRole) {
         val destination = when (userRole) {
             UserRole.ADMIN -> AdminRoutes.Home
-            UserRole.BENEFICIARY -> BeneficiaryRoutes.BeneficiaryHome
+            UserRole.BENEFICIARY -> BeneficiaryRoutes.Home
             else -> GeneralRoutes.Home
         }
 

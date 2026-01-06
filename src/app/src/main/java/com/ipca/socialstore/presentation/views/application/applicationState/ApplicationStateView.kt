@@ -655,7 +655,6 @@ fun CategoryBox(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxWidth() // Ensure Row fills width
             ) {
-                // 1. Title takes available space (weight 1f) and truncates if needed
                 Text(
                     text = title,
                     fontWeight = FontWeight.Bold,
@@ -667,7 +666,6 @@ fun CategoryBox(
                 )
 
                 if(description != null){
-                    // 2. Surface keeps its natural size, pushed to the right
                     Surface(
                         modifier = Modifier.padding(start = 15.dp),
                         color = descriptionBgTextColor,
