@@ -61,7 +61,7 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    suspend fun getUserId(){
+    fun getUserId(){
         val result = getUserIdUseCase()
         when(result){
             is ResultWrapper.Success -> {
