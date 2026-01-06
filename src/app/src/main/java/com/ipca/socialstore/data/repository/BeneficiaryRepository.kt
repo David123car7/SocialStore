@@ -9,11 +9,17 @@ import com.ipca.socialstore.data.models.BeneficiaryModel
 import com.ipca.socialstore.data.models.DocumentModel
 import com.ipca.socialstore.data.models.TableIdModel
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
+import com.ipca.socialstore.data.room.entitys.toEntity
+import com.ipca.socialstore.data.room.entitys.toModel
+import com.ipca.socialstore.data.room.interfaces.BeneficiaryInterface
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.postgrest.query.Columns
 import javax.inject.Inject
 
-class BeneficiaryRepository  @Inject constructor(private val supabase : SupabaseClient, private val exceptionMapper: ExceptionMapper){
+class BeneficiaryRepository  @Inject constructor(
+    private val supabase : SupabaseClient,
+    private val exceptionMapper: ExceptionMapper,
+    private val beneficiaryInterface: BeneficiaryInterface){
     suspend fun createBeneficiary(beneficiary: BeneficiaryModel): ResultWrapper<Int> {
         return try{
             val result = supabase.from(DatabaseTables.BENEFICIARY).insert(beneficiary){
@@ -23,6 +29,26 @@ class BeneficiaryRepository  @Inject constructor(private val supabase : Supabase
             ResultWrapper.Success(result.id)
         }catch (e: Exception){
             return ResultWrapper.Error(exceptionMapper.map(e))
+        }
+    }
+
+    suspend fun updateBeneficiary(beneficiary: BeneficiaryModel): ResultWrapper<Int> {
+        return try {
+            val id = beneficiary.id ?: return ResultWrapper.Error(
+                exceptionMapper.map(Exception("ID do beneficiário é nulo"))
+            )
+
+            val result = supabase.from(DatabaseTables.BENEFICIARY).update(beneficiary) {
+                filter {
+                    eq("id", id)
+                }
+                select(columns = Columns.list("id"))
+            }.decodeSingleOrNull<TableIdModel>()
+            if (result == null) return ResultWrapper.Error(AppError.DataNotUpdated) // Ou um erro equivalente
+            beneficiaryInterface.insertBeneficiary(beneficiary.toEntity())
+            ResultWrapper.Success(result.id)
+        } catch (e: Exception) {
+            ResultWrapper.Error(exceptionMapper.map(e))
         }
     }
 
@@ -69,21 +95,33 @@ class BeneficiaryRepository  @Inject constructor(private val supabase : Supabase
         }
     }
 
-    suspend fun getBeneficiaryById(id : Int) : ResultWrapper<BeneficiaryModel>{
+    suspend fun getBeneficiaryById(id: Int): ResultWrapper<BeneficiaryModel> {
+        val localData = beneficiaryInterface.getBeneficiary(id)
+
+        if (localData != null) {
+            Log.d("App Debug", "There is local data")
+            return ResultWrapper.Success(localData.toModel())
+        }
+
         return try {
             val result = supabase.from(DatabaseTables.BENEFICIARY)
                 .select {
                     filter {
-                        eq("id",id)
+                        eq("id", id)
                     }
                 }
                 .decodeSingleOrNull<BeneficiaryModel>()
+
             if (result == null) {
                 return ResultWrapper.Error(error = AppError.DataNotFound)
             }
+
+            if (result.id != null) {
+                beneficiaryInterface.insertBeneficiary(result.toEntity())
+            }
             ResultWrapper.Success(result)
-        }catch (e : Exception){
-            return ResultWrapper.Error(exceptionMapper.map(e))
+        } catch (e: Exception) {
+            ResultWrapper.Error(exceptionMapper.map(e))
         }
     }
 }
