@@ -15,7 +15,9 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults.buttonColors
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
@@ -47,6 +49,8 @@ import com.ipca.socialstore.presentation.ui.components.ErrorTextComponent
 import com.ipca.socialstore.presentation.ui.components.TextFieldDateComponent
 import com.ipca.socialstore.presentation.ui.components.TextFieldPasswordComponent
 import com.ipca.socialstore.presentation.ui.components.TextFieldStringComponent
+import com.ipca.socialstore.presentation.ui.theme.GreenIPCA
+import com.ipca.socialstore.presentation.ui.theme.IconTint
 import com.ipca.socialstore.presentation.ui.theme.SocialStoreTheme
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -104,13 +108,14 @@ fun RegisterViewContent(
                 imageVector = Icons.Default.Add,
                 contentDescription = null,
                 modifier = Modifier.size(64.dp),
-                tint = MaterialTheme.colorScheme.primary
+                tint = IconTint
             )
 
             Text(
                 text = "Criar Conta",
                 style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                color = GreenIPCA
             )
 
             Text(
@@ -123,7 +128,7 @@ fun RegisterViewContent(
                 modifier = Modifier,
                 label = "Email",
                 value = uiState.email,
-                icon = Icons.Default.Star,
+                icon = Icons.Outlined.Email,
                 onValueUpdate = onEmailUpdate
             )
 
@@ -139,6 +144,7 @@ fun RegisterViewContent(
                     .fillMaxWidth()
                     .height(50.dp),
                 shape = RoundedCornerShape(12.dp),
+                colors = buttonColors(GreenIPCA)
             ) {
                 Text("Registar", fontSize = 16.sp, fontWeight = FontWeight.Bold)
             }
@@ -150,7 +156,7 @@ fun RegisterViewContent(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text("Já tem conta?", style = MaterialTheme.typography.bodyMedium)
                 TextButton(onClick = onLogin) {
-                    Text("Entrar", fontWeight = FontWeight.Bold)
+                    Text("Entrar", color = GreenIPCA, fontWeight = FontWeight.Bold)
                 }
             }
 

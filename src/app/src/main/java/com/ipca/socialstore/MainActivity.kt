@@ -81,7 +81,7 @@ class MainActivity : ComponentActivity() {
                         composable<BeneficiaryRoutes.BeneficiaryHome>{
                             mainViewModel.getUserRoleScope()
                             BeneficiaryHomeView(
-                                modifier = Modifier,
+                                modifier = Modifier.padding(innerPadding),
                                 userRole = mainState.userRole
                             )
                         }
