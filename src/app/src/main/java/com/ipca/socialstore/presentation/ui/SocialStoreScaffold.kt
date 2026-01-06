@@ -29,6 +29,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -151,9 +152,10 @@ fun SocialStoreScaffoldContent(
                     Image(
                         painter = painterResource(id = R.drawable.saslogo),
                         contentDescription = "SASLogo",
+                        contentScale = ContentScale.FillHeight, // 1. Garante que a imagem escala para caber no espaço sem cortar
                         modifier = Modifier
-                            .height(63.dp)
-                            .padding(20.dp),
+                            .height(50.dp)
+                            .padding(vertical = 2.dp) // 3. Reduz o padding (8dp é suficiente para "respirar")
                     )
                 },
                 actions = {
@@ -172,16 +174,9 @@ fun SocialStoreScaffoldContent(
                                 Icon(
                                     imageVector = Icons.Default.Notifications,
                                     contentDescription = "Notificações",
-                                    tint = Color.Gray
+                                    tint = Color.White
                                 )
                             }
-                        }
-                        IconButton(onClick = {}) {
-                            Icon(
-                                imageVector = Icons.Default.Person,
-                                contentDescription = "Perfil",
-                                tint = Color.White
-                            )
                         }
                     }
                 }
