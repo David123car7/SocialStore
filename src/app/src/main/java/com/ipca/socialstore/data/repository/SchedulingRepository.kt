@@ -1,5 +1,6 @@
 package com.ipca.socialstore.data.repository
 
+import android.util.Log
 import com.ipca.socialstore.data.enums.DatabaseTables
 import com.ipca.socialstore.data.exceptions.AppError
 import com.ipca.socialstore.data.exceptions.ExceptionMapper
@@ -18,15 +19,16 @@ class SchedulingRepository @Inject constructor(
     private val exceptionMapper: ExceptionMapper)
 {
 
-    suspend fun createScheduling(scheduling : SchedulingModel) : ResultWrapper<Int> {
+    suspend fun createScheduling(scheduling : SchedulingModel) : ResultWrapper<SchedulingModel> {
         return try {
             val scheduling = supabase.from(DatabaseTables.SCHEDULING)
                 .insert(scheduling) {
-                    select(columns = Columns.list("id"))
-                }.decodeAsOrNull<TableIdModel>()
+                    select()
+                }.decodeAsOrNull<SchedulingModel>()
             if (scheduling == null) return ResultWrapper.Error(AppError.DataNotCreated)
-            ResultWrapper.Success(scheduling.id)
+            ResultWrapper.Success(scheduling)
         } catch (e: Exception) {
+            Log.d("App Debug", "KAZZIO $e}")
             ResultWrapper.Error(exceptionMapper.map(e))
         }
     }
@@ -115,6 +117,25 @@ class SchedulingRepository @Inject constructor(
         }
     }
 
+    suspend fun updateNote(schedulingId: Int, note: String): ResultWrapper<SchedulingModel> {
+        return try {
+            val result = supabase.from(DatabaseTables.SCHEDULING)
+                .update(
+                    {
+                        set("note", note)
+                }
+                ) {
+                    filter {
+                        eq("id", schedulingId)
+                    }
+                }.decodeSingle<SchedulingModel>()
+
+            ResultWrapper.Success(result)
+        } catch (e: Exception) {
+            ResultWrapper.Error(exceptionMapper.map(e))
+        }
+    }
+
     suspend fun getBeneficiaryBySchedulingId(schedulingId : Int) : ResultWrapper<SchedulingModel>{
         return try {
             val result = supabase.from(DatabaseTables.SCHEDULING)
@@ -139,6 +160,46 @@ class SchedulingRepository @Inject constructor(
                 }
             val response = result.decodeSingle<SchedulingModel>()
             ResultWrapper.Success(response)
+        } catch (e: Exception) {
+            ResultWrapper.Error(exceptionMapper.map(e))
+        }
+    }
+
+    suspend fun acceptSchedulingDate(schedulingId : Int, note: String) : ResultWrapper<SchedulingModel>{
+        return try {
+            val result = supabase.from(DatabaseTables.SCHEDULING)
+                .update(
+                    {
+                        set("state", "accept")
+                        set("note", note)
+                    }
+                ) {
+                    filter {
+                        eq("id", schedulingId)
+                    }
+                }.decodeSingle<SchedulingModel>()
+
+            ResultWrapper.Success(result)
+        } catch (e: Exception) {
+            ResultWrapper.Error(exceptionMapper.map(e))
+        }
+    }
+
+    suspend fun declineSchedulingDate(schedulingId : Int, reason : String) : ResultWrapper<SchedulingModel>{
+        return try {
+            val result = supabase.from(DatabaseTables.SCHEDULING)
+                .update(
+                    {
+                        set("state", "decline")
+                        set("reason", reason)
+                    }
+                ) {
+                    filter {
+                        eq("id", schedulingId)
+                    }
+                }.decodeSingle<SchedulingModel>()
+
+            ResultWrapper.Success(result)
         } catch (e: Exception) {
             ResultWrapper.Error(exceptionMapper.map(e))
         }

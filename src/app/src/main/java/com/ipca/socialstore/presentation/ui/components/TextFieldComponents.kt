@@ -11,6 +11,8 @@ import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.RemoveRedEye
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -21,6 +23,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -34,6 +38,9 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.ipca.socialstore.data.enums.RequestType
 import com.ipca.socialstore.presentation.ui.theme.GreenIPCA
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 @Composable
 fun TextFieldStringComponent(modifier: Modifier, label: String, value: String, icon: ImageVector? = null, onValueUpdate:(newValue: String)->Unit) {
@@ -64,6 +71,34 @@ fun TextFieldValueComponent(modifier: Modifier, label: String, value: String, ic
 
 @Composable
 fun TextFieldDateComponent(modifier: Modifier, label: String, date: String, onDateUpdate:(newValue: String)->Unit, onDatePickerUpdate:() -> Unit){
+    var showDatePicker by remember { mutableStateOf(false) }
+    val datePickerState = rememberDatePickerState()
+
+    if (showDatePicker) {
+        DatePickerDialog(
+            onDismissRequest = { showDatePicker = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    datePickerState.selectedDateMillis?.let { millis ->
+                        val date = Date(millis)
+                        val format = SimpleDateFormat("yyyy/MM/dd", Locale.getDefault())
+                        onDateUpdate(format.format(date))
+                    }
+                    showDatePicker = false
+                }) {
+                    Text("OK")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDatePicker = false }) {
+                    Text("Cancelar")
+                }
+            }
+        ) {
+            DatePicker(state = datePickerState)
+        }
+    }
+
     OutlinedTextField(
         value = date,
         onValueChange = onDateUpdate,
@@ -72,7 +107,7 @@ fun TextFieldDateComponent(modifier: Modifier, label: String, date: String, onDa
         leadingIcon = { Icon(Icons.Default.DateRange, null) },
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onDatePickerUpdate() },
+            .clickable { showDatePicker = !showDatePicker },
         enabled = false,
         readOnly = true,
         shape = RoundedCornerShape(12.dp),

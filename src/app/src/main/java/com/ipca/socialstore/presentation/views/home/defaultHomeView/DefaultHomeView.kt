@@ -341,8 +341,9 @@ private val mockCampaigns = listOf(
         category = "Alimentar",
         onGoing = true,
         startDate = "",
-        endDate = ""
-    ),
+        endDate = "",
+        goal = 100,
+        currentDonations = 0    ),
     CampaignModel(
         id = 2,
         name = "Kit Escolar 2026",
@@ -350,8 +351,9 @@ private val mockCampaigns = listOf(
         category = "Educação",
         onGoing = true,
         startDate = "",
-        endDate = ""
-    ),
+        endDate = "",
+        goal = 100,
+        currentDonations = 0    ),
     CampaignModel(
         id = 3,
         name = "Inverno Quente",
@@ -359,8 +361,9 @@ private val mockCampaigns = listOf(
         category = "Vestuário",
         onGoing = true,
         startDate = "",
-        endDate = ""
-    )
+        endDate = "",
+        goal = 100,
+        currentDonations = 0    )
 )
 
 @Preview(showBackground = true)

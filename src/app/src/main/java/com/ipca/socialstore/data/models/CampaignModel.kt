@@ -20,6 +20,12 @@ data class CampaignModel(
     @SerialName("ongoing")
     val onGoing : Boolean,
 
+    @SerialName("goal")
+    val goal : Int,
+
+    @SerialName("current_donations")
+    val currentDonations : Int,
+
     @SerialName("start_date")
     val startDate : String,
 

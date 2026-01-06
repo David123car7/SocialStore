@@ -59,6 +59,9 @@ dependencies {
     implementation(libs.androidx.hilt.common)
     implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.compose.ui.text)
+    implementation(libs.androidx.ui)
+    implementation(libs.androidx.navigation.runtime.ktx)
+
     val work_version = "2.11.0"
 
     // AndroidX & Compose

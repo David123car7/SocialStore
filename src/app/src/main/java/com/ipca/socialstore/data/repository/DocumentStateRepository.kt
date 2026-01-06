@@ -45,6 +45,8 @@ class DocumentStateRepository @Inject constructor(private val supabase: Supabase
         }
     }
 
+
+
     suspend fun deleteDocumentState(id: Int): ResultWrapper<Unit> {
         return try {
             supabase.from(DatabaseTables.DOCUMENT_STATE).delete {

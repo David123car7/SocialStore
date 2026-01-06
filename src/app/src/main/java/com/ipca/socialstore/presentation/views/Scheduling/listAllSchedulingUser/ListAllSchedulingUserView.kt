@@ -3,6 +3,7 @@ package com.ipca.socialstore.presentation.views.Scheduling.listAllSchedulingUser
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,17 +19,27 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SegmentedButtonDefaults.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -61,7 +72,8 @@ fun ListAllSchedulingUserView(
         navController = navController,
         onClickAccept = {viewModel.selectListAccept()},
         onClickHistory = {viewModel.selectListHistory()},
-        onClickCancel = {viewModel.selectListCanceled()}
+        onClickCancel = {viewModel.selectListCanceled()},
+        onClickProgress = {viewModel.selectListInProgress()}
     )
 }
 @Composable
@@ -72,7 +84,9 @@ fun ListAllSchedulingUserContent(
     onClickAccept : () -> Unit,
     onClickHistory : () -> Unit,
     onClickCancel : () -> Unit,
+    onClickProgress: () -> Unit,
 ){
+    var selectedTab by remember { mutableStateOf("proximos") }
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -99,16 +113,57 @@ fun ListAllSchedulingUserContent(
         }
 
         Row(
-            modifier = Modifier.fillMaxWidth().padding(bottom = 20.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp, horizontal = 16.dp)
+                .horizontalScroll(rememberScrollState()),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
+            // Chip: Próximos
+            FilterChip(
+                selected = selectedTab == "proximos",
+                onClick = {
+                    selectedTab = "proximos"
+                    onClickAccept()
+                },
+                label = { Text("Próximos (${uiState.accept})") },
+                leadingIcon = if (selectedTab == "proximos") {
+                    { Icon(Icons.Default.Check, contentDescription = null, modifier = Modifier.size(18.dp)) }
+                } else null
+            )
 
-            AssistChip(onClick = {onClickAccept()}, label = { Text("Próximos (${uiState.accept})") })
 
-            AssistChip(onClick = {onClickHistory()}, label = { Text("Histórico") })
+            FilterChip(
+                selected = selectedTab == "historico",
+                onClick = {
+                    selectedTab = "historico"
+                    onClickHistory()
+                },
+                label = { Text("Histórico") }
+            )
 
-            AssistChip(onClick = {onClickCancel()}, label = { Text("Cancelado(${uiState.cancel})") })
 
+            FilterChip(
+                selected = selectedTab == "cancelado",
+                onClick = {
+                    selectedTab = "cancelado"
+                    onClickCancel()
+                },
+                label = { Text("Cancelados (${uiState.cancel})") },
+                colors = FilterChipDefaults.filterChipColors(
+                    selectedContainerColor = Color(0xFFFFEBEE),
+                    selectedLabelColor = Color(0xFFC62828)
+                )
+            )
+
+            FilterChip(
+                selected = selectedTab == "pendentes",
+                onClick = {
+                    selectedTab = "pendentes"
+                    onClickProgress()
+                },
+                label = { Text("Por Confirmar") }
+            )
         }
 
         Text(
@@ -124,8 +179,9 @@ fun ListAllSchedulingUserContent(
                     item = item,
                     isLast = index == uiState.scheduling.lastIndex,
                     onNavigate = {item ->
-                        if (item.state == "accept"){
-
+                        if (item.state == "accept" || item.state == "in_Progress") {
+                            val routeName = BeneficiaryRoutes.SchedulingConfirmation::class.qualifiedName
+                            navController.navigate("$routeName/${item.id}")
                         }
                         if (item.state == "canceled" || item.state == "justified"){
                             val routeName = BeneficiaryRoutes.JustifyScheduling::class.qualifiedName
@@ -180,14 +236,20 @@ fun SchedulingTimelineItem(
                     )
                 }
 
+                val (label, containerColor, contentColor) = when (item.state) {
+                    "accept" -> Triple("Confirmado", Color(0xFFE8F5E9), Color(0xFF2E7D32))
+                    "justified" -> Triple("Justificada", Color(0xFFE3F2FD), Color(0xFF1976D2))
+                    "in_Progress" -> Triple("Por Confirmar", Color(0xFFE8F5E9), Color(0xFF2E7D32))
+                    else -> Triple("Justificar", Color(0xFFFFEBEE), Color(0xFFD32F2F))
+                }
                 Surface(
-                    color = if (isAccept) Color(0xFFE8F5E9) else Color(0xFFFFEBEE),
+                    color = containerColor,
                     shape = RoundedCornerShape(8.dp)
                 ) {
                     Text(
-                        text = if (isAccept) "Confirmar" else "Justificar",
+                        text = label,
                         modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
-                        color = statusColor,
+                        color = contentColor,
                         style = MaterialTheme.typography.labelMedium
                     )
                 }
@@ -197,7 +259,7 @@ fun SchedulingTimelineItem(
 }
 
 
-/*
+
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun ListAllSchedulingUserPreview() {
@@ -207,12 +269,13 @@ fun ListAllSchedulingUserPreview() {
         birthDate = "1990-05-15",
         academicId = 1,
         phoneNumber = "954525458"
+
     )
 
     val mockScheduling = listOf(
-        SchedulingModel(id = 6, schedulingDate = "2026-01-24", beneficiaryId = 3, state = "accept", reason = null),
-        SchedulingModel(id = 2, schedulingDate = "2026-01-22", beneficiaryId = 3, state = "canceled", reason = null),
-        SchedulingModel(id = 4, schedulingDate = "2026-01-14", beneficiaryId = 3, state = "canceled", reason = null)
+        SchedulingModel(id = 6, schedulingDate = "2026-01-24", beneficiaryId = 3, state = "accept", reason = null, null),
+        SchedulingModel(id = 2, schedulingDate = "2026-01-22", beneficiaryId = 3, state = "canceled", reason = null,null),
+        SchedulingModel(id = 4, schedulingDate = "2026-01-14", beneficiaryId = 3, state = "canceled", reason = null, null)
     )
 
     val mockUiState = ListSchedulingUserState(
@@ -229,9 +292,9 @@ fun ListAllSchedulingUserPreview() {
             navController = rememberNavController(),
             onClickHistory = {},
             onClickAccept = {},
-            onClickCancel = {}
+            onClickCancel = {},
+            onClickProgress = {}
         )
     }
 }
 
- */

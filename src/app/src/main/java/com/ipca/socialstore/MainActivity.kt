@@ -27,7 +27,6 @@ import com.ipca.socialstore.presentation.routes.CandidateRoutes
 import com.ipca.socialstore.presentation.routes.DefaultRoutes
 import com.ipca.socialstore.presentation.routes.GeneralRoutes
 import com.ipca.socialstore.presentation.ui.SocialStoreScaffold
-import com.ipca.socialstore.presentation.views.Scheduling.create.CreateSchedulingView
 import com.ipca.socialstore.presentation.views.stock.List.GetAllStockView
 import com.ipca.socialstore.presentation.views.stock.List.ListAllStockViewModel
 import com.ipca.socialstore.presentation.views.stock.List.StockItemDetailView
@@ -37,6 +36,7 @@ import com.ipca.socialstore.presentation.views.Scheduling.cancelByUser.Justifica
 import com.ipca.socialstore.presentation.views.Scheduling.listAllSchedulingUser.ListAllSchedulingUserView
 import com.ipca.socialstore.presentation.views.Scheduling.mainPage.SchedulingMainPageView
 import com.ipca.socialstore.presentation.views.Scheduling.management.SchedulingManagementView
+import com.ipca.socialstore.presentation.views.Scheduling.schedulingConfirmation.SchedulingConfirmationView
 import com.ipca.socialstore.presentation.views.application.applicationInfo.ApplicationInfoView
 import com.ipca.socialstore.presentation.views.application.applicationState.ApplicationStateView
 import com.ipca.socialstore.presentation.views.application.applicationStateAdmin.AplicationStateAdminView
@@ -44,6 +44,8 @@ import com.ipca.socialstore.presentation.views.application.createApplication.Cre
 import com.ipca.socialstore.presentation.views.application.listApplications.ListApplicationsView
 import com.ipca.socialstore.presentation.views.authentication.resetPassword.ResetPasswordView
 import com.ipca.socialstore.presentation.views.beneficiary.BeneficiaryManagementView
+import com.ipca.socialstore.presentation.views.campaign.create.CreateCampaignView
+import com.ipca.socialstore.presentation.views.campaign.edit.CampaignEditView
 import com.ipca.socialstore.presentation.views.campaigns.CampaignsListView
 import com.ipca.socialstore.presentation.views.home.adminHome.AdminHomeView
 import com.ipca.socialstore.presentation.views.home.beneficiaryHome.BeneficiaryHomeView
@@ -70,7 +72,6 @@ class MainActivity : ComponentActivity() {
                     NavHost(navController = navController, startDestination = GeneralRoutes.Home){
                         composable<GeneralRoutes.Home>{
                             mainViewModel.getUserRoleScope()
-
                             DefaultHomeView(
                                 modifier = Modifier.padding(innerPadding),
                                 navController = navController,
@@ -86,7 +87,6 @@ class MainActivity : ComponentActivity() {
                         }
                         composable<AdminRoutes.Home>{
                             mainViewModel.getUserRoleScope()
-
                             AdminHomeView(modifier = Modifier.padding(innerPadding), navController = navController, userRole = mainState.userRole)
                         }
                         composable<GeneralRoutes.TestHome>{
@@ -125,7 +125,18 @@ class MainActivity : ComponentActivity() {
                             ListApplicationsView(modifier = Modifier.padding(innerPadding), navController = navController, userRole = mainState.userRole)
                         }
                         composable<AdminRoutes.CampaignList>{
-                            CampaignsListView(modifier = Modifier.padding(innerPadding), navController = navController)
+                            CampaignsListView(modifier = Modifier.padding(innerPadding), navController = navController, userRole = mainState.userRole)
+                        }
+                        composable(
+                            route = AdminRoutes.CampaignEdit::class.qualifiedName!! + "/{campaign_id}",
+                            arguments = listOf(
+                                navArgument("campaign_id") { type = NavType.StringType }
+                            )
+                        ) {
+                            CampaignEditView(modifier = Modifier.padding(innerPadding), navController = navController, userRole = mainState.userRole)
+                        }
+                        composable<AdminRoutes.CreateCampaign>{
+                            CreateCampaignView(modifier = Modifier.padding(innerPadding), navController = navController, userRole = mainState.userRole)
                         }
                         composable <AdminRoutes.CreateItem>{
                             CreateItemView(modifier = Modifier.padding(innerPadding), navController = navController)
@@ -135,9 +146,6 @@ class MainActivity : ComponentActivity() {
                         }
                         composable <AdminRoutes.GetStock>{
                             GetAllStockView(modifier = Modifier.padding(innerPadding), navController = navController, viewModel = stockViewModel)
-                        }
-                        composable <AdminRoutes.CreateDonation>{
-                            CreateDonationView(modifier = Modifier.padding(innerPadding), navController = navController)
                         }
                         composable(
                             route = AdminRoutes.ApplicationState::class.qualifiedName!! + "/{applicationId}",
@@ -149,9 +157,6 @@ class MainActivity : ComponentActivity() {
                         }
                         composable <AdminRoutes.SelectStock>{
                             StockItemDetailView(modifier = Modifier.padding(innerPadding), navController = navController, viewModel = stockViewModel)
-                        }
-                        composable <AdminRoutes.CreateScheduling>{
-                            CreateSchedulingView(modifier = Modifier.padding(innerPadding), navController = navController)
                         }
                         composable <AdminRoutes.NotificationHistory>{
                             NotificationHistoryView(modifier = Modifier.padding(innerPadding), navController = navController)
@@ -183,6 +188,28 @@ class MainActivity : ComponentActivity() {
                             )
                         ) {
                             JustificationScreenView(
+                                modifier = Modifier.padding(innerPadding),
+                                navController = navController
+                            )
+                        }
+                        composable(
+                            route = BeneficiaryRoutes.SchedulingConfirmation::class.qualifiedName!! + "/{schedulingId}",
+                            arguments = listOf(
+                                navArgument("schedulingId") { type = NavType.StringType }
+                            )
+                        ) {
+                            SchedulingConfirmationView(
+                                modifier = Modifier.padding(innerPadding),
+                                navController = navController
+                            )
+                        }
+                        composable(
+                            route = AdminRoutes.SchedulingMainPage::class.qualifiedName!! + "/{beneficiaryId}",
+                            arguments = listOf(
+                                navArgument("beneficiaryId") { type = NavType.StringType }
+                            )
+                        ) {
+                            SchedulingMainPageView(
                                 modifier = Modifier.padding(innerPadding),
                                 navController = navController
                             )

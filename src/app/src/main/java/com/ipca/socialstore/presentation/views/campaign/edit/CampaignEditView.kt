@@ -1,5 +1,6 @@
-package com.ipca.socialstore.presentation.views.campaign.create
+package com.ipca.socialstore.presentation.views.campaign.edit
 
+import androidx.compose.runtime.getValue
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -39,11 +40,11 @@ import com.ipca.socialstore.presentation.ui.theme.SocialStoreTheme
 import com.ipca.socialstore.presentation.utils.navigation.NavigationLogic
 
 @Composable
-fun CreateCampaignView(modifier: Modifier, navController: NavController, userRole: UserRole){
-    val createCampaignViewModel: CreateCampaignViewModel = hiltViewModel()
+fun CampaignEditView(modifier: Modifier, navController: NavController, userRole: UserRole){
+    val createCampaignViewModel: EditCampaignViewModel = hiltViewModel()
     val uiState by createCampaignViewModel.uiState
 
-    CreateCampaignContent(
+    CampaignEditContent(
         modifier = modifier,
         uiState = uiState,
         onNameUpdate = createCampaignViewModel::updateName,
@@ -51,11 +52,11 @@ fun CreateCampaignView(modifier: Modifier, navController: NavController, userRol
         onDescriptionUpdate = createCampaignViewModel::updateDescription,
         onStartDateUpdate = createCampaignViewModel::updateStartDate,
         onEndDateUpdate = createCampaignViewModel::updateEndDate,
-        onCreateCampaign = createCampaignViewModel::createCampaign
+        onUpdateCampaign = createCampaignViewModel::editCampaign
     )
 
-    LaunchedEffect(uiState.isCreated) {
-        if(uiState.isCreated){
+    LaunchedEffect(uiState.isEdited) {
+        if(uiState.isEdited){
             NavigationLogic.navigateTo(
                 navController = navController,
                 route = AdminRoutes.CampaignList,
@@ -66,16 +67,16 @@ fun CreateCampaignView(modifier: Modifier, navController: NavController, userRol
 }
 
 @Composable
-fun CreateCampaignContent(
+fun CampaignEditContent(
     modifier: Modifier,
-    uiState: CreateCampaignState,
+    uiState: EditCampaignState,
     onNameUpdate:(String) -> Unit,
     onDescriptionUpdate:(String) -> Unit,
     onCategoryUpdate:(String) -> Unit,
     onStartDateUpdate:(String) -> Unit,
     onEndDateUpdate:(String) -> Unit,
-    onCreateCampaign:() -> Unit
-    ){
+    onUpdateCampaign:() -> Unit
+){
     Column(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(20.dp),
@@ -95,14 +96,14 @@ fun CreateCampaignContent(
         )
 
         Text(
-            text = "Nova Campanha",
+            text = "Editar Campanha",
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onSurface
         )
 
         Text(
-            text = "Preencha os dados para criar uma nova campanha.",
+            text = "Preencha os dados que pretende editar.",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center
@@ -151,7 +152,7 @@ fun CreateCampaignContent(
         )
 
         Button(
-            onClick = onCreateCampaign,
+            onClick = onUpdateCampaign,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(50.dp),
@@ -164,7 +165,7 @@ fun CreateCampaignContent(
 
 @Preview(showBackground = true, name = "2. Formulário Preenchido")
 @Composable
-fun CreateCampaignPreview() {
+fun EditCampaignPreview() {
     val filledCampaign = CampaignModel(
         id = 1,
         name = "Recolha de Natal",
@@ -177,23 +178,23 @@ fun CreateCampaignPreview() {
         currentDonations = 0
     )
 
-    val filledState = CreateCampaignState(
+    val filledState = EditCampaignState(
         campaign = filledCampaign
     )
 
     SocialStoreTheme {
-            CreateCampaignContent(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp),
-                uiState = filledState,
-                onNameUpdate = {},
-                onDescriptionUpdate = {},
-                onCategoryUpdate = {},
-                onEndDateUpdate = {},
-                onStartDateUpdate = {},
-                onCreateCampaign = {}
-            )
-        }
+        CampaignEditContent(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            uiState = filledState,
+            onNameUpdate = {},
+            onDescriptionUpdate = {},
+            onCategoryUpdate = {},
+            onEndDateUpdate = {},
+            onStartDateUpdate = {},
+            onUpdateCampaign = {}
+        )
+    }
 
 }

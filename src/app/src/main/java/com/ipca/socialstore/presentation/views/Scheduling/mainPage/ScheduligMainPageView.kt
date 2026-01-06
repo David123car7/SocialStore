@@ -1,11 +1,14 @@
 package com.ipca.socialstore.presentation.views.Scheduling.mainPage
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -36,15 +39,21 @@ fun SchedulingMainPageView(
     LaunchedEffect(currentCalendar) {
         val month = currentCalendar.get(Calendar.MONTH) + 1
         val year = currentCalendar.get(Calendar.YEAR)
-        viewModel.getAllBeneficiaries(month, year)
+        viewModel.getAllBeneficiariesByMonth(month, year)
     }
 
+    LaunchedEffect(uiState.beneficiary == null) {
+        viewModel.getAllBeneficiary()
+    }
     SchedulingMainContent(
         modifier = modifier,
         uiState = uiState,
         currentCalendar = currentCalendar,
         onMonthChange = { currentCalendar = it },
-        onCancelScheduling = { value -> viewModel.cancelScheduling(value) }
+        onCancelScheduling = { value -> viewModel.cancelScheduling(value) },
+        onCreateScheduling = {viewModel.createScheduling()},
+        onUpdateDate = {value -> viewModel.updateSchedulingDate(value)},
+        onUpdateBeneficiaryId = {value -> viewModel.updateBeneficiaryId(value)}
     )
 }
 
@@ -54,13 +63,32 @@ fun SchedulingMainContent(
     uiState: SchedulingMainState,
     currentCalendar: Calendar,
     onMonthChange: (Calendar) -> Unit,
-    onCancelScheduling: (value: Int) -> Unit
+    onCancelScheduling: (value: Int) -> Unit,
+    onCreateScheduling: () -> Unit,
+    onUpdateDate : (String) -> Unit,
+    onUpdateBeneficiaryId: (Int) -> Unit
 ){
+    var showPopup by remember { mutableStateOf(false) }
+    var selectDate by remember { mutableStateOf("") }
+    var selectedBeneficiary by remember {
+        mutableStateOf(uiState.beneficiary)
+    }
+
+    var expanded by remember { mutableStateOf(false) }
+
     Column(modifier = modifier.fillMaxSize().background(Color.White)) {
         CustomSchedulingCalendar(
             uiState = uiState,
             currentCalendar = currentCalendar,
-            onMonthChange = onMonthChange
+            onMonthChange = onMonthChange,
+            onClickDay = { date ->
+                selectDate = date
+                onUpdateDate(date)
+                uiState.beneficiary?.id.let { id ->
+                    onUpdateBeneficiaryId(id!!)
+                }
+                showPopup = true
+            }
         )
 
         Text(
@@ -75,13 +103,94 @@ fun SchedulingMainContent(
             contentPadding = PaddingValues(bottom = 24.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            itemsIndexed(uiState.beneficiaries ?: emptyList()){ index, item ->
+            itemsIndexed(uiState.scheduling ?: emptyList()){ index, item ->
                 SchedulingItemCard(
                     beneficiaryName = item.name,
                     date = item.date,
                     onCancelClick = { onCancelScheduling(item.schedulingId) }
                 )
             }
+        }
+
+        if (showPopup) {
+            var date by remember { mutableStateOf("") }
+            var note by remember { mutableStateOf("") }
+
+            AlertDialog(
+                onDismissRequest = { showPopup = false },
+                title = { Text("Novo Agendamento: $selectDate", fontWeight = FontWeight.Bold) },
+                text = {
+                    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                        if (uiState.beneficiary != null){
+                            OutlinedTextField(
+                                value = uiState.beneficiary.name,
+                                onValueChange = {},
+                                label = { Text("Nome") },
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
+                        else{
+                            Box(modifier = Modifier.fillMaxWidth()) {
+                                OutlinedTextField(
+                                    value = selectedBeneficiary?.name ?: "Selecionar Beneficiário",
+                                    onValueChange = {},
+                                    readOnly = true,
+                                    label = { Text("Beneficiário") },
+                                    modifier = Modifier.fillMaxWidth(),
+                                    trailingIcon = {
+                                        IconButton(onClick = { expanded = !expanded }) {
+                                            Icon(Icons.Default.ArrowDropDown, null)
+                                        }
+                                    }
+                                )
+                                DropdownMenu(
+                                    expanded = expanded,
+                                    onDismissRequest = { expanded = false },
+                                    modifier = Modifier.fillMaxWidth(0.7f)
+                                ) {
+                                    uiState.listBeneficiary?.forEach { beneficiary ->
+                                        DropdownMenuItem(
+                                            text = { Text(beneficiary.name) },
+                                            onClick = {
+                                                selectedBeneficiary = beneficiary
+                                                onUpdateBeneficiaryId(beneficiary.id!!)
+                                                expanded = false
+
+                                            }
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                        OutlinedTextField(
+                            value = selectDate,
+                            onValueChange = {},
+                            label = { Text("Data") },
+                            readOnly = true,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        OutlinedTextField(
+                            value = note,
+                            onValueChange = {  },
+                            label = { Text("Notas Adicionais") },
+                            modifier = Modifier.fillMaxWidth(),
+                            minLines = 2
+                        )
+                    }
+                },
+                confirmButton = {
+                    Button(
+                        onClick = {
+                            onCreateScheduling()
+                            showPopup = false
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF136342))
+                    ) { Text("Confirmar") }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showPopup = false }) { Text("Cancelar") }
+                }
+            )
         }
     }
 }
@@ -90,14 +199,14 @@ fun SchedulingMainContent(
 fun CustomSchedulingCalendar(
     uiState: SchedulingMainState,
     currentCalendar: Calendar,
-    onMonthChange: (Calendar) -> Unit
+    onMonthChange: (Calendar) -> Unit,
+    onClickDay : (String) -> Unit
 ) {
     val daysInMonth = currentCalendar.getActualMaximum(Calendar.DAY_OF_MONTH)
     val monthTitle = SimpleDateFormat("MMMM yyyy", Locale.getDefault()).format(currentCalendar.time)
 
-    // Lista de dias que têm agendamento para pintar de verde
-    val bookedDays = remember(uiState.beneficiaries) {
-        uiState.beneficiaries?.map { it.date.split("-").last().toInt() }?.toSet() ?: emptySet()
+    val bookedDays = remember(uiState.scheduling) {
+        uiState.scheduling?.map { it.date.split("-").last().toInt() }?.toSet() ?: emptySet()
     }
 
     Card(
@@ -128,7 +237,7 @@ fun CustomSchedulingCalendar(
             }
 
             Row(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
-                listOf("S", "M", "T", "W", "T", "F", "S").forEach { day ->
+                listOf("D", "S", "T", "Q", "Q", "S", "S").forEach { day ->
                     Text(text = day, modifier = Modifier.weight(1f), textAlign = TextAlign.Center, color = Color.Gray)
                 }
             }
@@ -140,6 +249,7 @@ fun CustomSchedulingCalendar(
                 Row(modifier = Modifier.fillMaxWidth()) {
                     for (j in 0..6) {
                         val isDayInMonth = (i == 0 && j >= firstDayOfMonth) || (i > 0 && dayCounter <= daysInMonth)
+                        val currentDay = dayCounter
 
                         Box(modifier = Modifier.weight(1f).aspectRatio(1f), contentAlignment = Alignment.Center) {
                             if (isDayInMonth && dayCounter <= daysInMonth) {
@@ -148,7 +258,17 @@ fun CustomSchedulingCalendar(
                                 Box(
                                     modifier = Modifier
                                         .size(36.dp)
-                                        .background(if (isBooked) Color(0xFF136342) else Color.Transparent, CircleShape),
+                                        .background(if (isBooked) Color(0xFF136342) else Color.Transparent, CircleShape)
+                                        .clickable(enabled = isDayInMonth){
+                                            val dateStr = String.format(
+                                                Locale.US,
+                                                "%04d-%02d-%02d",
+                                                currentCalendar.get(Calendar.YEAR),
+                                                currentCalendar.get(Calendar.MONTH) + 1,
+                                                currentDay
+                                            )
+                                            onClickDay(dateStr)
+                                        },
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Text(
@@ -196,9 +316,8 @@ fun SchedulingItemCard(beneficiaryName: String?, date: String, onCancelClick: ()
 @Composable
 fun SchedulingMainPreview() {
     SocialStoreTheme {
-        // 1. Simulação de dados (Mock State) conforme a tua lógica
         val mockUiState = SchedulingMainState(
-            beneficiaries = listOf(
+            scheduling = listOf(
                 SchedulingReceiverModel(
                     name = "kazzio",
                     schedulingId = 1,
@@ -211,20 +330,21 @@ fun SchedulingMainPreview() {
             error = null
         )
 
-        // 2. Simulação do mês atual (Janeiro 2026)
         val previewCalendar = Calendar.getInstance().apply {
             set(Calendar.YEAR, 2026)
             set(Calendar.MONTH, Calendar.JANUARY)
             set(Calendar.DAY_OF_MONTH, 1)
         }
 
-        // 3. Chamada do conteúdo principal com o modifier do Scaffold simulado
         SchedulingMainContent(
             modifier = Modifier.padding(top = 64.dp), // Simula a TopAppBar "Social Store"
             uiState = mockUiState,
             currentCalendar = previewCalendar,
             onMonthChange = {},
-            onCancelScheduling = {}
+            onCancelScheduling = {},
+            onCreateScheduling = {},
+            onUpdateBeneficiaryId = {},
+            onUpdateDate = {}
         )
     }
 }

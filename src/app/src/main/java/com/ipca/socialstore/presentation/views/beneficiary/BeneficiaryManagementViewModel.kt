@@ -24,6 +24,9 @@ data class BeneficiaryManagementState(
     val scheduling : List<SchedulingModel>? = null,
     val accept : Int? = null,
     val cancel : Int? = null,
+    val nextScheduling : SchedulingModel? = null,
+    val note : String? = null,
+    val declined : List<SchedulingModel>? = null,
 )
 @HiltViewModel
 class BeneficiaryManagementViewModel @Inject constructor(
@@ -38,6 +41,9 @@ class BeneficiaryManagementViewModel @Inject constructor(
 
     init {
         fetchBeneficiary()
+        fetchInfo()
+        println(beneficiaryId)
+
     }
 
     private fun fetchBeneficiary() {
@@ -84,8 +90,29 @@ class BeneficiaryManagementViewModel @Inject constructor(
                     cancel = result.data.cancel
                 )
             }
+            getNextScheduling()
+            getDeclined()
         }
     }
+
+    private fun getNextScheduling(){
+        val scheduling = uiState.value.scheduling
+        val next = scheduling?.filter { it.state == "accept" }?.minByOrNull { it.schedulingDate }
+        uiState.value = uiState.value.copy(
+            nextScheduling = next,
+            note = next?.note
+        )
+    }
+
+    fun getDeclined(){
+        val scheduling = uiState.value.scheduling
+        val declined = scheduling?.filter { it.state == "decline" || it.state == "in_Progress" }
+
+        uiState.value = uiState.value.copy(
+            declined = declined
+        )
+    }
+
 
 
 }
