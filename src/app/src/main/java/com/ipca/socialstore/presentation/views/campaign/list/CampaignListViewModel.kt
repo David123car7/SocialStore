@@ -1,41 +1,41 @@
-package com.ipca.socialstore.presentation.views.home.defaultHomeView
+package com.ipca.socialstore.presentation.views.campaign.adminList
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ipca.socialstore.data.models.CampaignModel
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
-import com.ipca.socialstore.domain.campaign.GetAllCampaignsLimitUseCase
+import com.ipca.socialstore.domain.campaign.DeleteCampaignUseCase
+import com.ipca.socialstore.domain.campaign.GetAllCampaignsUseCase
 import com.ipca.socialstore.presentation.utils.errors.ErrorText
 import com.ipca.socialstore.presentation.utils.errors.asUiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-data class DefaultHomeState (
-    var error : ErrorText? = null,
-    var campaignList: List<CampaignModel> = emptyList(),
-    var isLoading : Boolean = false,
+data class CampaignsListState(
+    val campaigns : List<CampaignModel> = emptyList(),
+    val isLoading : Boolean = false,
+    val error : ErrorText? = null,
 )
 
 @HiltViewModel
-class DefaultHomeViewModel @Inject constructor(
-    private val getAllCampaignsLimitUseCase: GetAllCampaignsLimitUseCase
-): ViewModel() {
-    var uiState = mutableStateOf(DefaultHomeState())
+class CampaignsListViewModel @Inject constructor(
+    private val getAllCampaignsUseCase: GetAllCampaignsUseCase): ViewModel(){
+    val uiState = mutableStateOf(CampaignsListState())
 
     init {
-        getAllCampaigns(limit = 3)
+        getAllCampaigns()
     }
 
-    fun getAllCampaigns(limit: Int){
+    fun getAllCampaigns(){
         viewModelScope.launch {
-            when(val result = getAllCampaignsLimitUseCase(limit = limit)){
+            when(val result = getAllCampaignsUseCase()){
                 is ResultWrapper.Success ->{
                     uiState.value = uiState.value.copy(
                         isLoading = false,
                         error = null,
-                        campaignList = result.data
+                        campaigns = result.data
                     )
                 }
                 is ResultWrapper.Error -> {

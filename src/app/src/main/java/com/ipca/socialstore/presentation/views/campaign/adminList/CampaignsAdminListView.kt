@@ -1,4 +1,4 @@
-package com.ipca.socialstore.presentation.views.campaign.list
+package com.ipca.socialstore.presentation.views.campaigns
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -29,31 +29,74 @@ import com.ipca.socialstore.presentation.routes.AdminRoutes
 import com.ipca.socialstore.presentation.ui.components.AlertComponent
 import com.ipca.socialstore.presentation.ui.components.SearchBarContent
 import com.ipca.socialstore.presentation.utils.navigation.NavigationLogic
+import com.ipca.socialstore.presentation.views.campaign.adminList.CampaignsAdminListState
 import com.ipca.socialstore.presentation.views.campaign.adminList.CampaignsListState
 import com.ipca.socialstore.presentation.views.campaign.adminList.CampaignsAdminListViewModel
-import com.ipca.socialstore.presentation.views.campaign.adminList.CampaignsListViewModel
 
 @Composable
-fun CampaignsListView(
+fun CampaignsAdminListView(
     modifier: Modifier = Modifier,
     navController: NavController,
     userRole: UserRole
 ) {
-    val campaignsViewModel: CampaignsListViewModel = hiltViewModel()
+    val campaignsViewModel: CampaignsAdminListViewModel = hiltViewModel()
     val uiState by campaignsViewModel.uiState
 
-    CampaignsListContent(
+    CampaignsAdminListContent(
         modifier = modifier,
         uiState = uiState,
+        onCreateClick = {
+            NavigationLogic.navigateTo(
+                navController = navController,
+                route = AdminRoutes.CreateCampaign,
+                userRole = userRole
+            )
+        },
+        onItemClick = { campaign ->
+
+        },
+        onEditClick = { campaign ->
+            val routeName = AdminRoutes.CampaignEdit::class.qualifiedName!!
+            navController.navigate("$routeName/${campaign.id}")
+        },
+        onDeleteConfirm = { campaign ->
+            campaignsViewModel.deleteCampaign(campaign.id!!)
+        }
     )
+
+    LaunchedEffect(uiState.campaignDeleted) {
+        if(uiState.campaignDeleted){
+            campaignsViewModel.getAllCampaigns()
+            campaignsViewModel.updateCampaignDeleted(false)
+        }
+    }
 }
 
 @Composable
-fun CampaignsListContent(
+fun CampaignsAdminListContent(
     modifier: Modifier = Modifier,
-    uiState: CampaignsListState,
+    uiState: CampaignsAdminListState,
+    onCreateClick: () -> Unit,
+    onItemClick: (CampaignModel) -> Unit,
+    onEditClick: (CampaignModel) -> Unit,
+    onDeleteConfirm: (CampaignModel) -> Unit
 ) {
     var searchQuery by remember { mutableStateOf("") }
+
+    var showDeleteDialog by remember { mutableStateOf(false) }
+    var campaignToDelete by remember { mutableStateOf<CampaignModel?>(null) }
+
+    if (campaignToDelete != null) {
+        AlertComponent(
+            show = showDeleteDialog,
+            title = "Eliminar Campanha",
+            icon = Icons.Default.Warning,
+            color = Color(0xFFFF5252),
+            message = "Tens a certeza que queres eliminar o ficheiro?",
+            onConfirm = {onDeleteConfirm(campaignToDelete!!)},
+            onDismiss = {showDeleteDialog = false}
+        )
+    }
 
     val filteredList = remember(uiState.campaigns, searchQuery) {
         uiState.campaigns.filter { campaign ->
@@ -100,9 +143,15 @@ fun CampaignsListContent(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     items(filteredList) { campaign ->
-                        CampaignItemCard(
+                        CampaignAdminItemCard(
                             modifier = Modifier.padding(),
                             campaign = campaign,
+                            onClick = { onItemClick(campaign) },
+                            onEditClick = { onEditClick(campaign) },
+                            onDeleteClick = {
+                                campaignToDelete = campaign
+                                showDeleteDialog = true
+                            }
                         )
                     }
                 }
@@ -123,13 +172,28 @@ fun CampaignsListContent(
                 )
             }
         }
+
+        FloatingActionButton(
+            onClick = onCreateClick,
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(16.dp),
+            containerColor = MaterialTheme.colorScheme.primary,
+            contentColor = MaterialTheme.colorScheme.onPrimary,
+            shape = CircleShape
+        ) {
+            Icon(Icons.Default.Add, contentDescription = "Nova Campanha")
+        }
     }
 }
 
 @Composable
-fun CampaignItemCard(
+fun CampaignAdminItemCard(
     modifier: Modifier = Modifier,
     campaign: CampaignModel,
+    onClick: () -> Unit,
+    onEditClick: () -> Unit,
+    onDeleteClick: () -> Unit
 ) {
     val isActive = campaign.onGoing
 
@@ -151,7 +215,8 @@ fun CampaignItemCard(
 
     Card(
         modifier = modifier
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
         colors = CardDefaults.cardColors(containerColor = containerColor),
         shape = MaterialTheme.shapes.medium
     ) {
@@ -204,7 +269,7 @@ fun CampaignItemCard(
                 text = campaign.description,
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                maxLines = 5,
+                maxLines = 2,
                 overflow = TextOverflow.Ellipsis
             )
 
@@ -266,6 +331,23 @@ fun CampaignItemCard(
                         color = MaterialTheme.colorScheme.onSurface,
                         fontWeight = FontWeight.Medium
                     )
+                }
+
+                Row {
+                    IconButton(onClick = onEditClick) {
+                        Icon(
+                            imageVector = Icons.Default.Edit,
+                            contentDescription = "Editar",
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                    IconButton(onClick = onDeleteClick) {
+                        Icon(
+                            imageVector = Icons.Default.Delete,
+                            contentDescription = "Eliminar",
+                            tint = MaterialTheme.colorScheme.error
+                        )
+                    }
                 }
             }
         }
