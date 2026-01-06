@@ -27,8 +27,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.ipca.socialstore.data.enums.UserRole
+import com.ipca.socialstore.presentation.routes.BeneficiaryRoutes
 import com.ipca.socialstore.presentation.ui.components.DashboardCard
 import com.ipca.socialstore.presentation.ui.theme.SocialStoreTheme
+import com.ipca.socialstore.presentation.utils.navigation.NavigationLogic
 import com.ipca.socialstore.presentation.views.home.adminHome.DashboardMenuItem
 
 data class BeneficiaryMenuItem(
@@ -39,15 +41,34 @@ data class BeneficiaryMenuItem(
 )
 
 @Composable
-fun BeneficiaryHomeView(modifier: Modifier, userRole : UserRole){
-    BenificiaryHomeContent(modifier = modifier)
+fun BeneficiaryHomeView(modifier: Modifier, navController: NavController,userRole : UserRole){
+    BenificiaryHomeContent(
+        modifier = modifier,
+        onClickDocuments = {
+            NavigationLogic.navigateTo(
+                navController = navController,
+                userRole = userRole,
+                route = BeneficiaryRoutes.Documents
+            )
+        },
+        onClickProfile = {
+            NavigationLogic.navigateTo(
+                navController = navController,
+                userRole = userRole,
+                route = BeneficiaryRoutes.Profile
+            )
+        }
+    )
 }
 
 @Composable
-    fun BenificiaryHomeContent(modifier: Modifier){
+    fun BenificiaryHomeContent(
+    modifier: Modifier,
+    onClickDocuments:() -> Unit,
+    onClickProfile:() -> Unit){
         val menuItems = listOf(
-            BeneficiaryMenuItem(1, "Meus Documentos", Icons.Outlined.Add, onClick = {}),
-            BeneficiaryMenuItem(2, "Dados Pessoais", Icons.Outlined.Person, onClick = {}),
+            BeneficiaryMenuItem(1, "Documentos", Icons.Outlined.Add, onClick = onClickDocuments),
+            BeneficiaryMenuItem(2, "Dados Pessoais", Icons.Outlined.Person, onClick = onClickProfile),
             BeneficiaryMenuItem(3, "Mensagens", Icons.Outlined.Mail, onClick = {}),
             BeneficiaryMenuItem(4, "Historico", Icons.Outlined.History, onClick = {}),
         )
@@ -99,7 +120,7 @@ fun BeneficiaryHomeView(modifier: Modifier, userRole : UserRole){
 @Composable
 fun BenificiaryHomePreview(){
     SocialStoreTheme() {
-        BenificiaryHomeContent(modifier = Modifier)
+        BenificiaryHomeContent(modifier = Modifier, onClickProfile = {}, onClickDocuments = {})
     }
 }
 
