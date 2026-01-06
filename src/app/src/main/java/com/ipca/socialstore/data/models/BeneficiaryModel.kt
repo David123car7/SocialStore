@@ -15,3 +15,4 @@ data class BeneficiaryModel(
     @SerialName("academic_id")
     val academicId : Int?,
 )
+

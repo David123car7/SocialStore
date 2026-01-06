@@ -26,6 +26,25 @@ class BeneficiaryRepository  @Inject constructor(private val supabase : Supabase
         }
     }
 
+    suspend fun updateBeneficiary(beneficiary: BeneficiaryModel): ResultWrapper<Int> {
+        return try {
+            val id = beneficiary.id ?: return ResultWrapper.Error(
+                exceptionMapper.map(Exception("ID do beneficiário é nulo"))
+            )
+
+            val result = supabase.from(DatabaseTables.BENEFICIARY).update(beneficiary) {
+                filter {
+                    eq("id", id)
+                }
+                select(columns = Columns.list("id"))
+            }.decodeSingleOrNull<TableIdModel>()
+            if (result == null) return ResultWrapper.Error(AppError.DataNotUpdated) // Ou um erro equivalente
+            ResultWrapper.Success(result.id)
+        } catch (e: Exception) {
+            ResultWrapper.Error(exceptionMapper.map(e))
+        }
+    }
+
     suspend fun existBeneficiary(beneficiaryId : String) : ResultWrapper<Int> {
         return try {
             val beneficiaryResult = supabase.from(DatabaseTables.BENEFICIARY)
@@ -83,6 +102,24 @@ class BeneficiaryRepository  @Inject constructor(private val supabase : Supabase
             }
             ResultWrapper.Success(result)
         }catch (e : Exception){
+            return ResultWrapper.Error(exceptionMapper.map(e))
+        }
+    }
+
+    suspend fun getBeneficiaryNameById(id: Int) : ResultWrapper<String> {
+        return try {
+            val result = supabase.from(DatabaseTables.BENEFICIARY)
+                .select(columns = Columns.list("name")) {
+                    filter {
+                        eq("id", id)
+                    }
+                }
+                .decodeSingleOrNull<BeneficiaryModel>()
+            if (result == null) {
+                return ResultWrapper.Error(error = AppError.DataNotFound)
+            }
+            ResultWrapper.Success(result.name)
+        } catch (e : Exception){
             return ResultWrapper.Error(exceptionMapper.map(e))
         }
     }
