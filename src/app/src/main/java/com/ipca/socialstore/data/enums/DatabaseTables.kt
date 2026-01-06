@@ -19,7 +19,11 @@ enum class DatabaseTables(val tableName: String) {
     BENEFICIARY("beneficiary"),
     SCHEDULING_DATE("scheduling_date"),
     SCHEDULING_NOTIFICATION("notification_scheduling"),
-    NOTIFICATION_SCHEDULED("notification_scheduled");
+    NOTIFICATION_SCHEDULED("notification_scheduled"),
+
+    DELIVERY("deliveries"),
+
+    DELIVERY_ITEMS("delivery_items");
 	
     override fun toString() = tableName
 }

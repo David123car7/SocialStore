@@ -60,14 +60,12 @@ fun GetAllStockViewContent(
 ) {
     val listToDisplay = uiState.searchResult ?: uiState.items
 
-    // Usamos um Box para garantir que o FloatingActionButton esteja sempre no topo
     Box(modifier = modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(horizontal = 12.dp)
         ) {
-            // A StockList agora contém a SearchBar e os Filtros, que devem estar sempre presentes
             StockList(
                 modifier = Modifier.weight(1f),
                 items = listToDisplay,
@@ -81,11 +79,9 @@ fun GetAllStockViewContent(
             )
         }
 
-        // Se houver um erro ou carregamento, mostramos uma sobreposição sem esconder o FAB
         if (uiState.isLoading) {
             LoadingIndicator()
         } else if (uiState.error != null) {
-            // O erro agora aparece sobre a lista, mas permite ver o resto da UI
             ErrorMessage(error = uiState.error)
         }
     }
