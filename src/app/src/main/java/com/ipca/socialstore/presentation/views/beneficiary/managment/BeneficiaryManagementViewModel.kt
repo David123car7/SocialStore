@@ -1,4 +1,4 @@
-package com.ipca.socialstore.presentation.views.beneficiary
+package com.ipca.socialstore.presentation.views.beneficiary.managment
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
@@ -9,10 +9,7 @@ import com.ipca.socialstore.data.models.BeneficiaryModel
 import com.ipca.socialstore.data.models.SchedulingModel
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
 import com.ipca.socialstore.domain.beneficiary.GetBeneficiaryByIdUseCase
-import com.ipca.socialstore.domain.scheduling.CancelSchedulingAdminUseCase
-import com.ipca.socialstore.domain.scheduling.GetSchedulingByBeneficiaryIdUseCase
 import com.ipca.socialstore.domain.services.scheduling.GetAllInfoBeneficiaryUseCase
-import com.ipca.socialstore.presentation.models.SchedulingHelperModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
