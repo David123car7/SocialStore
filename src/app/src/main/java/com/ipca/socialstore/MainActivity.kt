@@ -44,8 +44,14 @@ import com.ipca.socialstore.presentation.views.application.createApplication.Cre
 import com.ipca.socialstore.presentation.views.application.listApplications.ListApplicationsView
 import com.ipca.socialstore.presentation.views.authentication.resetPassword.ResetPasswordView
 
+
 import com.ipca.socialstore.presentation.views.basket.preparation.BasketPreparationView
 
+import com.ipca.socialstore.presentation.views.beneficiary.editProfile.BeneficiaryEditProfileView
+import com.ipca.socialstore.presentation.views.beneficiary.listDocuments.ListDocumentsView
+
+
+import com.ipca.socialstore.presentation.views.basket.preparation.BasketPreparationView
 import com.ipca.socialstore.presentation.views.beneficiary.editProfile.BeneficiaryEditProfileView
 import com.ipca.socialstore.presentation.views.beneficiary.listDocuments.ListDocumentsView
 
