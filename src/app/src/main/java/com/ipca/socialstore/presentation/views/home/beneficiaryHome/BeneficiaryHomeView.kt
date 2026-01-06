@@ -19,12 +19,14 @@ import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.ipca.socialstore.data.enums.UserRole
 import com.ipca.socialstore.presentation.routes.BeneficiaryRoutes
@@ -42,8 +44,12 @@ data class BeneficiaryMenuItem(
 
 @Composable
 fun BeneficiaryHomeView(modifier: Modifier, navController: NavController,userRole : UserRole){
+    val viewModel: BeneficiaryHomeViewModel = hiltViewModel()
+    val uiState by viewModel.uiState
+
     BenificiaryHomeContent(
         modifier = modifier,
+        uiState = uiState,
         onClickDocuments = {
             NavigationLogic.navigateTo(
                 navController = navController,
@@ -64,6 +70,7 @@ fun BeneficiaryHomeView(modifier: Modifier, navController: NavController,userRol
 @Composable
     fun BenificiaryHomeContent(
     modifier: Modifier,
+    uiState: BeneficiaryHomeState,
     onClickDocuments:() -> Unit,
     onClickProfile:() -> Unit){
         val menuItems = listOf(
@@ -82,12 +89,11 @@ fun BeneficiaryHomeView(modifier: Modifier, navController: NavController,userRol
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             contentPadding = PaddingValues(vertical = 16.dp)
         ) {
-            // --- Secção 1: Título Módulos ---
             item(span = { GridItemSpan(2) }) {
                 Column(modifier = Modifier.padding(bottom = 8.dp))
                 {
                     Text(
-                        "Olá, João",
+                        text = uiState.beneficiary.name,
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold
                     )
@@ -105,7 +111,6 @@ fun BeneficiaryHomeView(modifier: Modifier, navController: NavController,userRol
                 }
             }
 
-            // --- Secção 2: Os Cartões (Grid) ---
             items(menuItems) { item ->
                 DashboardCard(
                     title = item.title,
@@ -120,7 +125,7 @@ fun BeneficiaryHomeView(modifier: Modifier, navController: NavController,userRol
 @Composable
 fun BenificiaryHomePreview(){
     SocialStoreTheme() {
-        BenificiaryHomeContent(modifier = Modifier, onClickProfile = {}, onClickDocuments = {})
+        //BenificiaryHomeContent(modifier = Modifier, onClickProfile = {}, onClickDocuments = {})
     }
 }
 
