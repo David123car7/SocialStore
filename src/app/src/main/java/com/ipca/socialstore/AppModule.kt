@@ -1,8 +1,14 @@
 package com.ipca.socialstore
 
+import android.content.Context
+import androidx.room.Room
+import com.ipca.socialstore.data.room.AppDatabase
+import com.ipca.socialstore.data.room.interfaces.AcademicInterface
+import com.ipca.socialstore.data.room.interfaces.BeneficiaryInterface
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.Auth
@@ -31,5 +37,27 @@ object AppModule {
             install(Storage)
             install(Realtime)
         }
+    }
+
+    @Provides
+    @Singleton
+    fun provideAppDatabase(@ApplicationContext context: Context): AppDatabase {
+        return Room.databaseBuilder(
+            context,
+            AppDatabase::class.java,
+            "social_store_db"
+        )
+            .fallbackToDestructiveMigration()
+            .build()
+    }
+
+    @Provides
+    fun provideBeneficiaryInterface(database: AppDatabase): BeneficiaryInterface {
+        return database.beneficiaryInterface()
+    }
+
+    @Provides
+    fun provideAcademicInterface(database: AppDatabase): AcademicInterface {
+        return database.academicInterface()
     }
 }
