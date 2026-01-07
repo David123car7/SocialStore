@@ -35,7 +35,7 @@ fun ExpandableSection(
     icon: ImageVector,
     isExpanded: Boolean,
     onExpandChange: (Boolean) -> Unit,
-    iconColor: Color = MaterialTheme.colorScheme.onSurface,
+    iconColor: Color,
     content: @Composable () -> Unit
 ) {
     val rotationState by animateFloatAsState(targetValue = if (isExpanded) 180f else 0f, label = "rotation")
@@ -51,11 +51,11 @@ fun ExpandableSection(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(icon, null, tint = MaterialTheme.colorScheme.primary)
+                    Icon(icon, null, tint = iconColor)
                     Spacer(Modifier.width(12.dp))
                     Text(title, fontWeight = FontWeight.Bold, fontSize = 16.sp)
                 }
-                Icon(Icons.Default.KeyboardArrowDown, "Expandir", tint = iconColor, modifier = Modifier.rotate(rotationState))
+                Icon(Icons.Default.KeyboardArrowDown, "Expandir", tint = Color.Black, modifier = Modifier.rotate(rotationState))
             }
             AnimatedVisibility(visible = isExpanded) {
                 Column(
