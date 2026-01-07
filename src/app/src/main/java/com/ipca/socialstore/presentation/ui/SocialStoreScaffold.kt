@@ -1,5 +1,6 @@
 package com.ipca.socialstore.presentation.ui
 
+import android.graphics.drawable.Icon
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -17,11 +18,16 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Accessibility
 import androidx.compose.material.icons.filled.Assignment
 import androidx.compose.material.icons.filled.Camera
+import androidx.compose.material.icons.filled.Campaign
 import androidx.compose.material.icons.filled.FileOpen
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.Storage
+import androidx.compose.material.icons.outlined.Campaign
+import androidx.compose.material.icons.outlined.FileOpen
+import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.Inventory2
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
@@ -41,6 +47,7 @@ import com.ipca.socialstore.presentation.routes.GeneralRoutes
 import com.ipca.socialstore.presentation.ui.theme.SocialStoreTheme
 import com.ipca.socialstore.presentation.ui.theme.GreenIPCA
 import com.ipca.socialstore.R
+import com.ipca.socialstore.presentation.ui.theme.IconTint
 
 data class BottomNavItem(
     val icon: ImageVector,
@@ -74,17 +81,17 @@ fun SocialStoreScaffoldContent(
 
     val allNavItems = listOf(
         BottomNavItem( //Home
-            icon = Icons.Default.Home,
+            icon = Icons.Outlined.Home,
             route = GeneralRoutes.Home,
             isVisible = userRole == UserRole.GUEST || userRole == UserRole.DEFAULT
         ),
         BottomNavItem( //AdminHome
-            icon = Icons.Default.Home,
+            icon = Icons.Outlined.Home,
             route = AdminRoutes.Home,
             isVisible = userRole == UserRole.ADMIN
         ),
         BottomNavItem( //ApplicationInfo
-            icon = Icons.Default.FileOpen,
+            icon = Icons.Outlined.FileOpen,
             route = DefaultRoutes.ApplicationInfo,
             isVisible = userRole == UserRole.DEFAULT
         ),
@@ -94,22 +101,12 @@ fun SocialStoreScaffoldContent(
             isVisible = userRole == UserRole.CANDIDATE
         ),
         BottomNavItem(
-            icon = Icons.Default.Accessibility,
-            route = AdminRoutes.ListApplications,
-            isVisible = userRole == UserRole.ADMIN
-        ),
-        BottomNavItem(
             icon = Icons.Default.Assignment,
             route = AdminRoutes.SchedulingManagement,
             isVisible = userRole == UserRole.ADMIN
         ),
-        BottomNavItem(
-            icon = Icons.Filled.Camera,
-            route = AdminRoutes.CampaignList,
-            isVisible = userRole == UserRole.ADMIN
-        ),
         BottomNavItem( //stock
-            icon = Icons.Default.Storage,
+            icon = Icons.Outlined.Inventory2,
             route = AdminRoutes.GetStock,
             isVisible = userRole == UserRole.ADMIN
         ),
@@ -186,7 +183,7 @@ fun SocialStoreScaffoldContent(
                     allNavItems.forEach { item ->
                         if(item.isVisible){
                             NavigationBarItem(
-                                icon = {Icon(imageVector = item.icon, contentDescription = "")},
+                                icon = {Icon(imageVector = item.icon, tint = IconTint, contentDescription = "")},
                                 selected = currentRoute == GeneralRoutes.Home,
                                 onClick = {
                                     NavigationLogic.navigateTo(
@@ -194,7 +191,8 @@ fun SocialStoreScaffoldContent(
                                         userRole = userRole,
                                         route = item.route
                                     )
-                                }
+                                },
+
                             )
                         }
                     }
@@ -205,7 +203,7 @@ fun SocialStoreScaffoldContent(
                     allNavItems.forEach { item ->
                         if (item.isVisible) {
                             NavigationBarItem(
-                                icon = { Icon(imageVector = item.icon, contentDescription = "") },
+                                icon = { Icon(imageVector = item.icon, tint = IconTint, contentDescription = "") },
                                 selected = currentRoute == BeneficiaryRoutes.Home,
                                 onClick = {
                                     NavigationLogic.navigateTo(
@@ -219,7 +217,6 @@ fun SocialStoreScaffoldContent(
                     }
                 }
             }
-
         }
 
 
@@ -234,7 +231,7 @@ fun SocialStoreScaffoldGuestPreview() {
     SocialStoreTheme {
         SocialStoreScaffoldContent(
             navController = rememberNavController(),
-            userRole = UserRole.BENEFICIARY,
+            userRole = UserRole.DEFAULT,
             logout = {}
         ) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
