@@ -13,7 +13,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Campaign
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.Category
+import androidx.compose.material.icons.outlined.Description
+import androidx.compose.material.icons.outlined.Label
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults.buttonColors
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -35,6 +39,9 @@ import com.ipca.socialstore.data.models.CampaignModel
 import com.ipca.socialstore.presentation.routes.AdminRoutes
 import com.ipca.socialstore.presentation.ui.components.TextFieldDateComponent
 import com.ipca.socialstore.presentation.ui.components.TextFieldStringComponent
+import com.ipca.socialstore.presentation.ui.theme.GreenIPCA
+import com.ipca.socialstore.presentation.ui.theme.IconBgColor
+import com.ipca.socialstore.presentation.ui.theme.IconTint
 import com.ipca.socialstore.presentation.ui.theme.SocialStoreTheme
 import com.ipca.socialstore.presentation.utils.navigation.NavigationLogic
 
@@ -84,11 +91,11 @@ fun CreateCampaignContent(
         Icon(
             imageVector = Icons.Default.Campaign, // Ou Icons.Default.Edit
             contentDescription = null,
-            tint = MaterialTheme.colorScheme.primary,
+            tint = IconTint,
             modifier = Modifier
                 .size(64.dp)
                 .background(
-                    color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f),
+                    color = IconBgColor,
                     shape = CircleShape
                 )
                 .padding(12.dp)
@@ -114,7 +121,7 @@ fun CreateCampaignContent(
             modifier = Modifier,
             label = "Nome",
             value = uiState.campaign.name,
-            icon = Icons.Default.Star,
+            icon = Icons.Outlined.Label,
             onValueUpdate = onNameUpdate
         )
 
@@ -122,7 +129,7 @@ fun CreateCampaignContent(
             modifier = Modifier,
             label = "Descrição",
             value = uiState.campaign.description,
-            icon = Icons.Default.Star,
+            icon = Icons.Outlined.Description,
             onValueUpdate = onDescriptionUpdate
         )
 
@@ -130,7 +137,7 @@ fun CreateCampaignContent(
             modifier = Modifier,
             label = "Categoria",
             value = uiState.campaign.category,
-            icon = Icons.Default.Star,
+            icon = Icons.Outlined.Category,
             onValueUpdate = onCategoryUpdate
         )
 
@@ -144,7 +151,7 @@ fun CreateCampaignContent(
 
         TextFieldDateComponent(
             modifier = Modifier,
-            label = "Data Inicio",
+            label = "Data Fim",
             date = uiState.campaign.endDate,
             onDatePickerUpdate = {},
             onDateUpdate = onEndDateUpdate
@@ -155,6 +162,7 @@ fun CreateCampaignContent(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(50.dp),
+            colors = buttonColors(GreenIPCA),
             shape = RoundedCornerShape(12.dp)
         ) {
             Text("Continuar", fontWeight = FontWeight.Bold)

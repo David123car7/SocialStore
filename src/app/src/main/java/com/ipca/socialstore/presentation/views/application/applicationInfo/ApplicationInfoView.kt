@@ -22,7 +22,14 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.CheckCircle
+import androidx.compose.material.icons.outlined.CleaningServices
+import androidx.compose.material.icons.outlined.Description
+import androidx.compose.material.icons.outlined.FoodBank
 import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.ManageSearch
+import androidx.compose.material.icons.outlined.Restaurant
+import androidx.compose.material.icons.outlined.Sanitizer
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -48,6 +55,8 @@ import com.ipca.socialstore.data.enums.UserRole
 import com.ipca.socialstore.presentation.routes.DefaultRoutes
 import com.ipca.socialstore.presentation.ui.SocialStoreScaffold
 import com.ipca.socialstore.presentation.ui.SocialStoreScaffoldContent
+import com.ipca.socialstore.presentation.ui.theme.IconBgColor
+import com.ipca.socialstore.presentation.ui.theme.IconTint
 import com.ipca.socialstore.presentation.ui.theme.SocialStoreTheme
 import com.ipca.socialstore.presentation.utils.navigation.NavigationLogic
 
@@ -87,11 +96,11 @@ fun ApplicationInfoViewContent(modifier: Modifier, onStartApplicationClick:() ->
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            StepItem("Preencher\nDados", Icons.Default.Star)
+            StepItem("Preencher\nDados", Icons.Outlined.Description)
             StepDivider()
-            StepItem("Análise\nTécnica", Icons.Default.Star)
+            StepItem("Análise\nTécnica", Icons.Outlined.ManageSearch)
             StepDivider()
-            StepItem("Receber\nApoio", Icons.Default.Star)
+            StepItem("Receber\nApoio", Icons.Outlined.CheckCircle)
         }
 
         Text(
@@ -104,9 +113,9 @@ fun ApplicationInfoViewContent(modifier: Modifier, onStartApplicationClick:() ->
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            ServiceCard("Alimentação", Icons.Default.Star)
-            ServiceCard("Higiente", Icons.Default.Star)
-            ServiceCard("Produtos\nLimpeza", Icons.Default.Star)
+            ServiceCard("Alimentação", Icons.Outlined.Restaurant)
+            ServiceCard("Higiente", Icons.Outlined.Sanitizer)
+            ServiceCard("Produtos\nLimpeza", Icons.Outlined.CleaningServices)
         }
 
         Card(
@@ -143,7 +152,7 @@ fun ApplicationBanner(onClick: () -> Unit) {
             modifier = Modifier
                 .background(
                     Brush.verticalGradient(
-                        colors = listOf(Color(0xFF1976D2), Color(0xFF1565C0))
+                        colors = listOf(Color(0xFF02A6FF), Color(0xFF3130D2))
                     )
                 )
                 .padding(24.dp)
@@ -223,7 +232,7 @@ fun StepItem(text: String, icon: ImageVector) {
 @Composable
 fun ServiceCard(name: String, icon: ImageVector) {
     Card(
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFF5F5F5)),
+        colors = CardDefaults.cardColors(containerColor = IconBgColor),
         modifier = Modifier.size(100.dp)
     ) {
         Column(
@@ -231,7 +240,7 @@ fun ServiceCard(name: String, icon: ImageVector) {
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Icon(icon, null, tint = Color.Gray, modifier = Modifier.size(32.dp))
+            Icon(icon, null, tint = IconTint, modifier = Modifier.size(32.dp))
             Spacer(Modifier.height(8.dp))
             Text(name, style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.SemiBold, textAlign = TextAlign.Center)
         }

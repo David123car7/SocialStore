@@ -10,6 +10,7 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.DateRange
 import androidx.compose.material.icons.outlined.RemoveRedEye
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
@@ -104,7 +105,7 @@ fun TextFieldDateComponent(modifier: Modifier, label: String, date: String, onDa
         onValueChange = onDateUpdate,
         label = { Text(label) },
         placeholder = { Text("DD/MM/AAAA") },
-        leadingIcon = { Icon(Icons.Default.DateRange, null) },
+        leadingIcon = { Icon(Icons.Outlined.DateRange, null) },
         modifier = Modifier
             .fillMaxWidth()
             .clickable { showDatePicker = !showDatePicker },

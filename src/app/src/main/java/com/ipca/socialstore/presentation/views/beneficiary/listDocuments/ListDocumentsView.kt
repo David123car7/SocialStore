@@ -42,6 +42,7 @@ import com.ipca.socialstore.data.enums.UserRole
 import com.ipca.socialstore.presentation.models.DocumentReceiverModel
 import com.ipca.socialstore.presentation.routes.BeneficiaryRoutes
 import com.ipca.socialstore.presentation.ui.components.IntroductionComponent
+import com.ipca.socialstore.presentation.ui.theme.IconTint
 import com.ipca.socialstore.presentation.utils.navigation.NavigationLogic
 import com.ipca.socialstore.presentation.views.application.applicationState.CategoryBox
 import com.ipca.socialstore.presentation.views.application.applicationStateAdmin.ApplicationStateAdminViewModel
@@ -242,7 +243,7 @@ fun SimpleDocumentCard(
                 Icon(
                     imageVector = Icons.Default.Download,
                     contentDescription = "Descarregar",
-                    tint = MaterialTheme.colorScheme.primary // Ou Color.Gray se preferires neutro
+                    tint = IconTint
                 )
             }
         }

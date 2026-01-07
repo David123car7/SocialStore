@@ -24,6 +24,7 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.Storage
+import androidx.compose.material.icons.outlined.Assignment
 import androidx.compose.material.icons.outlined.Campaign
 import androidx.compose.material.icons.outlined.FileOpen
 import androidx.compose.material.icons.outlined.Home
@@ -101,7 +102,7 @@ fun SocialStoreScaffoldContent(
             isVisible = userRole == UserRole.CANDIDATE
         ),
         BottomNavItem(
-            icon = Icons.Default.Assignment,
+            icon = Icons.Outlined.Assignment,
             route = AdminRoutes.SchedulingManagement,
             isVisible = userRole == UserRole.ADMIN
         ),
@@ -231,7 +232,7 @@ fun SocialStoreScaffoldGuestPreview() {
     SocialStoreTheme {
         SocialStoreScaffoldContent(
             navController = rememberNavController(),
-            userRole = UserRole.DEFAULT,
+            userRole = UserRole.ADMIN,
             logout = {}
         ) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {

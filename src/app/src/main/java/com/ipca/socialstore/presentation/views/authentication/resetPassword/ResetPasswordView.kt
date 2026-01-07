@@ -20,7 +20,11 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.Close
+import androidx.compose.material.icons.outlined.Email
+import androidx.compose.material.icons.outlined.Token
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults.buttonColors
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -45,6 +49,8 @@ import com.ipca.socialstore.presentation.utils.navigation.NavigationLogic
 import com.ipca.socialstore.presentation.ui.components.ErrorTextComponent
 import com.ipca.socialstore.presentation.ui.components.TextFieldPasswordComponent
 import com.ipca.socialstore.presentation.ui.components.TextFieldStringComponent
+import com.ipca.socialstore.presentation.ui.theme.GreenIPCA
+import com.ipca.socialstore.presentation.ui.theme.IconTint
 import com.ipca.socialstore.presentation.ui.theme.SocialStoreTheme
 
 @Composable
@@ -112,10 +118,10 @@ fun ResetPasswordViewContent(
             verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically)
         ) {
             Icon(
-                imageVector = if (uiState.requestedReset) Icons.Default.Email else Icons.Default.Close,
+                imageVector = if (uiState.requestedReset) Icons.Outlined.Email else Icons.Outlined.Close,
                 contentDescription = null,
                 modifier = Modifier.size(64.dp).padding(bottom = 24.dp),
-                tint = MaterialTheme.colorScheme.primary
+                tint = IconTint
             )
 
             AnimatedVisibility(
@@ -186,7 +192,7 @@ fun ResetPasswordViewContent(
                         modifier = Modifier,
                         label = "Token",
                         value = uiState.token,
-                        icon = Icons.Default.Star,
+                        icon = Icons.Outlined.Token,
                         onValueUpdate = onTokenUpdate
                     )
 
@@ -209,7 +215,8 @@ fun ResetPasswordViewContent(
                     Button(
                         onClick = onClickReset,
                         modifier = Modifier.fillMaxWidth().height(50.dp),
-                        shape = RoundedCornerShape(12.dp)
+                        shape = RoundedCornerShape(12.dp),
+                        colors = buttonColors(GreenIPCA),
                     ) {
                         Text("Atualizar Palavra-passe")
                     }
