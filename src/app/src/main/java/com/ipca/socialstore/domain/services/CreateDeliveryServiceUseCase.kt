@@ -12,14 +12,28 @@ import com.ipca.socialstore.domain.scheduling.GetSchedulingByIdUseCase
 import javax.inject.Inject
 
 class CreateDeliveryServiceUseCase @Inject constructor(
-    private val createDeliveryItemsUseCase: CreateDeliveryItemsUseCase,
     private val createDeliveryUseCase: CreateDeliveryUseCase,
     private val getDeliveryItemsBySchedulingIdUseCase: GetDeliveryItemsBySchedulingIdUseCase,
-    private val deliveryItemsRepository: DeliveryItemsRepository
+    private val deliveryItemsRepository: DeliveryItemsRepository,
+    private val deliveryRepository: DeliveryRepository
 ){
 
+    suspend fun getItemsByScheduling(schedulingId: Int): ResultWrapper<List<DeliveryItemsModel>> {
+        val deliveryResult = deliveryRepository.getDeliveryBySchedulingId(schedulingId)
+
+        return when (deliveryResult) {
+            is ResultWrapper.Success -> {
+                val deliveryId = deliveryResult.data.id!!
+                getDeliveryItemsBySchedulingIdUseCase(deliveryId)
+            }
+            is ResultWrapper.Error -> {
+                ResultWrapper.Error(deliveryResult.error)
+            }
+        }
+    }
     suspend operator fun invoke(schedulingId : Int,  stockMap : Map<Int, Int>) : ResultWrapper<List<DeliveryItemsModel>>{
 
+        println("DEBUG: stockMap size = ${stockMap.size}")
         val deliveryResult = createDeliveryUseCase(schedulingId)
         if (deliveryResult is ResultWrapper.Error) return ResultWrapper.Error(deliveryResult.error)
 
@@ -53,7 +67,6 @@ class CreateDeliveryServiceUseCase @Inject constructor(
                 itemsToInsert.add(DeliveryItemsModel(deliveryId = deliveryId, stockId = id, quantity = qty))
             }
         }
-        if (itemsResult is ResultWrapper.Error) return ResultWrapper.Error(itemsResult.error)
 
         if (itemsToInsert.isNotEmpty()) deliveryItemsRepository.createDeliveryItems(itemsToInsert)
         if (itemsToUpdate.isNotEmpty()) deliveryItemsRepository.updateDeliveryItems(itemsToUpdate)
