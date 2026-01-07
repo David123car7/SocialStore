@@ -82,26 +82,21 @@ class BasketPreparationViewModel @Inject constructor(
         }
     }
 
-    fun fetchExistingItems(){
-        val sId = uiState.value.selectScheduling?.id
+    fun fetchExistingItems() {
+        val sId = uiState.value.selectScheduling?.id ?: return
+        uiState.value = uiState.value.copy(isLoading = true)
 
-        if (sId == null) {
-            uiState.value = uiState.value.copy(
-                error = ErrorText.DynamicString("Erro: Agendamento não selecionado")
-            )
-            return
-        }
-        uiState.value = uiState.value.copy(isLoading = true, error = null)
         viewModelScope.launch {
-            val result = getDeliveryItemsBySchedulingIdUseCase(sId)
-            if (result is ResultWrapper.Success) {
-                val mappedQuantities = result.data.associate {
-                    it.stockId to it.quantity
+            val result = createDeliveryServiceUseCase.getItemsByScheduling(sId)
+
+            uiState.value = uiState.value.copy(
+                isLoading = false,
+                selectedQuantities = if (result is ResultWrapper.Success) {
+                    result.data.associate { it.stockId to it.quantity }
+                } else {
+                    emptyMap()
                 }
-                uiState.value = uiState.value.copy(
-                    selectedQuantities = mappedQuantities,
-                )
-            }
+            )
         }
     }
     fun fetchInfo(){
@@ -206,13 +201,16 @@ class BasketPreparationViewModel @Inject constructor(
     fun updateSchedulingId(scheduling : SchedulingModel) {
 
         uiState.value = uiState.value.copy(
-            selectScheduling = scheduling
+            selectScheduling = scheduling,
+            selectedQuantities = emptyMap()
         )
+        println(scheduling)
         fetchExistingItems()
     }
 
     fun createDeliveryService() {
         val sId = uiState.value.selectScheduling?.id
+        println(sId)
 
         if (sId == null) {
             uiState.value = uiState.value.copy(
