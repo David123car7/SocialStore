@@ -30,8 +30,6 @@ data class ItemState(
 )
 @HiltViewModel
 class CreateItemViewModel @Inject constructor(
-    private val createItemUseCase: CreateItemUseCase,
-    private val createItemStockUseCase: CreateItemStockUseCase,
     private val createItemStockService: CreateItemStockService
 ): ViewModel(){
 

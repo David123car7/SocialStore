@@ -113,24 +113,24 @@ class StockRepository @Inject constructor(private val supabase: SupabaseClient, 
         }
     }
 
-    suspend fun updateQuantityInStockByDate(itemId: Int, expirationDate: String, newQuantity: Int): ResultWrapper<Int> {
+    suspend fun updateQuantityInStockByDate(stockId: Int, quantityToAdd: Int): ResultWrapper<Int> {
         return try {
+            val currentStock = supabase.from(DatabaseTables.STOCK)
+                .select {
+                    filter { eq("id", stockId) }
+                }.decodeSingleOrNull<StockModel>() ?: return ResultWrapper.Error(AppError.DataNotFound)
+
+            val updatedTotal = (currentStock.quantity) + quantityToAdd
+
             val stockResult = supabase.from(DatabaseTables.STOCK)
-                .update(mapOf("quantity" to newQuantity)) {
-                    filter {
-                        eq("item_id", itemId)
-                        eq("expiration_date", expirationDate)
-                    }
+                .update(mapOf("quantity" to updatedTotal)) {
+                    filter { eq("id", stockId) }
                     select()
                 }.decodeSingleOrNull<StockModel>()
 
             if (stockResult == null) return ResultWrapper.Error(AppError.DataNotUpdated)
 
-            val resultId = stockResult.id ?: return ResultWrapper.Error(
-                AppError.UnknownError(UnknownError.NULL_ID.errorMessage)
-            )
-
-            ResultWrapper.Success(resultId)
+            ResultWrapper.Success(stockResult.id!!)
         } catch (e: Exception) {
             ResultWrapper.Error(exceptionMapper.map(e))
         }
@@ -218,7 +218,6 @@ class StockRepository @Inject constructor(private val supabase: SupabaseClient, 
     }
 
     suspend fun workerExpirationDate(): ResultWrapper<List<Int>> {
-        // ALTERAÇÃO AQUI: O Supabase (tipo DATE) exige yyyy-MM-dd
         val formatter = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
 
         return try {
@@ -246,7 +245,6 @@ class StockRepository @Inject constructor(private val supabase: SupabaseClient, 
 
             ResultWrapper.Success(ids)
         } catch (e: Exception) {
-            // Agora o erro 'out of range' será capturado aqui se o formato estiver errado
             ResultWrapper.Error(exceptionMapper.map(e))
         }
     }
@@ -261,6 +259,26 @@ class StockRepository @Inject constructor(private val supabase: SupabaseClient, 
                 }.decodeList<StockModel>()
 
             ResultWrapper.Success(result)
+        } catch (e: Exception) {
+            ResultWrapper.Error(exceptionMapper.map(e))
+        }
+    }
+
+    suspend fun getStockByItemId(itemId: Int, listExpirationDate: List<String>): ResultWrapper<List<StockModel>> {
+        return try {
+            val result = supabase.from(DatabaseTables.STOCK)
+                .select {
+                    filter {
+                        eq("item_id", itemId)
+                        isIn("expiration_date", listExpirationDate)
+                    }
+                }
+                .decodeList<StockModel>()
+            if (result.isEmpty()) {
+                return ResultWrapper.Error(AppError.DataNotFound)
+            }
+            ResultWrapper.Success(result)
+
         } catch (e: Exception) {
             ResultWrapper.Error(exceptionMapper.map(e))
         }
