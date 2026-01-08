@@ -34,6 +34,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.ipca.socialstore.data.models.BeneficiaryModel
 import com.ipca.socialstore.data.models.SchedulingModel
+import com.ipca.socialstore.presentation.ui.theme.GreenIPCA
 
 @Composable
 fun SchedulingConfirmationView(
@@ -99,7 +100,7 @@ fun SchedulingConfirmationContent(
                     Box(
                         modifier = Modifier
                             .size(8.dp)
-                            .background(Color(0xFF4CAF50), CircleShape)
+                            .background(GreenIPCA, CircleShape)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
@@ -141,7 +142,7 @@ fun SchedulingConfirmationContent(
                     .fillMaxWidth()
                     .height(56.dp),
                 shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2E7D32))
+                colors = ButtonDefaults.buttonColors(containerColor = GreenIPCA)
             ) {
 
                 Text("Enviar", fontWeight = FontWeight.Bold, color = Color.White)

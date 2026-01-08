@@ -14,6 +14,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults.buttonColors
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -48,6 +49,7 @@ import com.ipca.socialstore.presentation.ui.components.SocialStoreDropdown
 import com.ipca.socialstore.presentation.ui.components.TextFieldDateComponent
 import com.ipca.socialstore.presentation.ui.components.TextFieldStringComponent
 import com.ipca.socialstore.presentation.ui.components.TextFieldValueComponent
+import com.ipca.socialstore.presentation.ui.theme.GreenIPCA
 import com.ipca.socialstore.presentation.ui.theme.SocialStoreTheme
 import com.ipca.socialstore.presentation.utils.navigation.NavigationLogic
 import java.text.SimpleDateFormat
@@ -142,7 +144,7 @@ fun CreateApplicationViewContent(
             onAcademicTypeChange = onTypeCourseUpdate,
             onAcademicCourseChange = onCourseUpdate,
             onAcademicNumberChange = onStudentNumberUpdate,
-            onIsStudentUpdate = {value -> onIsStudentUpdate(value)}
+            onIsStudentUpdate = {value -> onIsStudentUpdate(value)},
         )
 
         Button(
@@ -150,7 +152,8 @@ fun CreateApplicationViewContent(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(50.dp),
-            shape = RoundedCornerShape(12.dp)
+            shape = RoundedCornerShape(12.dp),
+            colors = buttonColors(GreenIPCA)
         ) {
             Text("Continuar", fontWeight = FontWeight.Bold)
         }
