@@ -16,6 +16,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.Email
+import androidx.compose.material.icons.outlined.PersonAdd
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults.buttonColors
 import androidx.compose.material3.CircularProgressIndicator
@@ -25,6 +26,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
@@ -50,6 +52,7 @@ import com.ipca.socialstore.presentation.ui.components.TextFieldDateComponent
 import com.ipca.socialstore.presentation.ui.components.TextFieldPasswordComponent
 import com.ipca.socialstore.presentation.ui.components.TextFieldStringComponent
 import com.ipca.socialstore.presentation.ui.theme.GreenIPCA
+import com.ipca.socialstore.presentation.ui.theme.IconBgColor
 import com.ipca.socialstore.presentation.ui.theme.IconTint
 import com.ipca.socialstore.presentation.ui.theme.SocialStoreTheme
 import java.text.SimpleDateFormat
@@ -104,12 +107,20 @@ fun RegisterViewContent(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically)
         ) {
-            Icon(
-                imageVector = Icons.Default.Add,
-                contentDescription = null,
-                modifier = Modifier.size(64.dp),
-                tint = IconTint
-            )
+            Surface(
+                modifier = Modifier.size(80.dp),
+                shape = RoundedCornerShape(20.dp),
+                color = IconBgColor
+            ) {
+                Icon(
+                    imageVector = Icons.Outlined.PersonAdd,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .fillMaxSize(),
+                    tint = IconTint
+                )
+            }
 
             Text(
                 text = "Criar Conta",

@@ -16,7 +16,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults.buttonColors
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -28,12 +31,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.ipca.socialstore.data.models.ItemModel
+import com.ipca.socialstore.presentation.ui.theme.GreenIPCA
+import com.ipca.socialstore.presentation.ui.theme.IconBgColor
+import com.ipca.socialstore.presentation.ui.theme.IconTint
 import com.ipca.socialstore.presentation.ui.theme.SocialStoreTheme
 
 
@@ -120,7 +127,7 @@ fun CreateItemViewContent(
 
                 if (uiState.listDate.size > 1) {
                     IconButton(onClick = { onRemoveFields(index) }) {
-                        Icon(Icons.Default.Delete, contentDescription = "Remover", tint = MaterialTheme.colorScheme.error)
+                        Icon(Icons.Outlined.Delete, contentDescription = "Remover", tint = MaterialTheme.colorScheme.error)
                     }
                 }
             }
@@ -128,26 +135,80 @@ fun CreateItemViewContent(
 
         TextButton(
             onClick = onAddFields,
+            colors = buttonColors(IconBgColor),
             modifier = Modifier.align(Alignment.Start)
         ) {
-            Icon(Icons.Default.Add, contentDescription = null)
+            Icon(Icons.Outlined.Add, tint = IconTint, contentDescription = null)
             Spacer(Modifier.width(4.dp))
-            Text("Adicionar outra data")
+            Text("Adicionar outra data", color = IconTint)
         }
 
         Spacer(Modifier.height(32.dp))
 
         Button(
             onClick = onClickCreate,
+            colors = buttonColors(GreenIPCA),
             modifier = Modifier.fillMaxWidth(),
             enabled = uiState.item.name.isNotBlank() && uiState.listDate.any { it.date.isNotBlank() }
         ) {
-            Text("Criar Item e Guardar Stock")
+            Text("Criar Item e Guardar Stock", color = Color.White)
         }
     }
 }
 
+@Preview(showBackground = true, name = "1. Formulário Vazio")
+@Composable
+fun PreviewCreateItemEmpty() {
+    val emptyState = ItemState(
+        item = ItemModel(name = "", itemType = ""),
+        isLoading = false,
+        error = null
+    )
 
+    SocialStoreTheme {
+        CreateItemViewContent(
+            modifier = Modifier.fillMaxSize(),
+            uiState = emptyState,
+            onItemNameUpdate = {},
+            onItemTypeUpdate = {},
+            onUpdateList = { _, _, _ -> },
+            onAddFields = {},
+            onRemoveFields = {},
+            onClickCreate = {}
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "2. Formulário Preenchido")
+@Composable
+fun PreviewCreateItemFilled() {
+    val filledState = ItemState(
+        item = ItemModel(name = "Leite UHT Meio Gordo", itemType = "Laticínios"),
+        isLoading = false,
+        error = null
+    )
+
+    SocialStoreTheme {
+        CreateItemViewContent(
+            modifier = Modifier.fillMaxSize(),
+            uiState = filledState,
+            onItemNameUpdate = {},
+            onItemTypeUpdate = {},
+            onUpdateList = { _, _, _ -> },
+            onAddFields = {},
+            onRemoveFields = {},
+            onClickCreate = {}
+        )
+    }
+}
+
+// --- MOCK CLASS (Apenas se não tiveres acesso à classe real no preview) ---
+// Se o 'listDate' usar uma classe que não consegues instanciar aqui,
+// comenta esta classe e usa a tua verdadeira.
+data class ItemDate(
+    val date: String = "",
+    val quantity: String = ""
+)
 /*
 @Preview(showBackground = true, name = "Criar Item - Vazio")
 @Composable

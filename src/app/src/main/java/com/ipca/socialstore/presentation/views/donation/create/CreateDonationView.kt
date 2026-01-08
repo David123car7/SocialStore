@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults.buttonColors
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -17,6 +18,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.ipca.socialstore.presentation.ui.theme.GreenIPCA
 import com.ipca.socialstore.presentation.ui.theme.SocialStoreTheme
 
 @Composable
@@ -101,6 +103,7 @@ fun CreateDonationViewContent(
 
         Button(
             modifier = Modifier.padding(8.dp),
+            colors = buttonColors(GreenIPCA),
             onClick = {onClickCreate()}
         ) {
             Text("CreateDonation")
@@ -108,18 +111,28 @@ fun CreateDonationViewContent(
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, name = "Formulário de Doação")
 @Composable
-fun PreviewCreateDonation() { //falta uistate
-    SocialStoreTheme() {/*
+fun PreviewCreateDonation() {
+    val mockState = DonationState(
+        // item = mockItem,              <-- Descomenta e usa as tuas classes
+        // donation = mockDonation,      <-- Descomenta e usa as tuas classes
+        quantity = 10,
+        expirationDate = "10/12/2025"
+    )
+
+    SocialStoreTheme {
         CreateDonationViewContent(
-            Modifier,
-            uiState,
-            onUpdateDate = { Unit },
-            onClickCreate = { Unit },
-            onUpdateQuantity = { Unit},
-            onUpdateExpiration = { Unit},
-            onUpdateItemType = { Unit},
-            onUpdateName = { Unit},)*/
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            uiState = mockState,
+            onUpdateDate = {},
+            onUpdateName = {},
+            onUpdateItemType = {},
+            onUpdateQuantity = {},
+            onUpdateExpiration = {},
+            onClickCreate = {}
+        )
     }
 }
