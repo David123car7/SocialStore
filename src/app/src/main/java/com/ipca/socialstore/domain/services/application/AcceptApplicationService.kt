@@ -6,6 +6,7 @@ import com.ipca.socialstore.data.enums.UserRole
 import com.ipca.socialstore.data.models.ApplicationModel
 import com.ipca.socialstore.data.models.ApplicationStateModel
 import com.ipca.socialstore.data.models.BeneficiaryModel
+import com.ipca.socialstore.data.pdfbox.PdfGenerator
 import com.ipca.socialstore.data.repository.ApplicationStateRepository
 import com.ipca.socialstore.data.repository.AuthRepository
 import com.ipca.socialstore.data.repository.BeneficiaryRepository

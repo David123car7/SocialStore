@@ -35,6 +35,7 @@ import androidx.navigation.NavController
 import com.ipca.socialstore.data.enums.UserRole
 import com.ipca.socialstore.data.models.BeneficiaryModel
 import com.ipca.socialstore.data.models.SchedulingModel
+import com.ipca.socialstore.presentation.ui.theme.GreenIPCA
 
 @Composable
 fun SchedulingConfirmationView(
@@ -103,7 +104,7 @@ fun SchedulingConfirmationContent(
                     Box(
                         modifier = Modifier
                             .size(8.dp)
-                            .background(Color(0xFF4CAF50), CircleShape)
+                            .background(GreenIPCA, CircleShape)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(

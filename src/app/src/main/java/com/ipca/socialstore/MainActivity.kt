@@ -61,6 +61,8 @@ import com.ipca.socialstore.presentation.views.campaign.create.CreateCampaignVie
 import com.ipca.socialstore.presentation.views.campaign.edit.CampaignEditView
 import com.ipca.socialstore.presentation.views.campaigns.CampaignsListView
 import com.ipca.socialstore.presentation.views.donation.listAllDonations.ListAllDonationsView
+import com.ipca.socialstore.presentation.views.campaign.list.CampaignsListView
+import com.ipca.socialstore.presentation.views.campaigns.CampaignsAdminListView
 import com.ipca.socialstore.presentation.views.home.adminHome.AdminHomeView
 import com.ipca.socialstore.presentation.views.home.beneficiaryHome.BeneficiaryHomeView
 import com.ipca.socialstore.presentation.views.home.defaultHomeView.DefaultHomeView
@@ -108,6 +110,10 @@ class MainActivity : ComponentActivity() {
                             TestHomeView(modifier = Modifier.padding(innerPadding),
                                 navController = navController, userRole = mainState.userRole)
                         }
+                        composable<GeneralRoutes.CampaignsList>{
+                            CampaignsListView(modifier = Modifier.padding(innerPadding),
+                                navController = navController, userRole = mainState.userRole)
+                        }
                         composable<GeneralRoutes.Login>{
                             LoginView(modifier = Modifier.padding(innerPadding),
                                 navController = navController, userRole = mainState.userRole)
@@ -140,7 +146,7 @@ class MainActivity : ComponentActivity() {
                             ListApplicationsView(modifier = Modifier.padding(innerPadding), navController = navController, userRole = mainState.userRole)
                         }
                         composable<AdminRoutes.CampaignList>{
-                            CampaignsListView(modifier = Modifier.padding(innerPadding), navController = navController, userRole = mainState.userRole)
+                            CampaignsAdminListView(modifier = Modifier.padding(innerPadding), navController = navController, userRole = mainState.userRole)
                         }
                         composable(
                             route = AdminRoutes.CampaignEdit::class.qualifiedName!! + "/{campaign_id}",

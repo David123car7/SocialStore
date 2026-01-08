@@ -37,6 +37,7 @@ import androidx.navigation.NavController
 import com.ipca.socialstore.data.enums.UserRole
 import com.ipca.socialstore.data.models.BeneficiaryModel
 import com.ipca.socialstore.data.models.SchedulingModel
+import com.ipca.socialstore.presentation.ui.theme.GreenIPCA
 
 @Composable
 fun JustificationScreenView(
@@ -175,6 +176,35 @@ fun JustificationScreenContent(
 
     }
 }
+@Preview(showBackground = true, name = "1. Ecrã de Justificação (Por preencher)")
+@Composable
+fun JustificationScreenPreviewEditable() {
+    // 1. Criar dados Mock baseados na imagem_67a1ad.png
+    val mockBeneficiary = BeneficiaryModel(
+        id = 27973,
+        name = "David Carvalho",
+        phoneNumber = "912345678",
+        birthDate = "2000-01-01",
+        academicId = null
+    )
+
+    // 2. Criar dados Mock baseados na imagem_67a18e.png
+    val mockScheduling = SchedulingModel(
+        id = 1,
+        schedulingDate = "08/01/2026",
+        beneficiaryId = 27973,
+        state = "absent", // Estado de falta injustificada
+        reason = null,
+        note = null
+    )
+
+    val uiState = JustificationState(
+        beneficiary = mockBeneficiary,
+        scheduling = mockScheduling,
+        reason = "",
+        isLoading = false,
+        error = null
+    )
 
 
 @Preview(showBackground = true, showSystemUi = true)

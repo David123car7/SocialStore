@@ -24,6 +24,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -134,7 +135,7 @@ fun ListAllSchedulingUserContent(
                     }
                 ,
                 leadingIcon = if (selectedTab == "proximos") {
-                    { Icon(Icons.Default.Check, contentDescription = null, modifier = Modifier.size(18.dp)) }
+                    { Icon(Icons.Outlined.Check, contentDescription = null, modifier = Modifier.size(18.dp)) }
                 } else null
             )
 

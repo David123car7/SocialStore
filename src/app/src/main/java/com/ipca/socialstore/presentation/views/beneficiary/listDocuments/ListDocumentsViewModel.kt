@@ -27,6 +27,7 @@ data class ListDocumentsState (
     val documentsOtherIncome: List<DocumentReceiverModel> = emptyList(),
     val documentsPermanentExpenses: List<DocumentReceiverModel> = emptyList(),
     val documentsInternationalSupport: List<DocumentReceiverModel> = emptyList(),
+    val documentsRequirement: List<DocumentReceiverModel> = emptyList(),
 
     val isLoading: Boolean = false,
     val error: ErrorText? = null,
@@ -101,12 +102,18 @@ class ListDocumentsViewModel @Inject constructor(
                 documentType = DocumentType.INTERNATIONAL_SUPPORT.folderName
             )
 
+            val requirementDocs = getDocuments(
+                applicationId = applicationId,
+                documentType = DocumentType.REQUERIMENT.folderName
+            )
+
             uiState.value = uiState.value.copy(
                 documentsBankStatements = docBankStatements,
                 documentsOtherIncome = docOtherIncome,
                 documentsIncomeProof = docIncomeProof,
                 documentsInternationalSupport = docInternationalSupport,
-                documentsPermanentExpenses = docPermanentExpenses
+                documentsPermanentExpenses = docPermanentExpenses,
+                documentsRequirement = requirementDocs
             )
         }
     }

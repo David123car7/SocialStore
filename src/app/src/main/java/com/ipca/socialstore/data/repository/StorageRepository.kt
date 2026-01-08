@@ -3,6 +3,7 @@ package com.ipca.socialstore.data.repository
 import android.content.Context
 import android.net.Uri
 import android.provider.OpenableColumns
+import android.util.Log
 import com.ipca.socialstore.data.enums.StorageBucket
 import com.ipca.socialstore.data.exceptions.AppError
 import com.ipca.socialstore.data.exceptions.ExceptionMapper
@@ -32,7 +33,6 @@ class StorageRepository @Inject constructor(
                         uploadedPaths.add(result.data)
                     }
                     is ResultWrapper.Error -> {
-                        //Delete all files that were stored before error
                         return ResultWrapper.Error(result.error)
                     }
                 }
@@ -65,6 +65,22 @@ class StorageRepository @Inject constructor(
                 upsert = false // Don't overwrite existing files
             }
 
+            ResultWrapper.Success(filePath)
+        } catch (e: Exception) {
+            ResultWrapper.Error(exceptionMapper.map(e))
+        }
+    }
+
+
+    suspend fun uploadApplicationDocumentBytes(bytes: ByteArray, fileName: String, folderName: String, context: Context): ResultWrapper<String> {
+        return try {
+            val userId = supabaseClient.auth.currentUserOrNull()?.id
+                ?: return ResultWrapper.Error(AppError.UserNotFound)
+            val filePath = "$userId/$folderName/$fileName"
+            val bucket = supabaseClient.storage.from(StorageBucket.APPLICATION_DOCUMENTS.bucketName)
+            val x = bucket.upload(path = filePath, data = bytes) {
+                upsert = false // Don't overwrite existing files
+            }
             ResultWrapper.Success(filePath)
         } catch (e: Exception) {
             ResultWrapper.Error(exceptionMapper.map(e))

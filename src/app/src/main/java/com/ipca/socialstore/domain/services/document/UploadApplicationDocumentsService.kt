@@ -2,6 +2,7 @@ package com.ipca.socialstore.domain.services.document
 
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import com.ipca.socialstore.data.enums.ApplicationDocumentTypeState
 import com.ipca.socialstore.data.enums.DocumentStatus
 import com.ipca.socialstore.data.exceptions.AppError
@@ -29,6 +30,7 @@ class UploadApplicationDocumentsService @Inject constructor(
     private val userRepository: UserRepository,
     private val authRepository: AuthRepository){
     suspend operator fun invoke(filesList: List<Uri>, folderName: String, context: Context) : ResultWrapper<Unit>{
+        Log.d("App Error", "GG")
         val uidResult = authRepository.getUserUid()
         if (uidResult is ResultWrapper.Error) return ResultWrapper.Error(uidResult.error)
         val uid = (uidResult as ResultWrapper.Success).data

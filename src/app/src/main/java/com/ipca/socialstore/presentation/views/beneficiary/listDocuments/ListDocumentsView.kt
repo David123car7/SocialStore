@@ -157,6 +157,13 @@ fun ListDocumentsContent(
             bgColor = Color.White,
             onDownloadFile = { fileName, path -> onDownloadFile(fileName, path)}
         )
+
+        Documents(
+            documentsList = uiState.documentsRequirement,
+            tittle = "Requerimento",
+            bgColor = Color.White,
+            onDownloadFile = { fileName, path -> onDownloadFile(fileName, path)}
+        )
     }
 }
 
