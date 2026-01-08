@@ -9,6 +9,16 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountBox
+import androidx.compose.material.icons.filled.Badge
+import androidx.compose.material.icons.filled.CalendarToday
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.MenuBook
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Phone
+import androidx.compose.material.icons.filled.School
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -21,8 +31,10 @@ import androidx.navigation.NavController
 import com.ipca.socialstore.data.enums.UserRole
 import com.ipca.socialstore.presentation.routes.BeneficiaryRoutes
 import com.ipca.socialstore.presentation.ui.components.CategoryBoxEdit
+import com.ipca.socialstore.presentation.ui.components.InfoRow
 import com.ipca.socialstore.presentation.ui.components.IntroductionComponent
 import com.ipca.socialstore.presentation.ui.components.ReadOnlyField
+import com.ipca.socialstore.presentation.ui.components.SectionTitle
 import com.ipca.socialstore.presentation.utils.navigation.NavigationLogic
 import com.ipca.socialstore.presentation.views.application.applicationState.CategoryBox
 import com.ipca.socialstore.presentation.views.beneficiary.listDocuments.ListDocumentsViewModel
@@ -67,30 +79,18 @@ fun BeneficiaryProfileContent(
             title = "Dados Pessoais",
             onEditClick = onEditClick
         ) {
-            ReadOnlyField("Nome Completo", uiState.beneficiary.name)
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                Box(Modifier.weight(1f)) {
-                    ReadOnlyField("Data Nasc.", uiState.beneficiary.birthDate)
-                }
-                Box(Modifier.weight(1f)) {
-                    ReadOnlyField("Telemóvel", uiState.beneficiary.phoneNumber)
-                }
-            }
+            InfoRow(label = "Nome Completo", value = uiState.beneficiary.name, icon = Icons.Default.Person)
+            InfoRow(label = "Telemóvel", value = uiState.beneficiary.phoneNumber, icon = Icons.Default.Phone)
+            InfoRow(label = "Data Nasc.", value = uiState.beneficiary.birthDate, icon = Icons.Default.CalendarToday)
         }
 
         if(uiState.academicData.id != null){
             CategoryBox(
                 title = "Dados Académicos",
             ) {
-                ReadOnlyField("Numero Estudante: ", uiState.academicData.studenNumber)
-                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Box(Modifier.weight(1f)) {
-                        ReadOnlyField("Tipo de Curso: ", uiState.academicData.typeCourse)
-                    }
-                    Box(Modifier.weight(1f)) {
-                        ReadOnlyField("Curso: ", uiState.academicData.course)
-                    }
-                }
+                InfoRow(label = "Numero de Estudante", value = uiState.academicData.studenNumber, icon = Icons.Default.AccountBox)
+                InfoRow(label = "Formação", value = uiState.academicData.typeCourse, icon = Icons.Default.School)
+                InfoRow(label = "Curso", value = uiState.academicData.course, icon = Icons.Default.MenuBook)
             }
         }
     }

@@ -11,11 +11,14 @@ import com.ipca.socialstore.data.models.AcademicModel
 import com.ipca.socialstore.data.models.ApplicationDataStateModel
 import com.ipca.socialstore.data.models.ApplicationModel
 import com.ipca.socialstore.data.models.ApplicationStateModel
+import com.ipca.socialstore.data.models.ScholarshipModel
+import com.ipca.socialstore.data.pdfbox.PdfGenerator
 import com.ipca.socialstore.data.repository.AcademicRepository
 import com.ipca.socialstore.data.repository.ApplicationDataStateRepository
 import com.ipca.socialstore.data.repository.ApplicationRepository
 import com.ipca.socialstore.data.repository.ApplicationStateRepository
 import com.ipca.socialstore.data.repository.AuthRepository
+import com.ipca.socialstore.data.repository.ScholarshipRepository
 import com.ipca.socialstore.data.repository.UserRepository
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
 import com.ipca.socialstore.domain.appDocType.CreateAllAppDocTypesUseCase
@@ -29,9 +32,9 @@ class CreateApplicationService @Inject constructor(
     private val userRepository: UserRepository,
     private val applicationStateRepository: ApplicationStateRepository,
     private val createAllAppDocTypesUseCase: CreateAllAppDocTypesUseCase,
-    private val applicationDataStateRepository: ApplicationDataStateRepository) {
-    @RequiresApi(Build.VERSION_CODES.O)
-    suspend operator fun invoke(applicationModel: ApplicationModel, academicModel: AcademicModel?): ResultWrapper<Int> {
+    private val applicationDataStateRepository: ApplicationDataStateRepository,
+    private val scholarshipRepository: ScholarshipRepository) {
+    suspend operator fun invoke(applicationModel: ApplicationModel, academicModel: AcademicModel?, scholarshipModel: ScholarshipModel?): ResultWrapper<Int> {
         val emailResult = authRepository.getUserEmail()
         if (emailResult is ResultWrapper.Error) return ResultWrapper.Error(emailResult.error)
 
@@ -89,10 +92,17 @@ class CreateApplicationService @Inject constructor(
         if(dataStateResult is ResultWrapper.Error) return ResultWrapper.Error(dataStateResult.error)
         val dataStateId = (dataStateResult as ResultWrapper.Success).data
 
+        var scholarShipId: Int? = null
+        if(scholarshipModel != null){
+            val scholarshipResult = scholarshipRepository.createScholarship(scholarship = scholarshipModel)
+            if(scholarshipResult is ResultWrapper.Error) return ResultWrapper.Error(scholarshipResult.error)
+            scholarShipId = (scholarshipResult as ResultWrapper.Success).data
+        }
+
         val formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd")
         val currentDate = LocalDate.now().format(formatter)
         val applicationResult = applicationRepository.createApplication(
-            applicationModel.copy(stateId = stateId, academicId = academicID, email = email, createdAt = currentDate, dataStateId = dataStateId)
+            applicationModel.copy(stateId = stateId, academicId = academicID, email = email, createdAt = currentDate, dataStateId = dataStateId, scholarshipId =scholarShipId)
         )
 
         if(applicationResult is ResultWrapper.Error) return ResultWrapper.Error(applicationResult.error)

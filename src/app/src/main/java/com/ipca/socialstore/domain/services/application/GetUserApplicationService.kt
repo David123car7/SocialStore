@@ -1,11 +1,13 @@
 package com.ipca.socialstore.domain.services.application
 
 import com.ipca.socialstore.data.models.AcademicModel
+import com.ipca.socialstore.data.models.ScholarshipModel
 import com.ipca.socialstore.data.repository.AcademicRepository
 import com.ipca.socialstore.data.repository.ApplicationDataStateRepository
 import com.ipca.socialstore.data.repository.ApplicationRepository
 import com.ipca.socialstore.data.repository.ApplicationStateRepository
 import com.ipca.socialstore.data.repository.AuthRepository
+import com.ipca.socialstore.data.repository.ScholarshipRepository
 import com.ipca.socialstore.data.repository.UserRepository
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
 import com.ipca.socialstore.presentation.models.ApplicationModelReceiver
@@ -18,7 +20,8 @@ class GetUserApplicationService @Inject constructor(
     private val applicationRepository: ApplicationRepository,
     private val applicationStateRepository: ApplicationStateRepository,
     private val applicationDataStateRepository: ApplicationDataStateRepository,
-    private val academicRepository: AcademicRepository
+    private val academicRepository: AcademicRepository,
+    private val scholarshipRepository: ScholarshipRepository
 ) {
     suspend operator fun invoke(appId: Int? = null): ResultWrapper<ApplicationModelReceiver> {
         var applicationId = appId
@@ -57,6 +60,14 @@ class GetUserApplicationService @Inject constructor(
             academicData = (academicDataResult as ResultWrapper.Success).data
         }
 
+        var scholarShipData: ScholarshipModel? = null
+        if(application.scholarshipId != null){
+            val scholarShipResult = scholarshipRepository.getScholarship(id = application.scholarshipId)
+            if (scholarShipResult is ResultWrapper.Error)
+                return ResultWrapper.Error(error = scholarShipResult.error)
+            scholarShipData = (scholarShipResult as ResultWrapper.Success).data
+        }
+
         return ResultWrapper.Success(
             ApplicationModelReceiver(
                 id = applicationId,
@@ -67,10 +78,13 @@ class GetUserApplicationService @Inject constructor(
                 cc = application.cc,
                 createdAt = application.createdAt,
                 birthDate = application.birthDate,
+                offCountry = application.offCountry,
                 requestType = getRequestTypeDisplayLabel(application.requestType),
                 applicationState = state,
                 applicationDataState = dataState,
-                academicData = academicData
+                academicData = academicData,
+                scholarShip = scholarShipData,
+                faes = application.faes
             )
         )
     }
