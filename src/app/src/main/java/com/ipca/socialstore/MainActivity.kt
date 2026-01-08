@@ -52,6 +52,9 @@ import com.ipca.socialstore.presentation.views.beneficiary.listDocuments.ListDoc
 import com.ipca.socialstore.presentation.views.basket.preparation.BasketPreparationView
 import com.ipca.socialstore.presentation.views.beneficiary.editProfile.BeneficiaryEditProfileView
 import com.ipca.socialstore.presentation.views.beneficiary.listDocuments.ListDocumentsView
+import com.ipca.socialstore.presentation.views.basket.preparation.BasketPreparationView
+import com.ipca.socialstore.presentation.views.beneficiary.editProfile.BeneficiaryEditProfileView
+import com.ipca.socialstore.presentation.views.beneficiary.listDocuments.ListDocumentsView
 import com.ipca.socialstore.presentation.views.beneficiary.managment.BeneficiaryManagementView
 import com.ipca.socialstore.presentation.views.beneficiary.profile.BeneficiaryProfileView
 import com.ipca.socialstore.presentation.views.campaign.create.CreateCampaignView
