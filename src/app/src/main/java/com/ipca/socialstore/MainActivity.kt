@@ -43,13 +43,24 @@ import com.ipca.socialstore.presentation.views.application.applicationStateAdmin
 import com.ipca.socialstore.presentation.views.application.createApplication.CreateApplicationView
 import com.ipca.socialstore.presentation.views.application.listApplications.ListApplicationsView
 import com.ipca.socialstore.presentation.views.authentication.resetPassword.ResetPasswordView
+
+
+import com.ipca.socialstore.presentation.views.basket.preparation.BasketPreparationView
+
 import com.ipca.socialstore.presentation.views.beneficiary.editProfile.BeneficiaryEditProfileView
 import com.ipca.socialstore.presentation.views.beneficiary.listDocuments.ListDocumentsView
+
+
+import com.ipca.socialstore.presentation.views.basket.preparation.BasketPreparationView
+import com.ipca.socialstore.presentation.views.beneficiary.editProfile.BeneficiaryEditProfileView
+import com.ipca.socialstore.presentation.views.beneficiary.listDocuments.ListDocumentsView
+
 import com.ipca.socialstore.presentation.views.beneficiary.managment.BeneficiaryManagementView
 import com.ipca.socialstore.presentation.views.beneficiary.profile.BeneficiaryProfileView
 import com.ipca.socialstore.presentation.views.campaign.create.CreateCampaignView
 import com.ipca.socialstore.presentation.views.campaign.edit.CampaignEditView
-import com.ipca.socialstore.presentation.views.campaigns.CampaignsListView
+import com.ipca.socialstore.presentation.views.campaign.list.CampaignsListView
+import com.ipca.socialstore.presentation.views.campaigns.CampaignsAdminListView
 import com.ipca.socialstore.presentation.views.home.adminHome.AdminHomeView
 import com.ipca.socialstore.presentation.views.home.beneficiaryHome.BeneficiaryHomeView
 import com.ipca.socialstore.presentation.views.home.defaultHomeView.DefaultHomeView
@@ -97,6 +108,10 @@ class MainActivity : ComponentActivity() {
                             TestHomeView(modifier = Modifier.padding(innerPadding),
                                 navController = navController, userRole = mainState.userRole)
                         }
+                        composable<GeneralRoutes.CampaignsList>{
+                            CampaignsListView(modifier = Modifier.padding(innerPadding),
+                                navController = navController, userRole = mainState.userRole)
+                        }
                         composable<GeneralRoutes.Login>{
                             LoginView(modifier = Modifier.padding(innerPadding),
                                 navController = navController, userRole = mainState.userRole)
@@ -129,7 +144,7 @@ class MainActivity : ComponentActivity() {
                             ListApplicationsView(modifier = Modifier.padding(innerPadding), navController = navController, userRole = mainState.userRole)
                         }
                         composable<AdminRoutes.CampaignList>{
-                            CampaignsListView(modifier = Modifier.padding(innerPadding), navController = navController, userRole = mainState.userRole)
+                            CampaignsAdminListView(modifier = Modifier.padding(innerPadding), navController = navController, userRole = mainState.userRole)
                         }
                         composable(
                             route = AdminRoutes.CampaignEdit::class.qualifiedName!! + "/{campaign_id}",
@@ -223,6 +238,17 @@ class MainActivity : ComponentActivity() {
                             )
                         ) {
                             SchedulingMainPageView(
+                                modifier = Modifier.padding(innerPadding),
+                                navController = navController
+                            )
+                        }
+                        composable(
+                            route = AdminRoutes.CreateDeliver::class.qualifiedName!! + "/{beneficiaryId}",
+                            arguments = listOf(
+                                navArgument("beneficiaryId") { type = NavType.StringType }
+                            )
+                        ) {
+                            BasketPreparationView(
                                 modifier = Modifier.padding(innerPadding),
                                 navController = navController
                             )

@@ -1,13 +1,8 @@
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.CreditCard
@@ -33,8 +28,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.ipca.socialstore.data.enums.RequestType
 import com.ipca.socialstore.data.enums.TypeCourse
+import com.ipca.socialstore.presentation.ui.components.BooleanSwitchComponent
 import com.ipca.socialstore.presentation.ui.components.RequestTypeSelection
 import com.ipca.socialstore.presentation.ui.components.SocialStoreDropdown
 import com.ipca.socialstore.presentation.ui.components.TextFieldDateComponent
@@ -58,12 +53,13 @@ fun ApplicationForm(
 
     // --- 2. Logic Values ---
     isStudent: Boolean = false,
-    isAdmin: Boolean = false,
+    isEditing: Boolean = false,
 
     // --- 3. Individual Values (Academic Data) ---
     academicCourseType: String,
     academicCourseName: String,
     academicStudentNumber: String,
+    scholarShipValue: String,
 
     // --- 4. Callbacks (Events) ---
     onNameChange: (String) -> Unit,
@@ -72,13 +68,22 @@ fun ApplicationForm(
     onPhoneChange: (String) -> Unit,
     onYearChange: (String) -> Unit,
     onRequestTypeChange: (String) -> Unit,
+    onOffCountryUpdate:(Boolean) -> Unit,
+    onFaesUpdate:(Boolean) -> Unit,
+    onScholarShipValueUpdate:(String) -> Unit,
+    onScholarShipUpdate:(Boolean)-> Unit,
+
 
     onAcademicTypeChange: (String) -> Unit,
     onAcademicCourseChange: (String) -> Unit,
     onAcademicNumberChange: (String) -> Unit,
     onIsStudentUpdate:(Boolean) -> Unit,
 ) {
-    var isRequestTypeExpanded by remember { mutableStateOf(false) }
+    var isOffCountryChecked by remember { mutableStateOf(false) }
+    var isFaesChecked by remember { mutableStateOf(false) }
+    var isScholarShipChecked by remember { mutableStateOf(false) }
+
+
     var isCourseTypeExpanded by remember { mutableStateOf(false) }
     var isStudentLocal by remember { mutableStateOf(isStudent) }
     var showDatePicker by remember { mutableStateOf(false) }
@@ -154,14 +159,14 @@ fun ApplicationForm(
             onValueUpdate = onYearChange
         )
 
-        RequestTypeSelection(
-            currentSelectionString = requestType,
-            onSelectionChange = { newCombinedString ->
-                onRequestTypeChange(newCombinedString)
-            }
-        )
+        if(!isEditing){
+            RequestTypeSelection(
+                currentSelectionString = requestType,
+                onSelectionChange = { newCombinedString ->
+                    onRequestTypeChange(newCombinedString)
+                }
+            )
 
-        if(!isAdmin){
             HorizontalDivider(thickness = 2.dp, color = Color.LightGray)
 
             Row(
@@ -226,6 +231,45 @@ fun ApplicationForm(
                     value = academicStudentNumber,
                     icon = Icons.Default.Star,
                     onValueUpdate = onAcademicNumberChange
+                )
+            }
+        }
+
+        if(!isEditing) {
+            BooleanSwitchComponent(
+                title = "Pais de Terceiros",
+                checked = isOffCountryChecked,
+                onCheckedChange = {
+                    isOffCountryChecked = !isOffCountryChecked
+                    onOffCountryUpdate(isOffCountryChecked)
+                }
+            )
+
+            BooleanSwitchComponent(
+                title = "Fundo de Apoio de Emergência Social (FAES)?",
+                checked = isFaesChecked,
+                onCheckedChange = {
+                    isFaesChecked = !isFaesChecked
+                    onFaesUpdate(isFaesChecked)
+                }
+            )
+
+            BooleanSwitchComponent(
+                title = "É beneficiário de alguma bolsa de estudo ou apoio?",
+                checked = isScholarShipChecked,
+                onCheckedChange = {
+                    isScholarShipChecked = !isScholarShipChecked
+                    onScholarShipUpdate(isScholarShipChecked)
+                }
+            )
+
+            if(isScholarShipChecked){
+                TextFieldValueComponent(
+                    modifier = Modifier,
+                    label = "Valor",
+                    value = scholarShipValue,
+                    icon = Icons.Default.Star,
+                    onValueUpdate = onScholarShipValueUpdate
                 )
             }
         }

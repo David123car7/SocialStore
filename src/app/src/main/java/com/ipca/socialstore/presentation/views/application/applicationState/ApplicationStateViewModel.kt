@@ -2,6 +2,7 @@ package com.ipca.socialstore.presentation.views.application.applicationState
 
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -9,11 +10,13 @@ import com.ipca.socialstore.data.enums.ApplicationDataStatus
 import com.ipca.socialstore.data.enums.ApplicationDocumentTypeState
 import com.ipca.socialstore.data.enums.ApplicationStates
 import com.ipca.socialstore.data.enums.DocumentType
+import com.ipca.socialstore.data.enums.StorageBucket
 import com.ipca.socialstore.data.exceptions.AppError
 import com.ipca.socialstore.data.models.ApplicationDataStateModel
 import com.ipca.socialstore.data.models.ApplicationDocumentTypeModel
 import com.ipca.socialstore.data.models.ApplicationModel
 import com.ipca.socialstore.data.models.ApplicationStateModel
+import com.ipca.socialstore.data.models.ScholarshipModel
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
 import com.ipca.socialstore.domain.appDocType.GetAppDocTypesUseCase
 import com.ipca.socialstore.domain.appDocType.UpdateAppDocTypeUseCase
@@ -24,13 +27,19 @@ import com.ipca.socialstore.domain.services.application.UpdateApplicationService
 import com.ipca.socialstore.domain.services.document.DeleteDocumentService
 import com.ipca.socialstore.domain.services.document.GetApplicationDocumentsService
 import com.ipca.socialstore.domain.services.document.UploadApplicationDocumentsService
+import com.ipca.socialstore.domain.storage.DownloadFileUseCase
 import com.ipca.socialstore.presentation.models.ApplicationModelReceiver
 import com.ipca.socialstore.presentation.models.DocumentReceiverModel
 import com.ipca.socialstore.presentation.utils.errors.ErrorText
 import com.ipca.socialstore.presentation.utils.errors.asUiText
+import com.ipca.socialstore.presentation.utils.files.FileSaveManager
 import com.ipca.socialstore.presentation.utils.files.getFileNameFromUri
+import com.ipca.socialstore.presentation.views.application.applicationStateAdmin.ApplicationStateAdminViewModel
+import com.ipca.socialstore.presentation.views.application.applicationStateAdmin.ApplicationStateAdminViewModel.DownloadEvent
 import com.ipca.socialstore.presentation.views.application.applicationStateAdmin.createEmptyDocumentTypeModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -48,18 +57,21 @@ data class ApplicationState(
     val selectedOtherIncome: List<Uri> = emptyList(),
     val selectedPermanentExpenses: List<Uri> = emptyList(),
     val selectedInternationalSupport: List<Uri> = emptyList(),
+    val selectedRequirement: List<Uri> = emptyList(),
 
     val documentsBankStatements: List<DocumentReceiverModel> = emptyList(),
     val documentsIncomeProof: List<DocumentReceiverModel> = emptyList(),
     val documentsOtherIncome: List<DocumentReceiverModel> = emptyList(),
     val documentsPermanentExpenses: List<DocumentReceiverModel> = emptyList(),
     val documentsInternationalSupport: List<DocumentReceiverModel> = emptyList(),
+    val documentsRequirement: List<DocumentReceiverModel> = emptyList(),
 
     val bankStatementDocsState: ApplicationDocumentTypeModel = createEmptyDocumentTypeModel(),
     val incomeProofDocsState: ApplicationDocumentTypeModel = createEmptyDocumentTypeModel(),
     val otherIncomeDocsState: ApplicationDocumentTypeModel = createEmptyDocumentTypeModel(),
     val permanentExpensesDocsState: ApplicationDocumentTypeModel = createEmptyDocumentTypeModel(),
     val internationalSupportDocsState: ApplicationDocumentTypeModel = createEmptyDocumentTypeModel(),
+    val documentsRequirementState: ApplicationDocumentTypeModel = createEmptyDocumentTypeModel()
     )
 
 @HiltViewModel
@@ -72,9 +84,22 @@ class ApplicationStateViewModel @Inject constructor(
     private val deleteApplicationService: DeleteApplicationService,
     private val updateApplicationService: UpdateApplicationService,
     private val updateAppDocTypeUseCase: UpdateAppDocTypeUseCase,
-    private val updateApplicationStateUseCase: UpdateApplicationStateUseCase) : ViewModel(){
+    private val updateApplicationStateUseCase: UpdateApplicationStateUseCase,
+    private val downloadFileUseCase: DownloadFileUseCase,
+    private val fileSaveManager: FileSaveManager) : ViewModel(){
 
     var uiState = mutableStateOf(ApplicationState())
+
+    sealed class DownloadEvent {
+        object Loading : DownloadEvent()
+        data class Error(val message: String) : DownloadEvent()
+        data class Success(val message: String) : DownloadEvent()
+        data class PromptUserToSave(val fileName: String) : DownloadEvent()
+    }
+
+    private val _downloadEvent = Channel<DownloadEvent>()
+    val downloadEvent = _downloadEvent.receiveAsFlow()
+    private var pendingFileBytes: ByteArray? = null
 
     init {
         viewModelScope.launch {
@@ -127,12 +152,18 @@ class ApplicationStateViewModel @Inject constructor(
                 documentType = DocumentType.INTERNATIONAL_SUPPORT.folderName
             )
 
+            val requirementDocs = getDocuments(
+                applicationId = applicationId,
+                documentType = DocumentType.REQUERIMENT.folderName
+            )
+
             uiState.value = uiState.value.copy(
                 documentsBankStatements = docBankStatements,
                 documentsOtherIncome = docOtherIncome,
                 documentsIncomeProof = docIncomeProof,
                 documentsInternationalSupport = docInternationalSupport,
-                documentsPermanentExpenses = docPermanentExpenses
+                documentsPermanentExpenses = docPermanentExpenses,
+                documentsRequirement = requirementDocs
             )
             getAppDocTypeStates(applicationId = applicationId)
         }
@@ -186,6 +217,50 @@ class ApplicationStateViewModel @Inject constructor(
         }
     }
 
+    fun updateFaes(value: Boolean) {
+        uiState.value = uiState.value.copy(
+            application = uiState.value.application.copy(faes = value)
+        )
+    }
+
+    fun updateScholarShipValue(newValue: String) {
+        val float = newValue.toFloatOrNull() ?: return
+        val currentApp = uiState.value.application
+
+        val updatedScholarship = currentApp.scholarShip?.copy(
+            value = float
+        ) ?: ScholarshipModel(value = float)
+
+        uiState.value = uiState.value.copy(
+            application = currentApp.copy(
+                scholarShip = updatedScholarship
+            )
+        )
+    }
+
+    fun updateOffCountry(value: Boolean) {
+        uiState.value = uiState.value.copy(
+            application = uiState.value.application.copy(offCountry = value)
+        )
+    }
+
+    fun downloadDocument(fileName: String, filePath: String) {
+        viewModelScope.launch {
+            _downloadEvent.send(DownloadEvent.Loading)
+            val result = downloadFileUseCase(filePath = filePath, bucket = StorageBucket.APPLICATION_DOCUMENTS.bucketName)
+            when (result) {
+                is ResultWrapper.Success -> {
+                    pendingFileBytes = result.data
+                    _downloadEvent.send(DownloadEvent.PromptUserToSave(fileName))
+                }
+                is ResultWrapper.Error -> {
+                    _downloadEvent.send(DownloadEvent.Error("Erro ao baixar: ${result.error}"))
+                    pendingFileBytes = null
+                }
+            }
+        }
+    }
+
     fun updateCourse(value: String) {
         val currentApp = uiState.value.application
         currentApp.academicData?.let { currentAcademic ->
@@ -221,7 +296,10 @@ class ApplicationStateViewModel @Inject constructor(
             schoolYear = uiState.value.application.schoolYear,
             stateId = uiState.value.application.applicationState.id!!,
             academicId = uiState.value.application.academicData?.id,
-            dataStateId = uiState.value.application.applicationDataState.id!!
+            dataStateId = uiState.value.application.applicationDataState.id!!,
+            offCountry = uiState.value.application.offCountry,
+            scholarshipId = uiState.value.application.scholarShip?.id!!,
+            faes = uiState.value.application.faes
         )
 
         viewModelScope.launch {
@@ -271,7 +349,8 @@ class ApplicationStateViewModel @Inject constructor(
                 deleteApplicationService(
                     applicationId = uiState.value.application.id!!,
                     academicId = uiState.value.application.academicData?.id,
-                    applicationStateId = uiState.value.application.applicationState.id!!
+                    applicationStateId = uiState.value.application.applicationState.id!!,
+                    scholarShipId = uiState.value.application.scholarShip?.id
                 )
             when (deleteAppResult) {
                 is ResultWrapper.Success -> {
@@ -321,6 +400,7 @@ class ApplicationStateViewModel @Inject constructor(
                     DocumentType.OTHER_INCOME.folderName -> uiState.value.copy(documentsOtherIncome = documentsResult.data)
                     DocumentType.PERMANENT_EXPENSES.folderName -> uiState.value.copy(documentsPermanentExpenses = documentsResult.data)
                     DocumentType.INTERNATIONAL_SUPPORT.folderName -> uiState.value.copy(documentsInternationalSupport = documentsResult.data)
+                    DocumentType.REQUERIMENT.folderName -> uiState.value.copy(documentsRequirement = documentsResult.data)
                     else -> uiState.value
                 }
 
@@ -359,7 +439,10 @@ class ApplicationStateViewModel @Inject constructor(
                         ?: createEmptyDocumentTypeModel(),
 
                     internationalSupportDocsState = typesList.find { it.type == DocumentType.INTERNATIONAL_SUPPORT.folderName }
-                        ?: createEmptyDocumentTypeModel()
+                        ?: createEmptyDocumentTypeModel(),
+
+                    documentsRequirementState = typesList.find { it.type == DocumentType.REQUERIMENT.folderName }
+                    ?: createEmptyDocumentTypeModel()
                 )
             }
             is ResultWrapper.Error -> {
@@ -418,6 +501,11 @@ class ApplicationStateViewModel @Inject constructor(
                     selectedInternationalSupport = currentState.selectedInternationalSupport + uri
                 )
             }
+            DocumentType.REQUERIMENT.folderName -> {
+                currentState.copy(
+                    selectedRequirement = currentState.selectedRequirement + uri
+                )
+            }
             else -> currentState
         }
     }
@@ -461,6 +549,11 @@ class ApplicationStateViewModel @Inject constructor(
             DocumentType.INTERNATIONAL_SUPPORT.folderName -> {
                 currentState.copy(
                     selectedInternationalSupport = currentState.selectedInternationalSupport - uri
+                )
+            }
+            DocumentType.REQUERIMENT.folderName -> {
+                currentState.copy(
+                    selectedRequirement = currentState.selectedInternationalSupport - uri
                 )
             }
             else -> currentState
@@ -536,10 +629,12 @@ class ApplicationStateViewModel @Inject constructor(
                 DocumentType.OTHER_INCOME.folderName -> uiState.value.selectedOtherIncome
                 DocumentType.PERMANENT_EXPENSES.folderName -> uiState.value.selectedPermanentExpenses
                 DocumentType.INTERNATIONAL_SUPPORT.folderName -> uiState.value.selectedInternationalSupport
+                DocumentType.REQUERIMENT.folderName -> uiState.value.selectedRequirement
                 else -> emptyList()
             }
-
+            Log.d("App Debug", "GG2")
             if (filesToUpload.isNotEmpty()) {
+                Log.d("App Debug", "GG3")
                 val result = uploadApplicationDocumentsService(filesList = filesToUpload, folderName = folderName, context = context)
                 when(result){
                     is ResultWrapper.Success -> {
@@ -574,9 +669,9 @@ class ApplicationStateViewModel @Inject constructor(
             DocumentType.OTHER_INCOME.folderName -> uiState.value.copy(selectedOtherIncome = emptyList())
             DocumentType.PERMANENT_EXPENSES.folderName -> uiState.value.copy(selectedPermanentExpenses = emptyList())
             DocumentType.INTERNATIONAL_SUPPORT.folderName -> uiState.value.copy(selectedInternationalSupport = emptyList())
+            DocumentType.REQUERIMENT.folderName -> uiState.value.copy(selectedRequirement = emptyList())
             else -> uiState.value
         }
-
         uiState.value = newState
     }
 
@@ -668,6 +763,23 @@ class ApplicationStateViewModel @Inject constructor(
         )
     }
 
+    fun saveToUserSelectedUri(uri: Uri) {
+        viewModelScope.launch {
+            val bytes = pendingFileBytes
+            if (bytes != null) {
+                val success = fileSaveManager.writeDataToUri(uri, bytes)
+                if (success) {
+                    _downloadEvent.send(DownloadEvent.Success("Guardado com sucesso!"))
+                } else {
+                    _downloadEvent.send(DownloadEvent.Error("Falha ao gravar ficheiro."))
+                }
+                pendingFileBytes = null
+            } else {
+                _downloadEvent.send(DownloadEvent.Error("Ficheiro perdido. Tente novamente."))
+            }
+        }
+    }
+
     //checks if the application state can be updated
     fun checkUpdateApplicationState(): Boolean {
         val state = uiState.value
@@ -688,6 +800,9 @@ class ApplicationStateViewModel @Inject constructor(
             return false
 
         if(state.internationalSupportDocsState.state == ApplicationDocumentTypeState.SOMETHING_WRONG.state)
+            return false
+
+        if(state.application.applicationState.state == ApplicationStates.ALMOST_APPROVED.status)
             return false
 
         return true
@@ -725,6 +840,10 @@ fun createEmptyApplication(): ApplicationModelReceiver {
         phoneNumber = "",
         email = "",
         requestType = "",
+        offCountry = false,
+        faes = false,
+        scholarShip = null,
+
 
         applicationState = ApplicationStateModel(
             id = null,

@@ -37,9 +37,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
@@ -55,7 +57,7 @@ import kotlin.text.uppercase
 
 @Composable
 fun DefaultHomeView(modifier: Modifier = Modifier, navController: NavController, userRole: UserRole) {
-    val homeViewModel: DefaultHomeViewModel = viewModel()
+    val homeViewModel: DefaultHomeViewModel = hiltViewModel()
     val uiState by homeViewModel.uiState
 
     DefaultHomeViewContent(
@@ -66,7 +68,13 @@ fun DefaultHomeView(modifier: Modifier = Modifier, navController: NavController,
                 navController = navController, userRole = userRole, route = DefaultRoutes.ApplicationInfo
             )
         },
-        onCampaignClick = {}
+        onCampaignClick = {
+            NavigationLogic.navigateTo(
+                navController = navController,
+                userRole = userRole,
+                route = GeneralRoutes.CampaignsList
+            )
+        }
     )
 
 }
@@ -242,7 +250,9 @@ fun PublicCampaignCard(campaign: CampaignModel, onClick: () -> Unit) {
                             modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
                             style = MaterialTheme.typography.labelSmall,
                             fontWeight = FontWeight.Bold,
-                            color = Color.Black
+                            color = Color.Black,
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis
                         )
                     }
                     Text(

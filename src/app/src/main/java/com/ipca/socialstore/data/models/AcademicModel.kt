@@ -5,9 +5,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class AcademicModel (
-
     val id: Int? = null,
-
     @SerialName("type_course")
     val typeCourse: String,
 

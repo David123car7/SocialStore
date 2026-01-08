@@ -9,6 +9,7 @@ import com.ipca.socialstore.data.repository.ApplicationStateRepository
 import com.ipca.socialstore.data.repository.AuthRepository
 import com.ipca.socialstore.data.repository.DocumentRepository
 import com.ipca.socialstore.data.repository.DocumentStateRepository
+import com.ipca.socialstore.data.repository.ScholarshipRepository
 import com.ipca.socialstore.data.repository.StorageRepository
 import com.ipca.socialstore.data.repository.UserRepository
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
@@ -25,8 +26,9 @@ class DeleteApplicationService @Inject constructor(
     private val storageRepository: StorageRepository,
     private val userRepository: UserRepository,
     private val authRepository: AuthRepository,
+    private val scholarshipRepository: ScholarshipRepository
 ){
-    suspend operator fun invoke(applicationId: Int, applicationStateId: Int, academicId: Int?): ResultWrapper<Unit> {
+    suspend operator fun invoke(applicationId: Int, applicationStateId: Int, academicId: Int?, scholarShipId: Int?): ResultWrapper<Unit> {
         val uidResult = authRepository.getUserUid()
         if (uidResult is ResultWrapper.Error) return ResultWrapper.Error(uidResult.error)
         val uid = (uidResult as ResultWrapper.Success).data
@@ -79,6 +81,12 @@ class DeleteApplicationService @Inject constructor(
         val removeAppDocTypes = appDocTypeRepository.deleteApplicationDocumentTypes(ids = appDocTypeIds)
         if(removeAppDocTypes is ResultWrapper.Error)
             return ResultWrapper.Error(error = removeAppDocTypes.error)
+
+        if(scholarShipId != null){
+            val removeScholarShipResult = scholarshipRepository.deleteScholarship(id = scholarShipId)
+            if(removeScholarShipResult is ResultWrapper.Error)
+                return ResultWrapper.Error(error = removeScholarShipResult.error)
+        }
 
         val setNullAppIdRes = userRepository.setUserApplicationId(uid = uid, null)
         if(setNullAppIdRes is ResultWrapper.Error)

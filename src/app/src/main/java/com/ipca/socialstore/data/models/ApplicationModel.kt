@@ -28,6 +28,12 @@ data class ApplicationModel(
     @SerialName("requestType")
     val requestType: String,
 
+    @SerialName("off_country")
+    val offCountry: Boolean,
+
+    @SerialName("faes")
+    val faes: Boolean,
+
     @SerialName("created_at")
     val createdAt: String,
 
@@ -39,4 +45,7 @@ data class ApplicationModel(
 
     @SerialName("academic_id")
     val academicId: Int?,
+
+    @SerialName("scholarship_id")
+    val scholarshipId: Int?,
 )

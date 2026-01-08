@@ -48,6 +48,10 @@ fun BeneficiaryManagementView(
         onAddNewScheduling = {
             val route = AdminRoutes.SchedulingMainPage::class.qualifiedName
             navController.navigate("$route/${uiState.beneficiary?.id}")
+        },
+        onCreateDeliver = {
+            val route = AdminRoutes.CreateDeliver::class.qualifiedName
+            navController.navigate("$route/${uiState.beneficiary?.id}")
         }
     )
 }
@@ -56,7 +60,8 @@ fun BeneficiaryManagementView(
 fun BeneficiaryManagementContent(
     modifier: Modifier,
     uiState: BeneficiaryManagementState,
-    onAddNewScheduling: () -> Unit
+    onAddNewScheduling: () -> Unit,
+    onCreateDeliver: () -> Unit
 ) {
     val beneficiary = uiState.beneficiary ?: return
     var expandedSection by remember { mutableStateOf<String?>(null) }
@@ -66,7 +71,7 @@ fun BeneficiaryManagementContent(
         modifier = modifier
             .fillMaxSize()
             .background(Color(0xFFF2F2F2))
-            .verticalScroll(scrollState) // Ativa o scroll vertical
+            .verticalScroll(scrollState)
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
@@ -226,6 +231,20 @@ fun BeneficiaryManagementContent(
                 Text("Novo Agendamento", fontWeight = FontWeight.Bold, color = Color.White)
             }
         }
+        Button(
+            onClick = {onCreateDeliver()},
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(56.dp),
+            shape = RoundedCornerShape(12.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2E7D32)) // Verde Social Store
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Default.Add, contentDescription = null, tint = Color.White)
+                Spacer(modifier = Modifier.width(8.dp))
+                Text("Preparar a Tina", fontWeight = FontWeight.Bold, color = Color.White)
+            }
+        }
 
         Spacer(modifier = Modifier.height(24.dp))
     }
@@ -337,7 +356,8 @@ fun PreviewManagement() {
                 cancel = 0,
                 note = "Entregar na porta lateral"
             ),
-            onAddNewScheduling = {}
+            onAddNewScheduling = {},
+            onCreateDeliver = {}
         )
     }
 }

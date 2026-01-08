@@ -1,4 +1,4 @@
-package com.ipca.socialstore.presentation.views.campaigns
+package com.ipca.socialstore.presentation.views.campaign.list
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
@@ -22,7 +22,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
@@ -31,8 +30,10 @@ import com.ipca.socialstore.data.models.CampaignModel
 import com.ipca.socialstore.presentation.routes.AdminRoutes
 import com.ipca.socialstore.presentation.ui.components.AlertComponent
 import com.ipca.socialstore.presentation.ui.components.SearchBarContent
-import com.ipca.socialstore.presentation.ui.components.WarningComponent
 import com.ipca.socialstore.presentation.utils.navigation.NavigationLogic
+import com.ipca.socialstore.presentation.views.campaign.adminList.CampaignsListState
+import com.ipca.socialstore.presentation.views.campaign.adminList.CampaignsAdminListViewModel
+import com.ipca.socialstore.presentation.views.campaign.adminList.CampaignsListViewModel
 import com.ipca.socialstore.presentation.views.campaign.list.CampaignsListState
 import com.ipca.socialstore.presentation.views.campaign.list.CampaignsListViewModel
 import androidx.compose.material.icons.outlined.DateRange
@@ -54,58 +55,15 @@ fun CampaignsListView(
     CampaignsListContent(
         modifier = modifier,
         uiState = uiState,
-        onCreateClick = {
-            NavigationLogic.navigateTo(
-                navController = navController,
-                route = AdminRoutes.CreateCampaign,
-                userRole = userRole
-            )
-        },
-        onItemClick = { campaign ->
-
-        },
-        onEditClick = { campaign ->
-            val routeName = AdminRoutes.CampaignEdit::class.qualifiedName!!
-            navController.navigate("$routeName/${campaign.id}")
-        },
-        onDeleteConfirm = { campaign ->
-            campaignsViewModel.deleteCampaign(campaign.id!!)
-        }
     )
-
-    LaunchedEffect(uiState.campaignDeleted) {
-        if(uiState.campaignDeleted){
-            campaignsViewModel.getAllCampaigns()
-            campaignsViewModel.updateCampaignDeleted(false)
-        }
-    }
 }
 
 @Composable
 fun CampaignsListContent(
     modifier: Modifier = Modifier,
     uiState: CampaignsListState,
-    onCreateClick: () -> Unit,
-    onItemClick: (CampaignModel) -> Unit,
-    onEditClick: (CampaignModel) -> Unit,
-    onDeleteConfirm: (CampaignModel) -> Unit
 ) {
     var searchQuery by remember { mutableStateOf("") }
-
-    var showDeleteDialog by remember { mutableStateOf(false) }
-    var campaignToDelete by remember { mutableStateOf<CampaignModel?>(null) }
-
-    if (campaignToDelete != null) {
-        AlertComponent(
-            show = showDeleteDialog,
-            title = "Eliminar Campanha",
-            icon = Icons.Default.Warning,
-            color = Color(0xFFFF5252),
-            message = "Tens a certeza que queres eliminar o ficheiro?",
-            onConfirm = {onDeleteConfirm(campaignToDelete!!)},
-            onDismiss = {showDeleteDialog = false}
-        )
-    }
 
     val filteredList = remember(uiState.campaigns, searchQuery) {
         uiState.campaigns.filter { campaign ->
@@ -155,12 +113,6 @@ fun CampaignsListContent(
                         CampaignItemCard(
                             modifier = Modifier.padding(),
                             campaign = campaign,
-                            onClick = { onItemClick(campaign) },
-                            onEditClick = { onEditClick(campaign) },
-                            onDeleteClick = {
-                                campaignToDelete = campaign
-                                showDeleteDialog = true
-                            }
                         )
                     }
                 }
@@ -200,9 +152,6 @@ fun CampaignsListContent(
 fun CampaignItemCard(
     modifier: Modifier = Modifier,
     campaign: CampaignModel,
-    onClick: () -> Unit,
-    onEditClick: () -> Unit,
-    onDeleteClick: () -> Unit
 ) {
     val isActive = campaign.onGoing
 
@@ -224,8 +173,7 @@ fun CampaignItemCard(
 
     Card(
         modifier = modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick),
+            .fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = containerColor),
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
         shape = MaterialTheme.shapes.medium
@@ -279,7 +227,7 @@ fun CampaignItemCard(
                 text = campaign.description,
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                maxLines = 2,
+                maxLines = 5,
                 overflow = TextOverflow.Ellipsis
             )
 
