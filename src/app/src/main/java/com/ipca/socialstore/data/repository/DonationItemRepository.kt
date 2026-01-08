@@ -27,4 +27,21 @@ class DonationItemRepository @Inject constructor(private val supabase: SupabaseC
             ResultWrapper.Error(exceptionMapper.map(e))
         }
     }
+
+    suspend fun getAllItemsByDonationId(donationId: Int): ResultWrapper<List<Int>> {
+        return try {
+
+            val result = supabase.from(DatabaseTables.DONATION_ITEM)
+                .select {
+                    filter {
+                        eq("donation_id", donationId)
+                    }
+                }
+                .decodeList<DonationItemModel>()
+            val itemIds = result.map { it.itemId }
+            ResultWrapper.Success(itemIds)
+        } catch (e: Exception) {
+            ResultWrapper.Error(exceptionMapper.map(e))
+        }
+    }
 }
