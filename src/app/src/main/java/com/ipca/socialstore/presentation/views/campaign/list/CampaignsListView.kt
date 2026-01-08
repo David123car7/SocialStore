@@ -1,19 +1,12 @@
 package com.ipca.socialstore.presentation.views.campaign.list
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Warning
-import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -24,19 +17,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.navigation.NavController
-import com.ipca.socialstore.data.enums.UserRole
 import com.ipca.socialstore.data.models.CampaignModel
-import com.ipca.socialstore.presentation.routes.AdminRoutes
-import com.ipca.socialstore.presentation.ui.components.AlertComponent
 import com.ipca.socialstore.presentation.ui.components.SearchBarContent
-import com.ipca.socialstore.presentation.utils.navigation.NavigationLogic
 import com.ipca.socialstore.presentation.views.campaign.adminList.CampaignsListState
-import com.ipca.socialstore.presentation.views.campaign.adminList.CampaignsAdminListViewModel
 import com.ipca.socialstore.presentation.views.campaign.adminList.CampaignsListViewModel
 import androidx.compose.material.icons.outlined.DateRange
-import androidx.compose.material.icons.outlined.Delete
-import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.ui.tooling.preview.Preview
 import com.ipca.socialstore.presentation.ui.theme.GreenIPCA
 import com.ipca.socialstore.presentation.ui.theme.IconBgColor
@@ -45,8 +30,6 @@ import com.ipca.socialstore.presentation.ui.theme.IconTint
 @Composable
 fun CampaignsListView(
     modifier: Modifier = Modifier,
-    navController: NavController,
-    userRole: UserRole
 ) {
     val campaignsViewModel: CampaignsListViewModel = hiltViewModel()
     val uiState by campaignsViewModel.uiState
@@ -63,13 +46,11 @@ fun CampaignsListContent(
     uiState: CampaignsListState,
 ) {
     var searchQuery by remember { mutableStateOf("") }
-
     val filteredList = remember(uiState.campaigns, searchQuery) {
         uiState.campaigns.filter { campaign ->
             campaign.name.contains(searchQuery, ignoreCase = true)
         }
     }
-
     Box(modifier = modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
@@ -79,16 +60,13 @@ fun CampaignsListContent(
             SearchBarContent(
                 onSearchItem = { query -> searchQuery = query }
             )
-
             HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-
             Text(
                 text = "${filteredList.size} campanhas encontradas",
                 style = MaterialTheme.typography.titleSmall,
                 color = Color.Gray,
                 modifier = Modifier.padding(bottom = 8.dp)
             )
-
             if (filteredList.isEmpty() && !uiState.isLoading) {
                 Box(
                     modifier = Modifier
@@ -117,7 +95,6 @@ fun CampaignsListContent(
                 }
             }
         }
-
         if (uiState.isLoading) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator()

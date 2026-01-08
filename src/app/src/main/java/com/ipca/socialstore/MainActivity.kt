@@ -39,10 +39,13 @@ import com.ipca.socialstore.presentation.views.Scheduling.management.SchedulingM
 import com.ipca.socialstore.presentation.views.Scheduling.schedulingConfirmation.SchedulingConfirmationView
 import com.ipca.socialstore.presentation.views.application.applicationInfo.ApplicationInfoView
 import com.ipca.socialstore.presentation.views.application.applicationState.ApplicationStateView
-import com.ipca.socialstore.presentation.views.application.applicationStateAdmin.AplicationStateAdminView
+import com.ipca.socialstore.presentation.views.application.applicationStateAdmin.ApplicationStateAdminView
 import com.ipca.socialstore.presentation.views.application.createApplication.CreateApplicationView
 import com.ipca.socialstore.presentation.views.application.listApplications.ListApplicationsView
 import com.ipca.socialstore.presentation.views.authentication.resetPassword.ResetPasswordView
+import com.ipca.socialstore.presentation.views.basket.preparation.BasketPreparationView
+import com.ipca.socialstore.presentation.views.beneficiary.editProfile.BeneficiaryEditProfileView
+import com.ipca.socialstore.presentation.views.beneficiary.listDocuments.ListDocumentsView
 import com.ipca.socialstore.presentation.views.basket.preparation.BasketPreparationView
 import com.ipca.socialstore.presentation.views.beneficiary.editProfile.BeneficiaryEditProfileView
 import com.ipca.socialstore.presentation.views.beneficiary.listDocuments.ListDocumentsView
@@ -104,8 +107,7 @@ class MainActivity : ComponentActivity() {
                                 navController = navController, userRole = mainState.userRole)
                         }
                         composable<GeneralRoutes.CampaignsList>{
-                            CampaignsListView(modifier = Modifier.padding(innerPadding),
-                                navController = navController, userRole = mainState.userRole)
+                            CampaignsListView(modifier = Modifier.padding(innerPadding))
                         }
                         composable<GeneralRoutes.Login>{
                             LoginView(modifier = Modifier.padding(innerPadding),
@@ -167,7 +169,7 @@ class MainActivity : ComponentActivity() {
                                 navArgument("applicationId") { type = NavType.StringType }
                             )
                         ) {
-                            AplicationStateAdminView(modifier = Modifier.padding(innerPadding), navController = navController, userRole = mainState.userRole)
+                            ApplicationStateAdminView(modifier = Modifier.padding(innerPadding), navController = navController, userRole = mainState.userRole)
                         }
                         composable <AdminRoutes.SelectStock>{
                             StockItemDetailView(modifier = Modifier.padding(innerPadding), navController = navController, viewModel = stockViewModel)

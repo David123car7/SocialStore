@@ -66,6 +66,21 @@ class ItemRepository @Inject constructor(private val supabase : SupabaseClient, 
         }
     }
 
+    suspend fun getItemByCode(barCode: String): ResultWrapper<ItemModel>{
+        return try {
+            val itemResult = supabase.from(DatabaseTables.ITEM)
+                .select() {
+                    filter {
+                        eq("bar_code",barCode)
+                    }
+                }.decodeSingle<ItemModel>()
+            ResultWrapper.Success(itemResult)
+        }
+        catch (e : Exception){
+            ResultWrapper.Error(exceptionMapper.map(e))
+        }
+    }
+
     suspend fun getItemName(itemId : List<Int>) : ResultWrapper<List<String>>{
         return try {
             val result = supabase.from(DatabaseTables.ITEM)

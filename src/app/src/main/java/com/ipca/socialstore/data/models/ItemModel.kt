@@ -9,6 +9,8 @@ data class ItemModel(
 
     @SerialName("name")
     val name : String,
+    @SerialName("bar_code")
+    val barCode : String,
 
     @SerialName("item_type")
     val itemType : String,

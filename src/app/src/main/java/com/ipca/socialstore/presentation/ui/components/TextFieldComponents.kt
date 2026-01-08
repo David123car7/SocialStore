@@ -8,6 +8,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.Label
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.DateRange
@@ -50,7 +51,7 @@ fun TextFieldStringComponent(modifier: Modifier, label: String, value: String, i
         onValueChange = onValueUpdate,
         label = { Text(label) },
         leadingIcon = { if(icon != null) Icon(icon, null)},
-        modifier = modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
         singleLine = true
     )
@@ -61,7 +62,7 @@ fun TextFieldValueComponent(modifier: Modifier, label: String, value: String, ic
     OutlinedTextField(
         value = value,
         onValueChange = onValueUpdate,
-        label = { Text(label) },
+        label = { label },
         leadingIcon = { Icon(icon, null) },
         modifier = modifier.fillMaxWidth(),
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
@@ -103,11 +104,10 @@ fun TextFieldDateComponent(modifier: Modifier, label: String, date: String, onDa
     OutlinedTextField(
         value = date,
         onValueChange = onDateUpdate,
-        label = { Text(label) },
+        label = { label },
         placeholder = { Text("DD/MM/AAAA") },
         leadingIcon = { Icon(Icons.Outlined.DateRange, null) },
-        modifier = Modifier
-            .fillMaxWidth()
+        modifier = modifier
             .clickable { showDatePicker = !showDatePicker },
         enabled = false,
         readOnly = true,
@@ -127,7 +127,7 @@ fun TextFieldPasswordComponent(modifier: Modifier, password: String, onPasswordU
     OutlinedTextField(
         value = password,
         onValueChange = onPasswordUpdate,
-        label = { Text("Palavra-passe") },
+        label = { "Palavra-passe" },
         leadingIcon = { Icon(Icons.Default.Lock, null) },
         trailingIcon = {
             val image = if (passwordVisible) Icons.Outlined.RemoveRedEye else Icons.Outlined.RemoveRedEye
@@ -164,7 +164,7 @@ fun <T> SocialStoreDropdown(
             value = if (selectedOption != null) getLabel(selectedOption) else "",
             onValueChange = {},
             readOnly = true,
-            label = { Text(label) },
+            label = { label },
             leadingIcon = { Icon(Icons.Default.Star, contentDescription = null) },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
             colors = OutlinedTextFieldDefaults.colors(),

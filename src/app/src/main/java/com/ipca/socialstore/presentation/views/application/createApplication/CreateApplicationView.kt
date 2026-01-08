@@ -64,8 +64,6 @@ fun CreateApplicationView(modifier: Modifier, navController: NavController, user
     CreateApplicationViewContent(
         modifier = modifier,
         uiState = uiState,
-
-        // --- Personal Info Updates ---
         onNameUpdate = applicationViewModel::updateName,
         onYearUpdate = applicationViewModel::updateSchoolYear,
         onBirthDateUpdate = applicationViewModel::updateBirthDate,
@@ -73,11 +71,7 @@ fun CreateApplicationView(modifier: Modifier, navController: NavController, user
         onPhoneUpdate = applicationViewModel::updatePhoneNumber,
         onRequestTypeUpdate = applicationViewModel::updateRequestType,
         onOffCountryUpdate = applicationViewModel::updateOffCountry,
-
-        // --- Student Status Updates ---
         onIsStudentUpdate = applicationViewModel::updateIsStudent,
-
-        // --- Academic Data Updates ---
         onTypeCourseUpdate = applicationViewModel::updateTypeCourse,
         onCourseUpdate = applicationViewModel::updateCourse,
         onStudentNumberUpdate = applicationViewModel::updateStudentNumber,
@@ -103,8 +97,6 @@ fun CreateApplicationView(modifier: Modifier, navController: NavController, user
 fun CreateApplicationViewContent(
     modifier: Modifier,
     uiState: CreateApplicationState,
-
-    // --- Actions/Callbacks ---
     onIsStudentUpdate: (Boolean) -> Unit,
     onNameUpdate: (String) -> Unit,
     onYearUpdate: (String) -> Unit,
@@ -116,12 +108,9 @@ fun CreateApplicationViewContent(
     onFaesUpdate:(Boolean) -> Unit,
     onScholarShipUpdate:(Boolean)-> Unit,
     onScholarShipValueUpdate:(String) -> Unit,
-
-    // Academic Data
     onTypeCourseUpdate: (String) -> Unit,
     onCourseUpdate: (String) -> Unit,
     onStudentNumberUpdate: (String) -> Unit,
-
     onSubmitApplication: () -> Unit
 ) {
     Column(
@@ -159,7 +148,6 @@ fun CreateApplicationViewContent(
             onFaesUpdate = onFaesUpdate,
             onScholarShipUpdate = onScholarShipUpdate
         )
-
         Button(
             onClick = onSubmitApplication,
             modifier = Modifier
@@ -170,7 +158,6 @@ fun CreateApplicationViewContent(
         ) {
             Text("Continuar", fontWeight = FontWeight.Bold)
         }
-
         if (uiState.error != null) {
             Text(text = uiState.error.asString(), modifier = Modifier.padding(8.dp))
         }
@@ -203,12 +190,9 @@ fun CreateApplicationViewPreview() {
             ),
             academicData = AcademicModel(typeCourse = "", course = "", studenNumber = "")
         )
-
         CreateApplicationViewContent(
             modifier = Modifier,
             uiState = uiState,
-
-            // --- Personal ---
             onNameUpdate = {},
             onYearUpdate = {},
             onBirthDateUpdate = {},
@@ -219,15 +203,10 @@ fun CreateApplicationViewPreview() {
             onFaesUpdate = {},
             onScholarShipValueUpdate = {},
             onScholarShipUpdate = {},
-
-            // --- Student ---
             onIsStudentUpdate = {},
-
-            // --- Academic ---
             onTypeCourseUpdate = {},
             onCourseUpdate = {},
             onStudentNumberUpdate = {},
-
             onSubmitApplication = {}
         )
     }
