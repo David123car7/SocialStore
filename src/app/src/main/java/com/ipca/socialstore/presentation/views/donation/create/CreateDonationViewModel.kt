@@ -15,7 +15,7 @@ import javax.inject.Inject
 
 data class DonationState(
     val donation : DonationModel = DonationModel(date = "", campaignId = null, donorName = ""),
-    val item : ItemModel = ItemModel(name = "", itemType = ""),
+    val item : ItemModel = ItemModel(name = "", barCode = "",itemType = ""),
     val donationItem : DonationItemModel = DonationItemModel(itemId = 0, donationId = 0),
     val expirationDate: String = "",
     val quantity: Int = 0,

@@ -279,7 +279,8 @@ fun PreviewStockItemDetail() {
     // 1. Mock Dados do Item (Arroz conforme a tua imagem)
     val mockItemData = ItemModel(
         name = "arroz",
-        itemType = "alimentação"
+        itemType = "alimentação",
+        barCode = ""
     )
 
     // 2. Mock do Mapa de Quantidades (Lotes atuais)
@@ -287,7 +288,6 @@ fun PreviewStockItemDetail() {
         "2025/10/17" to 200,
         "2025/10/15" to 66
     )
-
 
     val mockSelectedItem = StockReceiverModel(
         item = mockItemData,

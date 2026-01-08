@@ -325,9 +325,9 @@ fun EmptySearchResultMessage() {
 @Preview(showBackground = true, name = "Estado de Sucesso")
 @Composable
 fun PreviewGetAllStockSuccess() {
-    val mockItem1 = ItemModel(name = "Arroz Agulha 1kg", itemType = "Alimentação")
-    val mockItem2 = ItemModel(name = "Detergente Loiça", itemType = "Limpeza")
-    val mockItem3 = ItemModel(name = "T-Shirt Branca L", itemType = "Vestuário")
+    val mockItem1 = ItemModel(name = "Arroz Agulha 1kg", barCode = "",itemType = "Alimentação")
+    val mockItem2 = ItemModel(name = "Detergente Loiça", barCode = "",itemType = "Limpeza")
+    val mockItem3 = ItemModel(name = "T-Shirt Branca L", barCode = "",itemType = "Vestuário")
 
     val mockStockList = listOf(
         StockReceiverModel(item = mockItem1, stockId = 1, totalQuantity = 50, quantityMap = mutableMapOf()),

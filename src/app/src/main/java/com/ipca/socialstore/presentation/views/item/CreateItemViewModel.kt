@@ -20,7 +20,7 @@ data class ExpirationDate(
     val quantity: String = ""
 )
 data class ItemState(
-    val item : ItemModel = ItemModel(name = "", itemType = ""),
+    val item : ItemModel = ItemModel(name = "", itemType = "", barCode = ""),
     val listDate : List<ExpirationDate> = listOf(ExpirationDate()),
     val isLoading : Boolean = false,
     val error: ErrorText? = null,

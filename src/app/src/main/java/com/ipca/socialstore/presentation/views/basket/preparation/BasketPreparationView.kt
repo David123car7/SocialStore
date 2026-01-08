@@ -263,19 +263,19 @@ fun BasketPreparationPreview() {
             ),
             filteredList = listOf(
                 StockReceiverModel(
-                    item = ItemModel(name = "Arroz 1kg", itemType = "Alimentação"),
+                    item = ItemModel(name = "Arroz 1kg", barCode = "",itemType = "Alimentação"),
                     stockId = 1,
                     totalQuantity = 50,
                     quantityMap = emptyMap()
                 ),
                 StockReceiverModel(
-                    item = ItemModel(name = "Leite UHT 1L", itemType = "Alimentação"),
+                    item = ItemModel(name = "Leite UHT 1L", barCode = "",itemType = "Alimentação"),
                     stockId = 2,
                     totalQuantity = 24,
                     quantityMap = emptyMap()
                 ),
                 StockReceiverModel(
-                    item = ItemModel(name = "Sabonete", itemType = "Higiene"),
+                    item = ItemModel(name = "Sabonete", barCode = "",itemType = "Higiene"),
                     stockId = 3,
                     totalQuantity = 10,
                     quantityMap = emptyMap()
