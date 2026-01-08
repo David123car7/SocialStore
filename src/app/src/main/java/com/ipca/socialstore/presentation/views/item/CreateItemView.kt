@@ -18,22 +18,17 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Label
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Category
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Label
+import androidx.compose.material.icons.filled.QrCode
 import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.Storage
-import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.AddCircleOutline
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ButtonDefaults.buttonColors
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -43,9 +38,10 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -58,21 +54,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.google.mlkit.vision.codescanner.GmsBarcodeScanning
-import com.ipca.socialstore.data.models.ItemModel
 import com.ipca.socialstore.presentation.ui.components.IntroductionComponent
 import com.ipca.socialstore.presentation.ui.components.TextFieldDateComponent
 import com.ipca.socialstore.presentation.ui.components.TextFieldStringComponent
 import com.ipca.socialstore.presentation.ui.theme.GreenIPCA
-import com.ipca.socialstore.presentation.ui.theme.IconBgColor
-import com.ipca.socialstore.presentation.ui.theme.IconTint
-import com.ipca.socialstore.presentation.ui.theme.SocialStoreTheme
-import com.ipca.socialstore.presentation.views.scan.ScanContent
-
 
 @Composable
 fun CreateItemView(modifier: Modifier, navController: NavController){
@@ -85,6 +75,7 @@ fun CreateItemView(modifier: Modifier, navController: NavController){
         SimpleBarcodeScanner(
             context = context,
             onBarcodeScanned = { barcode ->
+                viewModel.getItemByCode(barCode = barcode)
                 Toast.makeText(context, "Código lido: $barcode", Toast.LENGTH_SHORT).show()
                 scanActivated = false
             },
@@ -105,7 +96,8 @@ fun CreateItemView(modifier: Modifier, navController: NavController){
             onRemoveFields = {value -> viewModel.removeFields(value)},
             onScanBarcode =  {
                 scanActivated = true
-            }
+            },
+            onItemBarcodeUpdate = {code -> viewModel.updateBarCode(code = code)}
         )
     }
 }
@@ -116,13 +108,22 @@ fun CreateItemViewContent(
     uiState: ItemState,
     onItemNameUpdate: (String) -> Unit,
     onItemTypeUpdate: (String) -> Unit,
+    onItemBarcodeUpdate: (String) -> Unit,
     onUpdateList: (Int, String?, String?) -> Unit,
     onAddFields: () -> Unit,
     onRemoveFields: (Int) -> Unit,
     onClickCreate: () -> Unit,
-    onScanBarcode: () -> Unit // Novo callback para o scanner (com valor default para não quebrar)
+    onScanBarcode: () -> Unit,
 ) {
     val scrollState = rememberScrollState()
+
+    var isBarcodeVisible by remember { mutableStateOf(false) }
+
+    LaunchedEffect(uiState.item.barCode) {
+        if (!uiState.item.barCode.isNullOrBlank()) {
+            isBarcodeVisible = true
+        }
+    }
 
     Column(
         modifier = modifier
@@ -130,7 +131,7 @@ fun CreateItemViewContent(
             .verticalScroll(scrollState)
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(20.dp) // Espaçamento automático entre elementos
+        verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
 
         IntroductionComponent(
@@ -147,10 +148,40 @@ fun CreateItemViewContent(
         ) {
             Icon(Icons.Default.QrCodeScanner, contentDescription = null)
             Spacer(Modifier.width(8.dp))
-            Text("Ler Código de Barras para Preencher")
+            Text("Ler Código de Barras (Câmara)")
         }
 
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = "Inserir código manualmente?",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.Gray
+                )
+                Switch(
+                    checked = isBarcodeVisible,
+                    onCheckedChange = { isBarcodeVisible = it },
+                    colors = SwitchDefaults.colors(
+                        checkedThumbColor = MaterialTheme.colorScheme.primary,
+                        checkedTrackColor = MaterialTheme.colorScheme.primaryContainer
+                    )
+                )
+            }
+
+            androidx.compose.animation.AnimatedVisibility(visible = isBarcodeVisible) {
+                TextFieldStringComponent(
+                    value = uiState.item.barCode ?: "",
+                    onValueUpdate = onItemBarcodeUpdate,
+                    label = "Código de Barras",
+                    icon = Icons.Default.QrCode,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+
             TextFieldStringComponent(
                 value = uiState.item.name,
                 onValueUpdate = onItemNameUpdate,
@@ -207,7 +238,7 @@ fun CreateItemViewContent(
                             value = itemDate.quantity,
                             onValueChange = { newQty -> onUpdateList(index, null, newQty) },
                             label = { Text("Qtd") },
-                            modifier = Modifier.weight(0.5f), // Menor que a data
+                            modifier = Modifier.weight(0.5f),
                             shape = RoundedCornerShape(12.dp),
                             singleLine = true,
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
@@ -227,8 +258,6 @@ fun CreateItemViewContent(
                         }
                     }
                 }
-
-                // Botão "Adicionar outra data" mais discreto dentro do Card
                 TextButton(
                     onClick = onAddFields,
                     modifier = Modifier.align(Alignment.Start)
@@ -242,13 +271,12 @@ fun CreateItemViewContent(
 
         Spacer(Modifier.height(16.dp))
 
-        // --- BOTÃO FINAL ---
         Button(
             onClick = onClickCreate,
-            colors = ButtonDefaults.buttonColors(containerColor = GreenIPCA), // Usando a tua cor GreenIPCA
+            colors = ButtonDefaults.buttonColors(containerColor = GreenIPCA),
             modifier = Modifier
                 .fillMaxWidth()
-                .height(50.dp), // Botão mais alto é mais fácil de clicar
+                .height(50.dp),
             shape = RoundedCornerShape(12.dp),
             elevation = ButtonDefaults.buttonElevation(4.dp),
             enabled = uiState.item.name.isNotBlank() && uiState.listDate.any { it.date.isNotBlank() }
@@ -262,8 +290,6 @@ fun CreateItemViewContent(
                 style = MaterialTheme.typography.bodyLarge
             )
         }
-
-        // Espaço extra no fundo para o scroll não ficar colado
         Spacer(Modifier.height(32.dp))
     }
 }
