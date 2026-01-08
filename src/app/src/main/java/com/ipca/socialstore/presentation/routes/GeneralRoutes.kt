@@ -22,4 +22,7 @@ sealed class GeneralRoutes {
 
     @Serializable
     object ResetView : GeneralRoutes()
+
+    @Serializable
+    object CampaignsList : GeneralRoutes()
 }

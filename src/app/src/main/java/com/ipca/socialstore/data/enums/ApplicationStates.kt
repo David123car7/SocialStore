@@ -14,6 +14,9 @@ enum class ApplicationStates(val status: String) {
     @SerialName("approved")
     APPROVED("approved"),
 
+    @SerialName("almost_approved")
+    ALMOST_APPROVED("almost_approved"),
+
     @SerialName("rejected")
     REJECTED("rejected"),
 

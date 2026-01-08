@@ -9,6 +9,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material3.* // Importações de Material3
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -17,6 +18,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -27,6 +29,11 @@ import com.ipca.socialstore.data.models.ItemModel
 import com.ipca.socialstore.presentation.ui.components.SearchBarContent
 import com.ipca.socialstore.presentation.models.StockReceiverModel
 import com.ipca.socialstore.presentation.routes.AdminRoutes
+import com.ipca.socialstore.presentation.ui.theme.GreenIPCA
+import com.ipca.socialstore.presentation.ui.theme.HighStock
+import com.ipca.socialstore.presentation.ui.theme.IconBgColor
+import com.ipca.socialstore.presentation.ui.theme.LowStock
+import com.ipca.socialstore.presentation.ui.theme.OutStock
 import com.ipca.socialstore.presentation.utils.errors.ErrorText
 import kotlin.collections.mutableMapOf
 
@@ -142,10 +149,10 @@ private fun StockList(
                             selectedType.value = null
                             onSearchType("")
                         },
-                        label = { Text("Todos") },
+                        label = { Text("Todos")},
                         colors = AssistChipDefaults.assistChipColors(
                             containerColor = if (selectedType.value == null)
-                                MaterialTheme.colorScheme.primaryContainer
+                                IconBgColor
                             else MaterialTheme.colorScheme.surfaceVariant
                         )
                     )
@@ -196,7 +203,6 @@ private fun StockList(
                 }
             }
         }
-
     }
 }
 @Composable
@@ -210,14 +216,14 @@ fun SingleItemStock(
     val isOutOfStock = quantity == 0
 
     val containerColor = when {
-        isOutOfStock -> MaterialTheme.colorScheme.errorContainer
-        isLowStock -> MaterialTheme.colorScheme.tertiaryContainer
-        else -> MaterialTheme.colorScheme.surfaceVariant
+        isOutOfStock -> OutStock
+        isLowStock -> LowStock
+        else -> HighStock
     }
     val contentColor = when {
-        isOutOfStock -> MaterialTheme.colorScheme.onErrorContainer
-        isLowStock -> MaterialTheme.colorScheme.onTertiaryContainer
-        else -> MaterialTheme.colorScheme.onSurface
+        isOutOfStock -> Color.Black
+        isLowStock -> Color.Black
+        else -> Color.Black
     }
 
     Card(

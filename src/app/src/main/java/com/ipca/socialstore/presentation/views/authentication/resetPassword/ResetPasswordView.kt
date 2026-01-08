@@ -4,6 +4,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -50,6 +51,7 @@ import com.ipca.socialstore.presentation.ui.components.ErrorTextComponent
 import com.ipca.socialstore.presentation.ui.components.TextFieldPasswordComponent
 import com.ipca.socialstore.presentation.ui.components.TextFieldStringComponent
 import com.ipca.socialstore.presentation.ui.theme.GreenIPCA
+import com.ipca.socialstore.presentation.ui.theme.IconBgColor
 import com.ipca.socialstore.presentation.ui.theme.IconTint
 import com.ipca.socialstore.presentation.ui.theme.SocialStoreTheme
 
@@ -120,7 +122,13 @@ fun ResetPasswordViewContent(
             Icon(
                 imageVector = if (uiState.requestedReset) Icons.Outlined.Email else Icons.Outlined.Close,
                 contentDescription = null,
-                modifier = Modifier.size(64.dp).padding(bottom = 24.dp),
+                modifier = Modifier
+                    .size(80.dp)
+                    .background(
+                        color = IconBgColor,
+                        shape = RoundedCornerShape(20.dp)
+                    )
+                    .padding(16.dp),
                 tint = IconTint
             )
 

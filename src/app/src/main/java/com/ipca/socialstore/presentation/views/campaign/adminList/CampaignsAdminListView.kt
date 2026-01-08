@@ -1,6 +1,5 @@
-package com.ipca.socialstore.presentation.views.campaign.list
+package com.ipca.socialstore.presentation.views.campaigns
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -13,7 +12,6 @@ import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Warning
-import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -31,38 +29,74 @@ import com.ipca.socialstore.presentation.routes.AdminRoutes
 import com.ipca.socialstore.presentation.ui.components.AlertComponent
 import com.ipca.socialstore.presentation.ui.components.SearchBarContent
 import com.ipca.socialstore.presentation.utils.navigation.NavigationLogic
+import com.ipca.socialstore.presentation.views.campaign.adminList.CampaignsAdminListState
 import com.ipca.socialstore.presentation.views.campaign.adminList.CampaignsListState
 import com.ipca.socialstore.presentation.views.campaign.adminList.CampaignsAdminListViewModel
-import com.ipca.socialstore.presentation.views.campaign.adminList.CampaignsListViewModel
-import androidx.compose.material.icons.outlined.DateRange
-import androidx.compose.material.icons.outlined.Delete
-import androidx.compose.material.icons.outlined.Edit
-import androidx.compose.ui.tooling.preview.Preview
-import com.ipca.socialstore.presentation.ui.theme.GreenIPCA
-import com.ipca.socialstore.presentation.ui.theme.IconBgColor
-import com.ipca.socialstore.presentation.ui.theme.IconTint
 
 @Composable
-fun CampaignsListView(
+fun CampaignsAdminListView(
     modifier: Modifier = Modifier,
     navController: NavController,
     userRole: UserRole
 ) {
-    val campaignsViewModel: CampaignsListViewModel = hiltViewModel()
+    val campaignsViewModel: CampaignsAdminListViewModel = hiltViewModel()
     val uiState by campaignsViewModel.uiState
 
-    CampaignsListContent(
+    CampaignsAdminListContent(
         modifier = modifier,
         uiState = uiState,
+        onCreateClick = {
+            NavigationLogic.navigateTo(
+                navController = navController,
+                route = AdminRoutes.CreateCampaign,
+                userRole = userRole
+            )
+        },
+        onItemClick = { campaign ->
+
+        },
+        onEditClick = { campaign ->
+            val routeName = AdminRoutes.CampaignEdit::class.qualifiedName!!
+            navController.navigate("$routeName/${campaign.id}")
+        },
+        onDeleteConfirm = { campaign ->
+            campaignsViewModel.deleteCampaign(campaign.id!!)
+        }
     )
+
+    LaunchedEffect(uiState.campaignDeleted) {
+        if(uiState.campaignDeleted){
+            campaignsViewModel.getAllCampaigns()
+            campaignsViewModel.updateCampaignDeleted(false)
+        }
+    }
 }
 
 @Composable
-fun CampaignsListContent(
+fun CampaignsAdminListContent(
     modifier: Modifier = Modifier,
-    uiState: CampaignsListState,
+    uiState: CampaignsAdminListState,
+    onCreateClick: () -> Unit,
+    onItemClick: (CampaignModel) -> Unit,
+    onEditClick: (CampaignModel) -> Unit,
+    onDeleteConfirm: (CampaignModel) -> Unit
 ) {
     var searchQuery by remember { mutableStateOf("") }
+
+    var showDeleteDialog by remember { mutableStateOf(false) }
+    var campaignToDelete by remember { mutableStateOf<CampaignModel?>(null) }
+
+    if (campaignToDelete != null) {
+        AlertComponent(
+            show = showDeleteDialog,
+            title = "Eliminar Campanha",
+            icon = Icons.Default.Warning,
+            color = Color(0xFFFF5252),
+            message = "Tens a certeza que queres eliminar o ficheiro?",
+            onConfirm = {onDeleteConfirm(campaignToDelete!!)},
+            onDismiss = {showDeleteDialog = false}
+        )
+    }
 
     val filteredList = remember(uiState.campaigns, searchQuery) {
         uiState.campaigns.filter { campaign ->
@@ -109,9 +143,15 @@ fun CampaignsListContent(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     items(filteredList) { campaign ->
-                        CampaignItemCard(
+                        CampaignAdminItemCard(
                             modifier = Modifier.padding(),
                             campaign = campaign,
+                            onClick = { onItemClick(campaign) },
+                            onEditClick = { onEditClick(campaign) },
+                            onDeleteClick = {
+                                campaignToDelete = campaign
+                                showDeleteDialog = true
+                            }
                         )
                     }
                 }
@@ -132,20 +172,35 @@ fun CampaignsListContent(
                 )
             }
         }
+
+        FloatingActionButton(
+            onClick = onCreateClick,
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(16.dp),
+            containerColor = MaterialTheme.colorScheme.primary,
+            contentColor = MaterialTheme.colorScheme.onPrimary,
+            shape = CircleShape
+        ) {
+            Icon(Icons.Default.Add, contentDescription = "Nova Campanha")
+        }
     }
 }
 
 @Composable
-fun CampaignItemCard(
+fun CampaignAdminItemCard(
     modifier: Modifier = Modifier,
     campaign: CampaignModel,
+    onClick: () -> Unit,
+    onEditClick: () -> Unit,
+    onDeleteClick: () -> Unit
 ) {
     val isActive = campaign.onGoing
 
     val containerColor = if (isActive)
-        IconBgColor
+        MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f)
     else
-        IconBgColor.copy(alpha = 0.3f)
+        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
 
     val statusText = if (isActive) "A Decorrer" else "Terminada"
     val statusColor = if (isActive) MaterialTheme.colorScheme.primary else Color.Gray
@@ -160,9 +215,9 @@ fun CampaignItemCard(
 
     Card(
         modifier = modifier
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
         colors = CardDefaults.cardColors(containerColor = containerColor),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
         shape = MaterialTheme.shapes.medium
     ) {
         Column(
@@ -194,7 +249,7 @@ fun CampaignItemCard(
                 }
 
                 Surface(
-                    color = if(isActive) GreenIPCA else Color.Gray,
+                    color = if(isActive) MaterialTheme.colorScheme.primary else Color.Gray,
                     shape = CircleShape,
                     modifier = Modifier.padding(start = 8.dp)
                 ) {
@@ -214,7 +269,7 @@ fun CampaignItemCard(
                 text = campaign.description,
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                maxLines = 5,
+                maxLines = 2,
                 overflow = TextOverflow.Ellipsis
             )
 
@@ -237,7 +292,7 @@ fun CampaignItemCard(
                         text = "$percentage%",
                         style = MaterialTheme.typography.labelSmall,
                         fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSurface
+                        color = statusColor
                     )
                 }
 
@@ -247,7 +302,7 @@ fun CampaignItemCard(
                         .fillMaxWidth()
                         .height(8.dp)
                         .clip(RoundedCornerShape(4.dp)),
-                    color = GreenIPCA,
+                    color = statusColor,
                     trackColor = MaterialTheme.colorScheme.surfaceVariant,
                 )
             }
@@ -264,10 +319,10 @@ fun CampaignItemCard(
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
-                        imageVector = Icons.Outlined.DateRange,
+                        imageVector = Icons.Default.DateRange,
                         contentDescription = null,
-                        tint = IconTint,
-                        modifier = Modifier.size(18.dp)
+                        tint = statusColor,
+                        modifier = Modifier.size(16.dp)
                     )
                     Spacer(modifier = Modifier.width(6.dp))
                     Text(
@@ -277,80 +332,24 @@ fun CampaignItemCard(
                         fontWeight = FontWeight.Medium
                     )
                 }
+
+                Row {
+                    IconButton(onClick = onEditClick) {
+                        Icon(
+                            imageVector = Icons.Default.Edit,
+                            contentDescription = "Editar",
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                    IconButton(onClick = onDeleteClick) {
+                        Icon(
+                            imageVector = Icons.Default.Delete,
+                            contentDescription = "Eliminar",
+                            tint = MaterialTheme.colorScheme.error
+                        )
+                    }
+                }
             }
         }
-    }
-}
-
-@Preview(showBackground = true, name = "Lista de Campanhas")
-@Composable
-fun CampaignsListPreview() {
-    // 1. Criar dados de teste (Mock Data)
-    val mockCampaigns = listOf(
-        CampaignModel(
-            id = 1,
-            name = "Recolha de Natal",
-            description = "Estamos a recolher brinquedos e roupas para crianças carenciadas durante a época festiva.",
-            category = "Brinquedos",
-            onGoing = true, // A decorrer
-            startDate = "01/12/2024",
-            endDate = "25/12/2024",
-            goal = 100,
-            currentDonations = 65
-        ),
-        CampaignModel(
-            id = 2,
-            name = "Banco Alimentar",
-            description = "Recolha de bens essenciais não perecíveis.",
-            category = "Alimentação",
-            onGoing = true,
-            startDate = "10/01/2024",
-            endDate = "20/01/2024",
-            goal = 500,
-            currentDonations = 120
-        ),
-        CampaignModel(
-            id = 3,
-            name = "Material Escolar 2023",
-            description = "Campanha finalizada para apoio ao início do ano letivo.",
-            category = "Educação",
-            onGoing = false, // Terminada
-            startDate = "01/09/2023",
-            endDate = "15/09/2023",
-            goal = 200,
-            currentDonations = 200
-        )
-    )
-
-    // 2. Criar o estado da UI com os dados
-    val mockState = CampaignsListState(
-        campaigns = mockCampaigns,
-        isLoading = false,
-        error = null,
-    )
-
-    // 3. Renderizar o componente com o tema
-    com.ipca.socialstore.presentation.ui.theme.SocialStoreTheme {
-        CampaignsListContent(
-            modifier = Modifier.fillMaxSize(),
-            uiState = mockState,
-        )
-    }
-}
-
-@Preview(showBackground = true, name = "Lista Vazia")
-@Composable
-fun CampaignsListEmptyPreview() {
-    val emptyState = CampaignsListState(
-        campaigns = emptyList(),
-        isLoading = false,
-        error = null
-    )
-
-    com.ipca.socialstore.presentation.ui.theme.SocialStoreTheme {
-        CampaignsListContent(
-            modifier = Modifier.fillMaxSize(),
-            uiState = emptyState,
-        )
     }
 }
