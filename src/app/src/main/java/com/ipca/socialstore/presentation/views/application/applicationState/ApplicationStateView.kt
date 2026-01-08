@@ -26,9 +26,15 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Download
+import androidx.compose.material.icons.filled.DriveFileRenameOutline
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.outlined.FileOpen
@@ -75,9 +81,9 @@ import com.ipca.socialstore.presentation.models.DocumentReceiverModel
 import com.ipca.socialstore.presentation.routes.GeneralRoutes
 import com.ipca.socialstore.presentation.ui.SocialStoreScaffoldContent
 import com.ipca.socialstore.presentation.ui.components.AlertComponent
+import com.ipca.socialstore.presentation.ui.components.ApplicationData
 import com.ipca.socialstore.presentation.ui.components.ButtonTracedComponent
 import com.ipca.socialstore.presentation.ui.components.ExpandableSection
-import com.ipca.socialstore.presentation.ui.components.ReadOnlyField
 import com.ipca.socialstore.presentation.ui.components.WarningComponent
 import com.ipca.socialstore.presentation.ui.theme.GreenIPCA
 import com.ipca.socialstore.presentation.ui.theme.IconTint
@@ -86,12 +92,42 @@ import com.ipca.socialstore.presentation.utils.files.getFileNameFromUri
 import com.ipca.socialstore.presentation.utils.navigation.NavigationLogic
 import com.ipca.socialstore.presentation.utils.ui.getApplicationDataStateViewData
 import com.ipca.socialstore.presentation.utils.ui.getApplicationDocumentTypeStateViewData
+import com.ipca.socialstore.presentation.views.application.applicationStateAdmin.ApplicationStateAdminViewModel
 
 @Composable
 fun ApplicationStateView(modifier: Modifier, navController: NavController, userRole: UserRole){
     val applicationStateViewModel: ApplicationStateViewModel = hiltViewModel()
     val uiState by applicationStateViewModel.uiState
     val context = LocalContext.current
+
+    val saveFileLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.CreateDocument("application/pdf")
+    ) { uri ->
+        if (uri != null) {
+            applicationStateViewModel.saveToUserSelectedUri(uri)
+        } else {
+            Toast.makeText(context, "Gravação cancelada", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        applicationStateViewModel.downloadEvent.collect { event ->
+            when (event) {
+                is ApplicationStateViewModel.DownloadEvent.Loading -> {
+                    Toast.makeText(context, "A descarregar...", Toast.LENGTH_SHORT).show()
+                }
+                is ApplicationStateViewModel.DownloadEvent.PromptUserToSave -> {
+                    saveFileLauncher.launch(event.fileName)
+                }
+                is ApplicationStateViewModel.DownloadEvent.Success -> {
+                    Toast.makeText(context, event.message, Toast.LENGTH_LONG).show()
+                }
+                is ApplicationStateViewModel.DownloadEvent.Error -> {
+                    Toast.makeText(context, event.message, Toast.LENGTH_LONG).show()
+                }
+            }
+        }
+    }
 
     ApplicationStateViewContent(
         modifier = modifier,
@@ -129,6 +165,9 @@ fun ApplicationStateView(modifier: Modifier, navController: NavController, userR
         },
         onApplicationUpdate = {
             applicationStateViewModel.updateApplication()
+        },
+        onDownloadFile = { fileName, filePath ->
+            applicationStateViewModel.downloadDocument(fileName = fileName, filePath = filePath)
         }
     )
 
@@ -168,10 +207,12 @@ fun ApplicationStateViewContent(
     onCourseUpdate: (String) -> Unit,
     onStudentNumberUpdate: (String) -> Unit,
     onApplicationUpdate:() ->Unit,
+    onDownloadFile: (fileName: String, filePath: String) -> Unit
     ){
 
     var isDataExpanded by remember { mutableStateOf(true) }
     var isDocsExpanded by remember { mutableStateOf(false) }
+    var isFinalDocExpanded by remember { mutableStateOf(false) }
     var showAlertBox by remember { mutableStateOf(false) }
 
     val bankStatementsFilesPicker = rememberLauncherForActivityResult(
@@ -202,6 +243,12 @@ fun ApplicationStateViewContent(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         onAddSelectedFile(DocumentType.INTERNATIONAL_SUPPORT.folderName, uri)
+    }
+
+    val requirementFilesPicker = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        onAddSelectedFile(DocumentType.REQUERIMENT.folderName, uri)
     }
 
     Column(
@@ -242,70 +289,7 @@ fun ApplicationStateViewContent(
             }
             val uiData = getApplicationDataStateViewData(uiState.application.applicationDataState.state)
             if (uiState.application.applicationDataState.state != ApplicationDataStatus.DENIED.status) {
-                CategoryBox(
-                    title = "Dados Pessoais",
-                    description = uiData.text,
-                    descriptionTextColor = uiData.textColor,
-                    descriptionBgTextColor = uiData.bgColor
-                ) {
-                    ReadOnlyField("Nome Completo", uiState.application.name)
-                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                        Box(Modifier.weight(1f)) {
-                            ReadOnlyField(
-                                "Email",
-                                uiState.application.email
-                            )
-                        }
-                        Box(Modifier.weight(1f)) {
-                            ReadOnlyField(
-                                label = "Ano Letivo",
-                                value = uiState.application.schoolYear.toString()
-                            )
-                        }
-                    }
-                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                        Box(Modifier.weight(1f)) {
-                            ReadOnlyField(
-                                label = "CC",
-                                value = uiState.application.cc
-                            )
-                        }
-                        Box(Modifier.weight(1f)) {
-                            ReadOnlyField(
-                                label = "Data Nasc.",
-                                value = uiState.application.birthDate
-                            )
-                        }
-                    }
-                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                        Box(Modifier.weight(1f)) {
-                            ReadOnlyField(
-                                "Numero de Telemovel",
-                                uiState.application.phoneNumber
-                            )
-                        }
-                        Box(Modifier.weight(1f)) {
-                            ReadOnlyField(
-                                "Tipo de Pedido",
-                                uiState.application.requestType
-                            )
-                        }
-                    }
-                }
-                if(uiState.application.academicData != null){
-                    CategoryBox(
-                        title = "Dados Académicos",
-                        description = uiData.text,
-                        descriptionTextColor = uiData.textColor,
-                        descriptionBgTextColor = uiData.bgColor
-                    ) {
-                        ReadOnlyField("Curso", uiState.application.academicData.course)
-                        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                            Box(Modifier.weight(1f)) { ReadOnlyField(label = "Tipo de Curso", value = uiState.application.academicData.typeCourse) }
-                            Box(Modifier.weight(1f)) { ReadOnlyField(label = "Numero de Estudante", value = uiState.application.academicData.studenNumber)}
-                        }
-                    }
-                }
+                ApplicationData(application = uiState.application)
             }
             else {
                 CategoryBox(
@@ -326,6 +310,7 @@ fun ApplicationStateViewContent(
                         academicCourseType = uiState.application.academicData?.typeCourse ?: "",
                         academicCourseName = uiState.application.academicData?.course ?: "",
                         academicStudentNumber = uiState.application.academicData?.studenNumber ?: "",
+                        scholarShipValue = if (uiState.application.scholarShip?.value == 0f) "" else uiState.application.schoolYear.toString(),
                         onNameChange = onNameUpdate,
                         onBirthDateChange = onBirthDateUpdate,
                         onCcChange = onCcUpdate,
@@ -335,8 +320,12 @@ fun ApplicationStateViewContent(
                         onAcademicTypeChange = onTypeCourseUpdate,
                         onAcademicCourseChange = onCourseUpdate,
                         onAcademicNumberChange = onStudentNumberUpdate,
-                        isAdmin = true,
-                        onIsStudentUpdate = {}
+                        isEditing = true,
+                        onIsStudentUpdate = {},
+                        onOffCountryUpdate = {  },
+                        onScholarShipUpdate = {  },
+                        onFaesUpdate = {  },
+                        onScholarShipValueUpdate = {}
                     )
                 }
                 Button(
@@ -366,7 +355,8 @@ fun ApplicationStateViewContent(
                 bgColor = Color.White,
                 filePicker = bankStatementsFilesPicker,
                 onDeleteFile = onDeleteFile,
-                onSubmitFile = onSubmitFile
+                onSubmitFile = onSubmitFile,
+                onDownloadFile = onDownloadFile
             )
 
             DocumentsList(
@@ -378,7 +368,8 @@ fun ApplicationStateViewContent(
                 bgColor = Color.White,
                 filePicker = incomeProofFilesPicker,
                 onDeleteFile = onDeleteFile,
-                onSubmitFile = onSubmitFile
+                onSubmitFile = onSubmitFile,
+                onDownloadFile = onDownloadFile
             )
 
             DocumentsList(
@@ -390,7 +381,8 @@ fun ApplicationStateViewContent(
                 bgColor = Color.White,
                 filePicker = otherIncomeFilesPicker,
                 onDeleteFile = onDeleteFile,
-                onSubmitFile = onSubmitFile
+                onSubmitFile = onSubmitFile,
+                onDownloadFile = onDownloadFile
             )
 
             DocumentsList(
@@ -402,20 +394,45 @@ fun ApplicationStateViewContent(
                 bgColor = Color.White,
                 filePicker = permanentExpensesFilesPicker,
                 onDeleteFile = onDeleteFile,
-                onSubmitFile = onSubmitFile
+                onSubmitFile = onSubmitFile,
+                onDownloadFile = onDownloadFile
             )
 
-            DocumentsList(
-                documentsList = uiState.documentsInternationalSupport,
-                documentsState = uiState.internationalSupportDocsState,
-                files = uiState.selectedInternationalSupport,
-                tittle = "Apoio Internacional",
-                description = uiState.internationalSupportDocsState.description,
-                bgColor = Color.White,
-                filePicker = internationalSupportFilesPicker,
-                onDeleteFile = onDeleteFile,
-                onSubmitFile = onSubmitFile
-            )
+            if(uiState.application.offCountry){
+                DocumentsList(
+                    documentsList = uiState.documentsInternationalSupport,
+                    documentsState = uiState.internationalSupportDocsState,
+                    files = uiState.selectedInternationalSupport,
+                    tittle = "Apoio Internacional",
+                    description = uiState.internationalSupportDocsState.description,
+                    bgColor = Color.White,
+                    filePicker = internationalSupportFilesPicker,
+                    onDeleteFile = onDeleteFile,
+                    onSubmitFile = onSubmitFile,
+                    onDownloadFile = onDownloadFile
+                )
+            }
+        }
+        if(uiState.application.applicationState.state == ApplicationStates.ALMOST_APPROVED.status){
+            ExpandableSection(
+                title = "Fase Final",
+                icon = Icons.Outlined.Person,
+                isExpanded = isFinalDocExpanded,
+                onExpandChange = { isFinalDocExpanded = it }
+            ) {
+                DocumentsList(
+                    documentsList = uiState.documentsRequirement,
+                    documentsState = uiState.documentsRequirementState,
+                    files = uiState.selectedRequirement,
+                    tittle = "Requerimento",
+                    description = uiState.documentsRequirementState.description,
+                    bgColor = Color.White,
+                    filePicker = requirementFilesPicker,
+                    onDeleteFile = onDeleteFile,
+                    onSubmitFile = onSubmitFile,
+                    onDownloadFile = onDownloadFile
+                )
+            }
         }
         Button(
             onClick = {showAlertBox = true},
@@ -442,7 +459,8 @@ fun DocumentsList(
     bgColor: Color,
     filePicker: ManagedActivityResultLauncher<String, Uri?>,
     onDeleteFile:(document: DocumentReceiverModel?, uri: Uri?, folderName: String) -> Unit,
-    onSubmitFile:(docTypeStateId: Int, type: String, msg: String, folderName: String) -> Unit){
+    onSubmitFile:(docTypeStateId: Int, type: String, msg: String, folderName: String) -> Unit,
+    onDownloadFile: (fileName: String, filePath: String) -> Unit){
 
     val uiData = getApplicationDocumentTypeStateViewData(documentsState.state)
 
@@ -473,6 +491,7 @@ fun DocumentsList(
                     var icon : ImageVector
                     val status: String
                     var canDelete = false
+                    var canDownload = false
 
                     if(doc.state == DocumentStatus.ACCEPTED.status){
                         statusColor = Color.Green
@@ -483,6 +502,12 @@ fun DocumentsList(
                         statusColor = Color.Gray
                         icon = Icons.Default.Star
                         status = "Por Rever"
+                    }
+                    else if(doc.state == DocumentStatus.NO_STATUS.status){
+                        statusColor = Color.Blue
+                        icon = Icons.Default.Star
+                        status = "Gerado"
+                        canDownload = true
                     }
                     else{
                         statusColor = Color.Red
@@ -501,6 +526,8 @@ fun DocumentsList(
                         canDelete = canDelete,
                         onDeleteFile = { onDeleteFile(doc, null, documentsState.type) },
                         errorMessage = doc.description,
+                        onDownloadFile = {onDownloadFile(doc.name, doc.path)},
+                        canDownload = canDownload
                     )
                 }
             }
@@ -515,6 +542,7 @@ fun DocumentsList(
                         canDelete = true,
                         onDeleteFile = { onDeleteFile(null, file, documentsState.type) },
                         imageVector = Icons.Default.Star,
+                        onDownloadFile = {}
                     )
                 }
             }
@@ -555,7 +583,7 @@ fun StatusTimelineHeader(state: String) {
                 TimelineComponent(
                     label = "Submetido",
                     description = "A candidatura foi submetida.",
-                    icon = Icons.Default.Star,
+                    icon = Icons.Default.Schedule,
                     step = 1,
                     color = Color(0xFFFBC02D)
                 )
@@ -564,7 +592,7 @@ fun StatusTimelineHeader(state: String) {
                 TimelineComponent(
                     label = "Correção",
                     description = "A candidatura precisa de ser corrigida.",
-                    icon = Icons.Default.Star,
+                    icon = Icons.Default.Edit,
                     step = 2,
                     color = Color(0xFF1976D2)
                 )
@@ -573,7 +601,7 @@ fun StatusTimelineHeader(state: String) {
                 TimelineComponent(
                     label = "Aceite",
                     description = "Candidatura aprovada.",
-                    icon = Icons.Default.Star,
+                    icon = Icons.Default.CheckCircle,
                     step = 3,
                     color = Color(0xFF43A047)
                 )
@@ -582,9 +610,18 @@ fun StatusTimelineHeader(state: String) {
                 TimelineComponent(
                     label = "Recusado",
                     description = "Candidatura não aceite.",
-                    icon = Icons.Default.Star,
+                    icon = Icons.Default.Cancel,
                     step = 3,
                     color = Color(0xFFD32F2F)
+                )
+            }
+            else if(state == ApplicationStates.ALMOST_APPROVED.status){
+                TimelineComponent(
+                    label = "Assinatura Pendente",
+                    description = "Dados validados! Descarregue o requerimento, assine e submeta-o para finalizar a candidatura.",
+                    icon = Icons.Default.DriveFileRenameOutline,
+                    step = 3,
+                    color = Color(0xFFF57C00)
                 )
             }
         }
@@ -706,6 +743,8 @@ fun DocumentRow(
     canDelete: Boolean,
     imageVector: ImageVector,
     onDeleteFile:() -> Unit,
+    canDownload: Boolean = false,
+    onDownloadFile:() -> Unit,
     errorMessage: String? = null
 ) {
     Column(
@@ -738,6 +777,19 @@ fun DocumentRow(
                         imageVector = Icons.Default.Close,
                         contentDescription = "Eliminar ficheiro",
                         tint = Color(0xFFE57373),
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+            }
+            if(canDownload){
+                IconButton(
+                    onClick = onDownloadFile,
+                    modifier = Modifier.size(32.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Download,
+                        contentDescription = "Download",
+                        tint = Color.Gray,
                         modifier = Modifier.size(20.dp)
                     )
                 }
@@ -828,7 +880,8 @@ fun ApplicationStatePreview(){
                 onTypeCourseUpdate = {},
                 onCourseUpdate = {},
                 onStudentNumberUpdate = {},
-                onApplicationUpdate = {}
+                onApplicationUpdate = {},
+                onDownloadFile = { fileName, filePath -> }
             )
         }
     }

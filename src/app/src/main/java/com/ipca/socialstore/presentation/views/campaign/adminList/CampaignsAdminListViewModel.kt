@@ -1,11 +1,10 @@
-package com.ipca.socialstore.presentation.views.campaign.list
+package com.ipca.socialstore.presentation.views.campaign.adminList
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ipca.socialstore.data.models.CampaignModel
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
-import com.ipca.socialstore.domain.campaign.CreateCampaignUseCase
 import com.ipca.socialstore.domain.campaign.DeleteCampaignUseCase
 import com.ipca.socialstore.domain.campaign.GetAllCampaignsUseCase
 import com.ipca.socialstore.presentation.utils.errors.ErrorText
@@ -14,7 +13,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-data class CampaignsListState(
+data class CampaignsAdminListState(
     val campaigns : List<CampaignModel> = emptyList(),
     val isLoading : Boolean = false,
     val error : ErrorText? = null,
@@ -22,12 +21,10 @@ data class CampaignsListState(
 )
 
 @HiltViewModel
-class CampaignsListViewModel @Inject constructor(
+class CampaignsAdminListViewModel @Inject constructor(
     private val getAllCampaignsUseCase: GetAllCampaignsUseCase,
-    private val createCampaignUseCase: CreateCampaignUseCase,
     private val deleteCampaignUseCase: DeleteCampaignUseCase): ViewModel(){
-    val uiState = mutableStateOf(CampaignsListState())
-
+    val uiState = mutableStateOf(CampaignsAdminListState())
 
     fun updateCampaignDeleted(state: Boolean){
         uiState.value = uiState.value.copy(campaignDeleted = state)

@@ -5,4 +5,5 @@ enum class DocumentStatus(val status: String) {
     ACCEPTED("accepted"),
     TO_SEND("to_send"),
     DENIED("denied"),
+    NO_STATUS("no_status"), //file cant be deleted
 }

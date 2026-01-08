@@ -29,3 +29,16 @@ fun getRequestTypeDisplayLabel(dbValue: String): String {
         }
         .joinToString(", ")
 }
+
+fun getRequestTypeDbValue(displayLabel: String): String {
+    // Handle empty or default cases
+    if (displayLabel.isBlank() || displayLabel == "Nenhum") return ""
+
+    return displayLabel.split(",") // 1. Split by comma
+        .map { it.trim() }         // 2. Remove whitespace (e.g., " Limpeza" -> "Limpeza")
+        .mapNotNull { label ->
+            // 3. Find the Enum that matches this label
+            RequestType.entries.find { it.label.equals(label, ignoreCase = true) }?.code
+        }
+        .joinToString("_")         // 4. Join codes with underscore
+}

@@ -1,5 +1,6 @@
 package com.ipca.socialstore.data.repository
 
+import android.util.Log
 import com.ipca.socialstore.data.enums.DatabaseTables
 import com.ipca.socialstore.data.exceptions.AppError
 import com.ipca.socialstore.data.exceptions.ExceptionMapper
@@ -26,6 +27,7 @@ class DocumentStateRepository @Inject constructor(private val supabase: Supabase
     }
 
     suspend fun updateDocumentState(documentState: DocumentStateModel): ResultWrapper<Int> {
+        Log.d("App Debug", documentState.id.toString())
         val id = documentState.id
             ?: return ResultWrapper.Error(AppError.UnknownError("Document State Id Null"))
         return try {

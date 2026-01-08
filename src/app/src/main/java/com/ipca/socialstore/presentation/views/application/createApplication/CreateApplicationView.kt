@@ -70,6 +70,7 @@ fun CreateApplicationView(modifier: Modifier, navController: NavController, user
         onCcUpdate = applicationViewModel::updateCc,
         onPhoneUpdate = applicationViewModel::updatePhoneNumber,
         onRequestTypeUpdate = applicationViewModel::updateRequestType,
+        onOffCountryUpdate = applicationViewModel::updateOffCountry,
 
         // --- Student Status Updates ---
         onIsStudentUpdate = applicationViewModel::updateIsStudent,
@@ -78,7 +79,10 @@ fun CreateApplicationView(modifier: Modifier, navController: NavController, user
         onTypeCourseUpdate = applicationViewModel::updateTypeCourse,
         onCourseUpdate = applicationViewModel::updateCourse,
         onStudentNumberUpdate = applicationViewModel::updateStudentNumber,
-        onSubmitApplication = applicationViewModel::createApplication
+        onSubmitApplication = applicationViewModel::createApplication,
+        onFaesUpdate = applicationViewModel::updateFaes,
+        onScholarShipValueUpdate = applicationViewModel::updateScholarShipValue,
+        onScholarShipUpdate = applicationViewModel::updateScholarShip
     )
 
     LaunchedEffect(uiState.isSuccess) {
@@ -106,6 +110,10 @@ fun CreateApplicationViewContent(
     onCcUpdate: (String) -> Unit,
     onPhoneUpdate: (String) -> Unit,
     onRequestTypeUpdate: (String) -> Unit,
+    onOffCountryUpdate:(Boolean) -> Unit,
+    onFaesUpdate:(Boolean) -> Unit,
+    onScholarShipUpdate:(Boolean)-> Unit,
+    onScholarShipValueUpdate:(String) -> Unit,
 
     // Academic Data
     onTypeCourseUpdate: (String) -> Unit,
@@ -133,6 +141,7 @@ fun CreateApplicationViewContent(
             academicCourseType = uiState.academicData?.typeCourse ?: "",
             academicCourseName = uiState.academicData?.course ?: "",
             academicStudentNumber = uiState.academicData?.studenNumber ?: "",
+            scholarShipValue = if (uiState.scholarShip?.value == 0f) "" else uiState.scholarShip?.value.toString(),
             onNameChange = onNameUpdate,
             onBirthDateChange = onBirthDateUpdate,
             onCcChange = onCcUpdate,
@@ -142,7 +151,11 @@ fun CreateApplicationViewContent(
             onAcademicTypeChange = onTypeCourseUpdate,
             onAcademicCourseChange = onCourseUpdate,
             onAcademicNumberChange = onStudentNumberUpdate,
-            onIsStudentUpdate = {value -> onIsStudentUpdate(value)}
+            onIsStudentUpdate = {value -> onIsStudentUpdate(value)},
+            onOffCountryUpdate = onOffCountryUpdate,
+            onScholarShipValueUpdate = onScholarShipValueUpdate,
+            onFaesUpdate = onFaesUpdate,
+            onScholarShipUpdate = onScholarShipUpdate
         )
 
         Button(
@@ -169,7 +182,6 @@ fun CreateApplicationViewPreview() {
             isLoading = false,
             error = null,
             isSuccess = false,
-            selectedFiles = emptyList(),
             application = ApplicationModel(
                 stateId = -1,
                 schoolYear = 0,
@@ -181,7 +193,10 @@ fun CreateApplicationViewPreview() {
                 requestType = "",
                 academicId = null,
                 createdAt = "",
-                dataStateId = -1
+                dataStateId = -1,
+                offCountry = false,
+                faes = false,
+                scholarshipId = -1
             ),
             academicData = AcademicModel(typeCourse = "", course = "", studenNumber = "")
         )
@@ -197,6 +212,10 @@ fun CreateApplicationViewPreview() {
             onCcUpdate = {},
             onPhoneUpdate = {},
             onRequestTypeUpdate = {},
+            onOffCountryUpdate = {},
+            onFaesUpdate = {},
+            onScholarShipValueUpdate = {},
+            onScholarShipUpdate = {},
 
             // --- Student ---
             onIsStudentUpdate = {},

@@ -90,4 +90,16 @@ class CampaignRepository @Inject constructor(
             ResultWrapper.Error(exceptionMapper.map(e))
         }
     }
+
+    suspend fun getAllCampaignsLimit(limit: Int) : ResultWrapper<List<CampaignModel>> {
+        return try {
+            val campaigns = supabase.from(DatabaseTables.CAMPAIGN)
+                .select(){limit(count = limit.toLong())}
+                .decodeList<CampaignModel>()
+            ResultWrapper.Success(campaigns)
+        }
+        catch (e : Exception){
+            ResultWrapper.Error(exceptionMapper.map(e))
+        }
+    }
 }
