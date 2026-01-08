@@ -139,8 +139,8 @@ fun SchedulingConfirmationContent(
 
         Spacer(modifier = Modifier.weight(1f))
 
-        if (userRole == UserRole.BENEFICIARY) {
-            if (uiState.scheduling?.state == "accept") {
+        if (userRole == UserRole.BENEFICIARY){
+            if (uiState.scheduling?.state == "accept"){
                 Button(
                     onClick = { onConfirm() },
                     modifier = Modifier

@@ -136,7 +136,6 @@ fun JustificationScreenContent(
                 readOnly = true,
                 placeholder = { Text("Escreva aqui o motivo detalhado...") },
                 shape = RoundedCornerShape(12.dp),
-
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedContainerColor = Color.White,
                     unfocusedContainerColor = Color.White
@@ -259,6 +258,9 @@ fun JustificationScreenPreviewJustified() {
     }
 }
 /*
+
+
+
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun JustificationScreenPreview() {
