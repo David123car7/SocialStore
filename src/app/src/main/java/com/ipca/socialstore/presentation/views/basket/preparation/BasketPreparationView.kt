@@ -71,7 +71,7 @@ fun BasketPreparationView(
         onSelectDate = {value -> viewModel.updateSchedulingId(value)}
     )
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(uiState.selectScheduling) {
         viewModel.fetchInfo()
     }
 }
@@ -91,6 +91,7 @@ fun BasketPreparationContent(
     val beneficiary = uiState.beneficiary ?: return
     var expanded by remember { mutableStateOf(false) }
     var selectedDate by remember { mutableStateOf("Selecionar Data") }
+    var showWarning by remember { mutableStateOf(false) }
 
     Column(
         modifier = modifier
@@ -128,6 +129,7 @@ fun BasketPreparationContent(
                                 onClickDate(item.schedulingDate)
                                 onSelectDate(item)
                                 expanded = false
+                                showWarning = false
                             }
                         )
                     }
@@ -135,7 +137,14 @@ fun BasketPreparationContent(
             }
         }
 
-
+        if(showWarning){
+            Text(
+                text = "Por favor, selecione uma data antes de continuar",
+                color = Color.Red,
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.padding(start = 4.dp, top = 4.dp)
+            )
+        }
         Text("Adicionar Itens ao Cabaz", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
         SearchBarContent { value -> onSearchItem(value)}
 
@@ -170,11 +179,18 @@ fun BasketPreparationContent(
 
         Spacer(modifier = Modifier.height(80.dp))
 
+
         Button(
-            onClick = {onCreate()},
+            onClick = {
+                if (uiState.selectScheduling == null){
+                    showWarning = true
+                }else{
+                    onCreate()
+                }
+                      },
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text(text = "Confirmar Entrega")
+            Text(text = "Colocar Items Entrega")
         }
     }
 }

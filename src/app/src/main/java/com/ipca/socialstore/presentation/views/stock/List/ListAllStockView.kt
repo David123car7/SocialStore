@@ -20,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -68,32 +69,52 @@ fun GetAllStockViewContent(
     val listToDisplay = uiState.searchResult ?: uiState.items
 
     Box(modifier = modifier.fillMaxSize()) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 12.dp)
-        ) {
-            StockList(
-                modifier = Modifier.weight(1f),
-                items = listToDisplay,
-                navController = navController,
-                uiState = uiState,
-                onItemClick = onItemClick,
-                onSearchItem = onSearchItem,
-                isSearchExecuted = uiState.searchResult != null,
-                onSearchType = onSearchType,
-                onGetItemId = onGetItemId,
-            )
+
+        // 1. CONTEÚDO DINÂMICO (Loading, Erro ou Lista)
+        when {
+            uiState.isLoading -> {
+                LoadingIndicator()
+            }
+            uiState.error != null -> {
+                ErrorMessage(error = uiState.error)
+            }
+            else -> {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 12.dp)
+                ) {
+                    StockList(
+                        modifier = Modifier.weight(1f),
+                        items = listToDisplay,
+                        navController = navController,
+                        uiState = uiState,
+                        onItemClick = onItemClick,
+                        onSearchItem = onSearchItem,
+                        isSearchExecuted = uiState.searchResult != null,
+                        onSearchType = onSearchType,
+                        onGetItemId = onGetItemId,
+                    )
+                }
+            }
         }
 
-        if (uiState.isLoading) {
-            LoadingIndicator()
-        } else if (uiState.error != null) {
-            ErrorMessage(error = uiState.error)
+        FloatingActionButton(
+            onClick = {
+                navController.navigate(AdminRoutes.CreateItem)
+            },
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(16.dp)
+                .navigationBarsPadding(),
+            containerColor = MaterialTheme.colorScheme.primary,
+            contentColor = MaterialTheme.colorScheme.onPrimary,
+            shape = CircleShape
+        ) {
+            Icon(Icons.Default.Add, contentDescription = "Adicionar Item")
         }
     }
 }
-
 @Composable
 private fun StockList(
     modifier: Modifier,
@@ -109,7 +130,7 @@ private fun StockList(
     val selectedType = remember { mutableStateOf<String?>(null) }
 
     val itemTypes = remember(items) {
-        items?.map { it.item.itemType }?.filter { it!!.isNotBlank() }?.distinct() ?: emptyList()
+        items?.map { it.item.itemType }?.filter { it.isNotBlank() }?.distinct() ?: emptyList()
     }
     
     Box(modifier = modifier.fillMaxSize()) {
@@ -156,8 +177,6 @@ private fun StockList(
                 style = MaterialTheme.typography.titleSmall,
                 modifier = Modifier.padding(bottom = 8.dp)
             )
-
-            // 2. LÓGICA DA LISTA OU MENSAGEM DE VAZIO
             if (items.isNullOrEmpty()) {
                 Box(
                     modifier = Modifier.weight(1f).fillMaxWidth(),
@@ -185,21 +204,6 @@ private fun StockList(
             }
         }
 
-        // 3. FLOATING ACTION BUTTON FIXO NO CANTO INFERIOR
-        FloatingActionButton(
-            onClick = {
-                navController.navigate(AdminRoutes.CreateItem)
-            },
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .padding(16.dp)
-                .navigationBarsPadding(),
-            containerColor = GreenIPCA,
-            contentColor = MaterialTheme.colorScheme.onPrimary,
-            shape = CircleShape
-        ) {
-            Icon(Icons.Outlined.Add, contentDescription = "Adicionar Item")
-        }
     }
 }
 @Composable
@@ -275,13 +279,24 @@ fun LoadingIndicator() {
 
 @Composable
 fun ErrorMessage(error: ErrorText?) {
+    val errorString = error?.asString() ?: ""
+
+    val displayMessage = if (errorString.contains("Not Found", ignoreCase = true)) {
+        "Não existe stock disponível no momento."
+    } else {
+        errorString.ifBlank { "Erro ao carregar stock. Tente novamente." }
+    }
+
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text(
-            text = error?.asString() ?: "Erro ao carregar stock. Tente novamente.",
-            color = MaterialTheme.colorScheme.error,
-            style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.padding(24.dp)
-        )
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(
+                text = displayMessage,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = MaterialTheme.typography.titleMedium,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(24.dp)
+            )
+        }
     }
 }
 
@@ -311,7 +326,6 @@ fun EmptySearchResultMessage() {
 @Preview(showBackground = true, name = "Estado de Sucesso")
 @Composable
 fun PreviewGetAllStockSuccess() {
-    // 1. Criar dados mockados para os itens
     val mockItem1 = ItemModel(name = "Arroz Agulha 1kg", itemType = "Alimentação")
     val mockItem2 = ItemModel(name = "Detergente Loiça", itemType = "Limpeza")
     val mockItem3 = ItemModel(name = "T-Shirt Branca L", itemType = "Vestuário")

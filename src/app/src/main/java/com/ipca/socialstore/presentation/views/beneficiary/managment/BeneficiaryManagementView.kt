@@ -28,6 +28,7 @@ import com.ipca.socialstore.data.models.BeneficiaryModel
 import com.ipca.socialstore.presentation.routes.AdminRoutes
 import com.ipca.socialstore.presentation.ui.theme.GreenIPCA
 import com.ipca.socialstore.presentation.ui.theme.IconTint
+import com.ipca.socialstore.presentation.routes.BeneficiaryRoutes
 import com.ipca.socialstore.presentation.ui.theme.SocialStoreTheme
 
 @Composable
@@ -52,6 +53,10 @@ fun BeneficiaryManagementView(
         onCreateDeliver = {
             val route = AdminRoutes.CreateDeliver::class.qualifiedName
             navController.navigate("$route/${uiState.beneficiary?.id}")
+        },
+        onMoreScheduling = {
+            val route = BeneficiaryRoutes.Scheduling::class.qualifiedName
+            navController.navigate("$route?beneficiaryId=${uiState.beneficiary?.id}")
         }
     )
 }
@@ -61,7 +66,8 @@ fun BeneficiaryManagementContent(
     modifier: Modifier,
     uiState: BeneficiaryManagementState,
     onAddNewScheduling: () -> Unit,
-    onCreateDeliver: () -> Unit
+    onCreateDeliver: () -> Unit,
+    onMoreScheduling : () -> Unit,
 ) {
     val beneficiary = uiState.beneficiary ?: return
     var expandedSection by remember { mutableStateOf<String?>(null) }
@@ -124,7 +130,7 @@ fun BeneficiaryManagementContent(
 
                 Spacer(modifier = Modifier.height(16.dp))
                 Button(
-                    onClick = { /* Navegação para calendário */ },
+                    onClick = { onMoreScheduling() },
                     modifier = Modifier.fillMaxWidth().height(45.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE0E0E0)),
                     shape = RoundedCornerShape(10.dp)
@@ -357,7 +363,8 @@ fun PreviewManagement() {
                 note = "Entregar na porta lateral"
             ),
             onAddNewScheduling = {},
-            onCreateDeliver = {}
+            onCreateDeliver = {},
+            onMoreScheduling = {}
         )
     }
 }

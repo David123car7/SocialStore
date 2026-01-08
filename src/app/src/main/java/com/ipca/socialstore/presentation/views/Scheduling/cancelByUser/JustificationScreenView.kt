@@ -34,6 +34,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.ipca.socialstore.data.enums.UserRole
 import com.ipca.socialstore.data.models.BeneficiaryModel
 import com.ipca.socialstore.data.models.SchedulingModel
 import com.ipca.socialstore.presentation.ui.theme.GreenIPCA
@@ -41,7 +42,9 @@ import com.ipca.socialstore.presentation.ui.theme.GreenIPCA
 @Composable
 fun JustificationScreenView(
     modifier: Modifier,
-    navController: NavController
+    navController: NavController,
+    userRole: UserRole
+
 ){
 
     val viewModel : JustificationScreenViewModel = hiltViewModel()
@@ -51,7 +54,8 @@ fun JustificationScreenView(
         modifier = modifier,
         uiState = uiState,
         updateReason = {value -> viewModel.updateReasonUi(value)},
-        onUpdate = {viewModel.updateReason()}
+        onUpdate = {viewModel.updateReason()},
+        userRole = userRole,
     )
 }
 
@@ -60,7 +64,8 @@ fun JustificationScreenContent(
     modifier: Modifier,
     uiState: JustificationState,
     updateReason : (value : String) -> Unit,
-    onUpdate : () -> Unit
+    onUpdate : () -> Unit,
+    userRole: UserRole
 ){
     val isJustified = uiState.scheduling?.state == "justified"
     Column(
@@ -120,35 +125,54 @@ fun JustificationScreenContent(
             modifier = Modifier.padding(bottom = 8.dp)
         )
 
-        OutlinedTextField(
-            value = uiState.reason ?: "",
-            onValueChange = { value -> if (!isJustified) updateReason(value)},
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(200.dp),
-            placeholder = { Text("Escreva aqui o motivo detalhado...") },
-            shape = RoundedCornerShape(12.dp),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedContainerColor = Color.White,
-                unfocusedContainerColor = Color.White
-            )
-        )
-
-
-        Spacer(modifier = Modifier.weight(1f))
-
-        if (!isJustified){
-            Button(
-                onClick = { onUpdate() },
+        if (userRole == UserRole.ADMIN){
+            OutlinedTextField(
+                value = uiState.reason ?: "",
+                onValueChange = { value -> if (!isJustified) updateReason(value)},
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(56.dp),
+                    .height(200.dp),
+                readOnly = true,
+                placeholder = { Text("Escreva aqui o motivo detalhado...") },
                 shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = GreenIPCA)
-            ) {
-                Text("Enviar Justificação", fontWeight = FontWeight.Bold, color = Color.White)
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedContainerColor = Color.White,
+                    unfocusedContainerColor = Color.White
+                )
+            )
+        }
+        else{
+            OutlinedTextField(
+                value = uiState.reason ?: "",
+                onValueChange = { value -> if (!isJustified) updateReason(value)},
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp),
+                placeholder = { Text("Escreva aqui o motivo detalhado...") },
+                shape = RoundedCornerShape(12.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedContainerColor = Color.White,
+                    unfocusedContainerColor = Color.White
+                )
+            )
+        }
+        Spacer(modifier = Modifier.weight(1f))
+
+        if (userRole == UserRole.BENEFICIARY){
+            if (!isJustified){
+                Button(
+                    onClick = { onUpdate() },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEF5350))
+                ) {
+                    Text("Enviar Justificação", fontWeight = FontWeight.Bold, color = Color.White)
+                }
             }
         }
+
 
     }
 }
@@ -182,63 +206,16 @@ fun JustificationScreenPreviewEditable() {
         error = null
     )
 
-    MaterialTheme {
-        JustificationScreenContent(
-            modifier = Modifier.fillMaxSize(),
-            uiState = uiState,
-            updateReason = {},
-            onUpdate = {}
-        )
-    }
-}
 
-@Preview(showBackground = true, name = "2. Ecrã Já Justificado (Botão Oculto)")
-@Composable
-fun JustificationScreenPreviewJustified() {
-    val mockBeneficiary = BeneficiaryModel(
-        id = 27973,
-        name = "David Carvalho",
-        phoneNumber = "912345678",
-        birthDate = "2000-01-01",
-        academicId = null
-    )
-
-    val mockScheduling = SchedulingModel(
-        id = 2,
-        schedulingDate = "05/01/2026",
-        beneficiaryId = 27973,
-        state = "justified", // IMPORTANTE: Isto esconde o botão no teu código
-        reason = "Estive doente e não consegui comparecer.",
-        note = "Justificação aceite."
-    )
-
-    val uiState = JustificationState(
-        beneficiary = mockBeneficiary,
-        scheduling = mockScheduling,
-        reason = mockScheduling.reason, // Preenche a caixa de texto
-        isLoading = false,
-        error = null
-    )
-
-    MaterialTheme {
-        JustificationScreenContent(
-            modifier = Modifier.fillMaxSize(),
-            uiState = uiState,
-            updateReason = {},
-            onUpdate = {}
-        )
-    }
-}
-/*
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun JustificationScreenPreview() {
-    // Simulando os modelos conforme a tua estrutura
     val mockBeneficiary = BeneficiaryModel(
         id = 3,
         name = "David",
         birthDate = "1990-05-15",
-        addressId = 1
+        phoneNumber = "",
+        academicId = 1
     )
 
     val mockScheduling = SchedulingModel(
@@ -246,7 +223,8 @@ fun JustificationScreenPreview() {
         schedulingDate = "22/01/2026",
         beneficiaryId = 3,
         state = "canceled",
-        reason = "TEste"
+        reason = "TEste",
+        note = ""
     )
 
     val mockUiState = JustificationState(
@@ -260,10 +238,11 @@ fun JustificationScreenPreview() {
             modifier = Modifier,
             uiState = mockUiState,
             updateReason = {},
-            onUpdate = {}
+            onUpdate = {},
+            userRole = UserRole.ADMIN
         )
     }
 }
 
- */
+
 

@@ -65,6 +65,7 @@ class SchedulingConfirmationViewModel @Inject constructor(
         }
     }
 
+
     fun getScheduling(){
         val id = schedulingId?.toIntOrNull()
 

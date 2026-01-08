@@ -204,7 +204,6 @@ class BasketPreparationViewModel @Inject constructor(
             selectScheduling = scheduling,
             selectedQuantities = emptyMap()
         )
-        println(scheduling)
         fetchExistingItems()
     }
 

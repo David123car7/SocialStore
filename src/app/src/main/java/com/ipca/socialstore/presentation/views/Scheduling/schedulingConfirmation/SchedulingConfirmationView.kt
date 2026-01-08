@@ -32,6 +32,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.ipca.socialstore.data.enums.UserRole
 import com.ipca.socialstore.data.models.BeneficiaryModel
 import com.ipca.socialstore.data.models.SchedulingModel
 import com.ipca.socialstore.presentation.ui.theme.GreenIPCA
@@ -39,7 +40,8 @@ import com.ipca.socialstore.presentation.ui.theme.GreenIPCA
 @Composable
 fun SchedulingConfirmationView(
     modifier: Modifier,
-    navController: NavController
+    navController: NavController,
+    userRole: UserRole
 ) {
     val viewModel: SchedulingConfirmationViewModel = hiltViewModel()
     val uiState by viewModel.uiState
@@ -50,7 +52,8 @@ fun SchedulingConfirmationView(
         updateObservation = { value -> viewModel.updateNoteUi(value)},
         onConfirm = {viewModel.updateNote() },
         onAccept = {viewModel.acceptScheduling()},
-        onDecline = {viewModel.declineScheduling()}
+        onDecline = {viewModel.declineScheduling()},
+        userRole = userRole
     )
 }
 
@@ -61,7 +64,8 @@ fun SchedulingConfirmationContent(
     updateObservation: (String) -> Unit,
     onConfirm: () -> Unit,
     onAccept: () -> Unit,
-    onDecline: () -> Unit
+    onDecline: () -> Unit,
+    userRole: UserRole
 ) {
     Column(
         modifier = modifier
@@ -135,48 +139,70 @@ fun SchedulingConfirmationContent(
 
         Spacer(modifier = Modifier.weight(1f))
 
-        if (uiState.scheduling?.state == "accept"){
-            Button(
-                onClick = { onConfirm() },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp),
-                shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = GreenIPCA)
-            ) {
-
-                Text("Enviar", fontWeight = FontWeight.Bold, color = Color.White)
-            }
-        }
-        if (uiState.scheduling?.state == "in_Progress") {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
+        if (userRole == UserRole.BENEFICIARY){
+            if (uiState.scheduling?.state == "accept"){
                 Button(
-                    onClick = { onAccept() },
+                    onClick = { onConfirm() },
                     modifier = Modifier
-                        .weight(1f) 
+                        .fillMaxWidth()
                         .height(56.dp),
                     shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF136342))
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2E7D32))
                 ) {
-                    Text("Aceitar", fontWeight = FontWeight.Bold, color = Color.White)
-                }
 
-                Button(
-                    onClick = { onDecline() },
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(56.dp),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD32F2F))
-                ) {
-                    Text("Recusar", fontWeight = FontWeight.Bold, color = Color.White)
+                    Text("Enviar", fontWeight = FontWeight.Bold, color = Color.White)
                 }
             }
+            if (uiState.scheduling?.state == "in_Progress") {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Button(
+                        onClick = { onAccept() },
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(56.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF136342))
+                    ) {
+                        Text("Aceitar", fontWeight = FontWeight.Bold, color = Color.White)
+                    }
 
+                    Button(
+                        onClick = { onDecline() },
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(56.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD32F2F))
+                    ) {
+                        Text("Recusar", fontWeight = FontWeight.Bold, color = Color.White)
+                    }
+                }
+
+            }
         }
+        else{
+            if (uiState.scheduling?.state == "accept"){
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Button(
+                        onClick = { onDecline() },
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(56.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD32F2F))
+                    ) {
+                        Text("Cancelar", fontWeight = FontWeight.Bold, color = Color.White)
+                    }
+                }
+            }
+        }
+
 
 
     }
@@ -198,7 +224,7 @@ fun SchedulingConfirmationPreview() {
         id = 6,
         schedulingDate = "2026-01-24",
         beneficiaryId = 4,
-        state = "accept",
+        state = "canceled",
         reason = null,
         note = null
     )
@@ -218,7 +244,8 @@ fun SchedulingConfirmationPreview() {
             updateObservation = {},
             onConfirm = {},
             onDecline = {},
-            onAccept = {}
+            onAccept = {},
+            userRole = UserRole.ADMIN
         )
     }
 }

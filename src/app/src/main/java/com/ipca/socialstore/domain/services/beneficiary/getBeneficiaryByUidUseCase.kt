@@ -12,9 +12,9 @@ class GetBeneficiaryByUidUseCase @Inject constructor(
 ) {
     suspend operator fun invoke() : ResultWrapper<BeneficiaryModel>{
         val beneficiaryResult = getUserBeneficiaryIdUseCase()
-        if (beneficiaryResult is ResultWrapper.Error) return ResultWrapper.Error(beneficiaryResult.error)
+        if (beneficiaryResult is ResultWrapper.Error)
+            return ResultWrapper.Error(beneficiaryResult.error)
         val beneficiaryId = (beneficiaryResult as ResultWrapper.Success).data
-
         val getBeneficiary = getBeneficiaryByIdUseCase(beneficiaryId)
         if (getBeneficiary is ResultWrapper.Error) return ResultWrapper.Error(getBeneficiary.error)
         val beneficiary = (getBeneficiary as ResultWrapper.Success).data

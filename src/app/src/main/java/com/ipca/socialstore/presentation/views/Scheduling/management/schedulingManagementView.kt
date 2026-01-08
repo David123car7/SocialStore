@@ -2,7 +2,9 @@ package com.ipca.socialstore.presentation.views.Scheduling.management
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -52,25 +54,56 @@ fun SchedulingManagementView(
 @Composable
 fun SchedulingManagementContent(
     modifier: Modifier,
-    uiState : SchedulingManagementState,
-    onSearchBeneficiary : (value : String) -> Unit,
-    onClick:  (BeneficiaryModel) -> Unit,
-){
+    uiState: SchedulingManagementState,
+    onSearchBeneficiary: (value: String) -> Unit,
+    onClick: (BeneficiaryModel) -> Unit,
+) {
     Column(
-        modifier.fillMaxSize()
+        modifier = modifier.fillMaxSize()
     ) {
-        SearchBarContent({value -> onSearchBeneficiary(value)})
+        SearchBarContent({ value -> onSearchBeneficiary(value) })
 
-        LazyColumn(
-            modifier.fillMaxSize()
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 24.dp, vertical = 16.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            itemsIndexed(uiState.filteredBeneficiaries ?: emptyList()){index, item ->
-                BeneficiaryCard(
-                    item.name,
-                    item.id.toString(),
-                    status = "Regular",
-                    onClick = {onClick(item)}
+            Text(
+                text = "Lista de Beneficiários",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = Color.Black
+            )
+        }
+
+        val beneficiaries = uiState.filteredBeneficiaries ?: emptyList()
+
+        if (beneficiaries.isEmpty()) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "Nenhum beneficiário encontrado",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = Color.Gray
                 )
+            }
+        } else {
+            LazyColumn(
+                modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                contentPadding = PaddingValues(bottom = 16.dp)
+            ) {
+                itemsIndexed(beneficiaries) { index, item ->
+                    BeneficiaryCard(
+                        name = item.name,
+                        processNumber = item.id.toString(),
+                        status = "Regular",
+                        onClick = { onClick(item) }
+                    )
+                }
             }
         }
     }

@@ -43,8 +43,10 @@ class SchedulingMainPageViewModel @Inject constructor(
     private val beneficiaryId: String? = savedStateHandle["beneficiaryId"]
 
     init {
-        beneficiaryId?.toIntOrNull()?.let { id ->
-            fetchBeneficiary(id)
+        val id = if (beneficiaryId != null) beneficiaryId.toIntOrNull() else null
+
+        id?.let {
+            fetchBeneficiary(it)
         }
 
     }
