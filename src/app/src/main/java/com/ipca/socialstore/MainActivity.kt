@@ -59,7 +59,6 @@ import com.ipca.socialstore.presentation.views.beneficiary.managment.Beneficiary
 import com.ipca.socialstore.presentation.views.beneficiary.profile.BeneficiaryProfileView
 import com.ipca.socialstore.presentation.views.campaign.create.CreateCampaignView
 import com.ipca.socialstore.presentation.views.campaign.edit.CampaignEditView
-import com.ipca.socialstore.presentation.views.campaigns.CampaignsListView
 import com.ipca.socialstore.presentation.views.donation.listAllDonations.ListAllDonationsView
 import com.ipca.socialstore.presentation.views.campaign.list.CampaignsListView
 import com.ipca.socialstore.presentation.views.campaigns.CampaignsAdminListView

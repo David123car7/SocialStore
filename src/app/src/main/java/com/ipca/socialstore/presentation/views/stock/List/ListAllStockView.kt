@@ -203,7 +203,6 @@ private fun StockList(
                 }
             }
         }
-
     }
 }
 @Composable

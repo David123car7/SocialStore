@@ -147,7 +147,7 @@ fun SchedulingConfirmationContent(
                         .fillMaxWidth()
                         .height(56.dp),
                     shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2E7D32))
+                    colors = ButtonDefaults.buttonColors(containerColor = GreenIPCA)
                 ) {
 
                     Text("Enviar", fontWeight = FontWeight.Bold, color = Color.White)
@@ -159,52 +159,39 @@ fun SchedulingConfirmationContent(
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Button(
-                        onClick = { onAccept() },
+                        onClick = { onConfirm() },
                         modifier = Modifier
-                            .weight(1f)
+                            .fillMaxWidth()
                             .height(56.dp),
                         shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF136342))
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2E7D32))
                     ) {
-                        Text("Aceitar", fontWeight = FontWeight.Bold, color = Color.White)
-                    }
 
-                    Button(
-                        onClick = { onDecline() },
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(56.dp),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD32F2F))
-                    ) {
-                        Text("Recusar", fontWeight = FontWeight.Bold, color = Color.White)
+                        Text("Enviar", fontWeight = FontWeight.Bold, color = Color.White)
                     }
                 }
-
-            }
-        }
-        else{
-            if (uiState.scheduling?.state == "accept"){
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Button(
-                        onClick = { onDecline() },
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(56.dp),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD32F2F))
+            } else {
+                if (uiState.scheduling?.state == "accept") {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        Text("Cancelar", fontWeight = FontWeight.Bold, color = Color.White)
+                        Button(
+                            onClick = { onDecline() },
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(56.dp),
+                            shape = RoundedCornerShape(12.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD32F2F))
+                        ) {
+                            Text("Cancelar", fontWeight = FontWeight.Bold, color = Color.White)
+                        }
                     }
                 }
             }
+
+
         }
-
-
-
     }
 }
 
