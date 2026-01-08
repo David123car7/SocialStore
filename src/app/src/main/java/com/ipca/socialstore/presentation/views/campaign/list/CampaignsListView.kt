@@ -34,11 +34,10 @@ import com.ipca.socialstore.presentation.utils.navigation.NavigationLogic
 import com.ipca.socialstore.presentation.views.campaign.adminList.CampaignsListState
 import com.ipca.socialstore.presentation.views.campaign.adminList.CampaignsAdminListViewModel
 import com.ipca.socialstore.presentation.views.campaign.adminList.CampaignsListViewModel
-import com.ipca.socialstore.presentation.views.campaign.list.CampaignsListState
-import com.ipca.socialstore.presentation.views.campaign.list.CampaignsListViewModel
 import androidx.compose.material.icons.outlined.DateRange
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.ui.tooling.preview.Preview
 import com.ipca.socialstore.presentation.ui.theme.GreenIPCA
 import com.ipca.socialstore.presentation.ui.theme.IconBgColor
 import com.ipca.socialstore.presentation.ui.theme.IconTint
@@ -132,18 +131,6 @@ fun CampaignsListContent(
                     modifier = Modifier.padding(16.dp)
                 )
             }
-        }
-
-        FloatingActionButton(
-            onClick = onCreateClick,
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .padding(16.dp),
-            containerColor = Color.Black,
-            contentColor = Color.Black.copy(alpha = 0.5f),
-            shape = CircleShape
-        ) {
-            Icon(Icons.Outlined.Add, tint = Color.White, contentDescription = "Nova Campanha")
         }
     }
 }
@@ -290,23 +277,6 @@ fun CampaignItemCard(
                         fontWeight = FontWeight.Medium
                     )
                 }
-
-                Row {
-                    IconButton(onClick = onEditClick) {
-                        Icon(
-                            imageVector = Icons.Outlined.Edit,
-                            contentDescription = "Editar",
-                            tint = IconTint
-                        )
-                    }
-                    IconButton(onClick = onDeleteClick) {
-                        Icon(
-                            imageVector = Icons.Default.Delete,
-                            contentDescription = "Eliminar",
-                            tint = MaterialTheme.colorScheme.error
-                        )
-                    }
-                }
             }
         }
     }
@@ -357,7 +327,6 @@ fun CampaignsListPreview() {
         campaigns = mockCampaigns,
         isLoading = false,
         error = null,
-        campaignDeleted = false
     )
 
     // 3. Renderizar o componente com o tema
@@ -365,10 +334,6 @@ fun CampaignsListPreview() {
         CampaignsListContent(
             modifier = Modifier.fillMaxSize(),
             uiState = mockState,
-            onCreateClick = {},
-            onItemClick = {},
-            onEditClick = {},
-            onDeleteConfirm = {}
         )
     }
 }
@@ -386,10 +351,6 @@ fun CampaignsListEmptyPreview() {
         CampaignsListContent(
             modifier = Modifier.fillMaxSize(),
             uiState = emptyState,
-            onCreateClick = {},
-            onItemClick = {},
-            onEditClick = {},
-            onDeleteConfirm = {}
         )
     }
 }
