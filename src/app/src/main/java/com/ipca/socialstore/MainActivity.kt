@@ -60,6 +60,7 @@ import com.ipca.socialstore.presentation.views.beneficiary.profile.BeneficiaryPr
 import com.ipca.socialstore.presentation.views.campaign.create.CreateCampaignView
 import com.ipca.socialstore.presentation.views.campaign.edit.CampaignEditView
 import com.ipca.socialstore.presentation.views.campaigns.CampaignsListView
+import com.ipca.socialstore.presentation.views.donation.listAllDonations.ListAllDonationsView
 import com.ipca.socialstore.presentation.views.home.adminHome.AdminHomeView
 import com.ipca.socialstore.presentation.views.home.beneficiaryHome.BeneficiaryHomeView
 import com.ipca.socialstore.presentation.views.home.defaultHomeView.DefaultHomeView
@@ -192,9 +193,23 @@ class MainActivity : ComponentActivity() {
                                 navController = navController
                             )
                         }
-                        composable <BeneficiaryRoutes.Scheduling>{
-                            ListAllSchedulingUserView(modifier = Modifier.padding(innerPadding), navController = navController)
+                        composable(
+                            route = BeneficiaryRoutes.Scheduling::class.qualifiedName!! + "?beneficiaryId={beneficiaryId}",
+                            arguments = listOf(
+                                navArgument("beneficiaryId") {
+                                    type = NavType.StringType
+                                    nullable = true
+                                    defaultValue = null
+                                }
+                            )
+                        ) {
+                            ListAllSchedulingUserView(
+                                modifier = Modifier.padding(innerPadding),
+                                navController = navController,
+                                userRole = mainState.userRole
+                            )
                         }
+
                         composable<BeneficiaryRoutes.Documents>{
                             ListDocumentsView(modifier = Modifier.padding(innerPadding), navController = navController, userRole = mainState.userRole)
                         }
@@ -212,7 +227,8 @@ class MainActivity : ComponentActivity() {
                         ) {
                             JustificationScreenView(
                                 modifier = Modifier.padding(innerPadding),
-                                navController = navController
+                                navController = navController,
+                                userRole = mainState.userRole
                             )
                         }
                         composable(
@@ -223,7 +239,8 @@ class MainActivity : ComponentActivity() {
                         ) {
                             SchedulingConfirmationView(
                                 modifier = Modifier.padding(innerPadding),
-                                navController = navController
+                                navController = navController,
+                                userRole = mainState.userRole
                             )
                         }
                         composable(
@@ -247,6 +264,9 @@ class MainActivity : ComponentActivity() {
                                 modifier = Modifier.padding(innerPadding),
                                 navController = navController
                             )
+                        }
+                        composable <AdminRoutes.ListAllDonations>{
+                            ListAllDonationsView(modifier = Modifier.padding(innerPadding), navController = navController)
                         }
                     }
                     LaunchedEffect(mainState.isLoggedIn) {

@@ -42,4 +42,16 @@ class DonationRepository @Inject constructor(private val supabase : SupabaseClie
             ResultWrapper.Error(exceptionMapper.map(e))
         }
     }
+
+    suspend fun getAllDonation() : ResultWrapper<List<DonationModel>>{
+        return try {
+            val donationResult = supabase.from(DatabaseTables.DONATION)
+                .select()
+                .decodeList<DonationModel>()
+            ResultWrapper.Success(donationResult)
+        }
+        catch (e : Exception){
+            ResultWrapper.Error(exceptionMapper.map(e))
+        }
+    }
 }

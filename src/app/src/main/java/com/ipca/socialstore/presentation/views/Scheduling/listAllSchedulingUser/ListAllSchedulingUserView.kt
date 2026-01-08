@@ -49,6 +49,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.ipca.socialstore.data.enums.UserRole
 import com.ipca.socialstore.data.models.BeneficiaryModel
 import com.ipca.socialstore.data.models.SchedulingModel
 import com.ipca.socialstore.presentation.routes.AdminRoutes
@@ -58,14 +59,11 @@ import com.ipca.socialstore.presentation.routes.BeneficiaryRoutes
 @Composable
 fun ListAllSchedulingUserView(
     modifier: Modifier,
-    navController: NavController
+    navController: NavController,
+    userRole: UserRole
 ){
     val viewModel : ListAllSchedulingUserViewModel = hiltViewModel()
     val uiState by viewModel.uiState
-
-    LaunchedEffect(Unit) {
-        viewModel.fetchInfo()
-    }
     ListAllSchedulingUserContent(
         modifier = modifier,
         uiState = uiState,
@@ -73,7 +71,8 @@ fun ListAllSchedulingUserView(
         onClickAccept = {viewModel.selectListAccept()},
         onClickHistory = {viewModel.selectListHistory()},
         onClickCancel = {viewModel.selectListCanceled()},
-        onClickProgress = {viewModel.selectListInProgress()}
+        onClickProgress = {viewModel.selectListInProgress()},
+        userRole = userRole
     )
 }
 @Composable
@@ -85,6 +84,7 @@ fun ListAllSchedulingUserContent(
     onClickHistory : () -> Unit,
     onClickCancel : () -> Unit,
     onClickProgress: () -> Unit,
+    userRole : UserRole,
 ){
     var selectedTab by remember { mutableStateOf("proximos") }
     Column(
@@ -119,14 +119,20 @@ fun ListAllSchedulingUserContent(
                 .horizontalScroll(rememberScrollState()),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            // Chip: Próximos
             FilterChip(
                 selected = selectedTab == "proximos",
                 onClick = {
                     selectedTab = "proximos"
                     onClickAccept()
                 },
-                label = { Text("Próximos (${uiState.accept})") },
+                label = {
+                    if (userRole == UserRole.BENEFICIARY){
+                        Text("Próximos (${uiState.accept})")
+                    }else{
+                        Text("Próximos ")
+                    }
+                    }
+                ,
                 leadingIcon = if (selectedTab == "proximos") {
                     { Icon(Icons.Default.Check, contentDescription = null, modifier = Modifier.size(18.dp)) }
                 } else null
@@ -149,7 +155,13 @@ fun ListAllSchedulingUserContent(
                     selectedTab = "cancelado"
                     onClickCancel()
                 },
-                label = { Text("Cancelados (${uiState.cancel})") },
+                label = {
+                    if (userRole == UserRole.BENEFICIARY){
+                        Text("Cancelados (${uiState.cancel})")
+                    }
+                    else{
+                        Text("Cancelados")
+                    } },
                 colors = FilterChipDefaults.filterChipColors(
                     selectedContainerColor = Color(0xFFFFEBEE),
                     selectedLabelColor = Color(0xFFC62828)
@@ -239,7 +251,7 @@ fun SchedulingTimelineItem(
                 val (label, containerColor, contentColor) = when (item.state) {
                     "accept" -> Triple("Confirmado", Color(0xFFE8F5E9), Color(0xFF2E7D32))
                     "justified" -> Triple("Justificada", Color(0xFFE3F2FD), Color(0xFF1976D2))
-                    "in_Progress" -> Triple("Por Confirmar", Color(0xFFE8F5E9), Color(0xFF2E7D32))
+                    "in_Progress" -> Triple("Por Confirmar", Color(0xFFFFF8E1), Color(0xFFFF8F00))
                     else -> Triple("Justificar", Color(0xFFFFEBEE), Color(0xFFD32F2F))
                 }
                 Surface(
@@ -293,7 +305,8 @@ fun ListAllSchedulingUserPreview() {
             onClickHistory = {},
             onClickAccept = {},
             onClickCancel = {},
-            onClickProgress = {}
+            onClickProgress = {},
+            userRole = UserRole.ADMIN
         )
     }
 }

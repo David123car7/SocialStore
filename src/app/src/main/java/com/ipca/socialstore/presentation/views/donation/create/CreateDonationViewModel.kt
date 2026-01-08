@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class DonationState(
-    val donation : DonationModel = DonationModel(date = "", campaignId = null, name = ""),
+    val donation : DonationModel = DonationModel(date = "", campaignId = null, donorName = ""),
     val item : ItemModel = ItemModel(name = "", itemType = ""),
     val donationItem : DonationItemModel = DonationItemModel(itemId = 0, donationId = 0),
     val expirationDate: String = "",

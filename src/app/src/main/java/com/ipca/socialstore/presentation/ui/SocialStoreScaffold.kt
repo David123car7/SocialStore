@@ -106,7 +106,7 @@ fun SocialStoreScaffoldContent(
             route = AdminRoutes.SchedulingManagement,
             isVisible = userRole == UserRole.ADMIN
         ),
-        BottomNavItem( //stock
+        BottomNavItem(
             icon = Icons.Outlined.Inventory2,
             route = AdminRoutes.GetStock,
             isVisible = userRole == UserRole.ADMIN
@@ -121,9 +121,9 @@ fun SocialStoreScaffoldContent(
             route = BeneficiaryRoutes.Home,
             isVisible = userRole == UserRole.BENEFICIARY
         ),
-        BottomNavItem( //stock
+        BottomNavItem(
             icon = Icons.Default.Schedule,
-            route = BeneficiaryRoutes.Scheduling,
+            route = BeneficiaryRoutes.Scheduling::class.qualifiedName!!,
             isVisible = userRole == UserRole.BENEFICIARY
         ),
     )
@@ -147,10 +147,10 @@ fun SocialStoreScaffoldContent(
                     Image(
                         painter = painterResource(id = R.drawable.saslogo),
                         contentDescription = "SASLogo",
-                        contentScale = ContentScale.FillHeight, // 1. Garante que a imagem escala para caber no espaço sem cortar
+                        contentScale = ContentScale.FillHeight,
                         modifier = Modifier
                             .height(50.dp)
-                            .padding(vertical = 2.dp) // 3. Reduz o padding (8dp é suficiente para "respirar")
+                            .padding(vertical = 2.dp)
                     )
                 },
                 actions = {
@@ -178,40 +178,36 @@ fun SocialStoreScaffoldContent(
             )
         },
 
-        bottomBar = {
-            if(userRole != UserRole.GUEST){
-                NavigationBar() {
-                    allNavItems.forEach { item ->
-                        if(item.isVisible){
-                            NavigationBarItem(
-                                icon = {Icon(imageVector = item.icon, tint = IconTint, contentDescription = "")},
-                                selected = currentRoute == GeneralRoutes.Home,
-                                onClick = {
-                                    NavigationLogic.navigateTo(
-                                        navController = navController,
-                                        userRole = userRole,
-                                        route = item.route
-                                    )
-                                },
 
-                            )
-                        }
-                    }
-                }
-            }
-            if (userRole == UserRole.BENEFICIARY){
-                NavigationBar() {
+        bottomBar = {
+            if (userRole != UserRole.GUEST) {
+                NavigationBar {
                     allNavItems.forEach { item ->
                         if (item.isVisible) {
+                            val isSelected = currentRoute?.route == item.route.toString() ||
+                                    currentRoute?.route?.contains(item.route.toString()) == true
+
                             NavigationBarItem(
-                                icon = { Icon(imageVector = item.icon, tint = IconTint, contentDescription = "") },
-                                selected = currentRoute == BeneficiaryRoutes.Home,
-                                onClick = {
-                                    NavigationLogic.navigateTo(
-                                        navController = navController,
-                                        userRole = userRole,
-                                        route = item.route
+                                icon = {
+                                    Icon(
+                                        imageVector = item.icon,
+                                        contentDescription = null
                                     )
+                                },
+                                label = { },
+                                selected = isSelected,
+                                onClick = {
+                                    if (!isSelected) {
+                                        if (item.route is String) {
+                                            navController.navigate(item.route)
+                                        } else {
+                                            NavigationLogic.navigateTo(
+                                                navController = navController,
+                                                userRole = userRole,
+                                                route = item.route
+                                            )
+                                        }
+                                    }
                                 }
                             )
                         }
@@ -219,6 +215,7 @@ fun SocialStoreScaffoldContent(
                 }
             }
         }
+
 
 
     ) { paddingValues ->
