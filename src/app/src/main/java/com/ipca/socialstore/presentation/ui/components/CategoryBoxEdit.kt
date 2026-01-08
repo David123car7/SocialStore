@@ -24,7 +24,9 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.*
+import com.ipca.socialstore.presentation.ui.theme.IconTint
 
 @Composable
 fun CategoryBoxEdit(
@@ -59,9 +61,9 @@ fun CategoryBoxEdit(
                     modifier = Modifier.size(24.dp)
                 ) {
                     Icon(
-                        imageVector = Icons.Default.Edit,
+                        imageVector = Icons.Outlined.Edit,
                         contentDescription = "Editar",
-                        tint = MaterialTheme.colorScheme.primary,
+                        tint = IconTint,
                         modifier = Modifier.size(20.dp)
                     )
                 }

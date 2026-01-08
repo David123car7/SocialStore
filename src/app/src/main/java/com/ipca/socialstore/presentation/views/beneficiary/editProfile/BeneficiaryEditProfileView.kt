@@ -3,19 +3,28 @@ package com.ipca.socialstore.presentation.views.beneficiary.editProfile
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Campaign
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.outlined.Phone
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults.buttonColors
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -29,10 +38,18 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.ipca.socialstore.data.enums.UserRole
+import com.ipca.socialstore.data.models.BeneficiaryModel
 import com.ipca.socialstore.presentation.routes.BeneficiaryRoutes
 import com.ipca.socialstore.presentation.ui.components.TextFieldDateComponent
 import com.ipca.socialstore.presentation.ui.components.TextFieldStringComponent
+import com.ipca.socialstore.presentation.ui.theme.GreenIPCA
+import com.ipca.socialstore.presentation.ui.theme.IconBgColor
+import com.ipca.socialstore.presentation.ui.theme.IconTint
+import com.ipca.socialstore.presentation.ui.theme.SocialStoreTheme
 import com.ipca.socialstore.presentation.utils.navigation.NavigationLogic
+import com.ipca.socialstore.presentation.views.authentication.register.RegisterState
+import com.ipca.socialstore.presentation.views.authentication.register.RegisterViewContent
+import com.ipca.socialstore.presentation.views.mockups.Beneficiary
 
 @Composable
 fun BeneficiaryEditProfileView(
@@ -65,29 +82,33 @@ fun BeneficiaryEditProfileView(
 
 @Composable
 fun BeneficiaryEditProfileContent(
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     uiState: BeneficiaryEditProfileState,
     onNameUpdate:(String) -> Unit,
     onBirthDateUpdate:(String) -> Unit,
     onPhoneNumberUpdate:(String) -> Unit,
-    onUpdateProfile:() -> Unit){
-
+    onUpdateProfile:() -> Unit
+){
     Column(
-        modifier = modifier,
+        modifier = modifier
+            .fillMaxSize()
+            .padding(horizontal = 24.dp)
+            .verticalScroll(rememberScrollState())
+            .padding(vertical = 16.dp),
         verticalArrangement = Arrangement.spacedBy(20.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Icon(
-            imageVector = Icons.Default.Campaign, // Ou Icons.Default.Edit
+            imageVector = Icons.Default.Campaign,
             contentDescription = null,
-            tint = MaterialTheme.colorScheme.primary,
+            tint = IconTint,
             modifier = Modifier
-                .size(64.dp)
+                .size(80.dp)
                 .background(
-                    color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f),
-                    shape = CircleShape
+                    color = IconBgColor,
+                    shape = RoundedCornerShape(20.dp)
                 )
-                .padding(12.dp)
+                .padding(16.dp)
         )
 
         Text(
@@ -110,7 +131,7 @@ fun BeneficiaryEditProfileContent(
             modifier = Modifier,
             label = "Nome",
             value = uiState.beneficiary.name,
-            icon = Icons.Default.Star,
+            icon = Icons.Outlined.Person,
             onValueUpdate = onNameUpdate
         )
 
@@ -126,7 +147,7 @@ fun BeneficiaryEditProfileContent(
             modifier = Modifier,
             label = "Telemovel",
             value = uiState.beneficiary.phoneNumber,
-            icon = Icons.Default.Star,
+            icon = Icons.Outlined.Phone,
             onValueUpdate = onPhoneNumberUpdate
         )
 
@@ -135,15 +156,37 @@ fun BeneficiaryEditProfileContent(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(50.dp),
-            shape = RoundedCornerShape(12.dp)
+            shape = RoundedCornerShape(12.dp),
+            colors = buttonColors(GreenIPCA)
         ) {
             Text("Atualizar", fontWeight = FontWeight.Bold)
         }
+
+        // Espaço extra no fundo para garantir que o botão não fica colado ao fim do scroll
+        Spacer(modifier = Modifier.height(30.dp))
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, showSystemUi = true)
 @Composable
-fun BenificiaryEditProfilePreview(){
+fun BeneficiaryEditProfilePreview(){
+    SocialStoreTheme() {
+        val beneficiary = BeneficiaryModel(
+            id = 1,
+            name = "Nome",
+            birthDate = "Data de Nascimento",
+            phoneNumber = "Telemovel",
+            academicId = null,
+        )
+        val uiState = BeneficiaryEditProfileState(beneficiary = beneficiary, isLoading = false, error = null, isUpdated = false)
 
+        BeneficiaryEditProfileContent(
+            modifier = Modifier,
+            uiState = uiState,
+            onNameUpdate = { Unit},
+            onBirthDateUpdate = { Unit},
+            onPhoneNumberUpdate = { Unit},
+            onUpdateProfile = { Unit}
+        )
+    }
 }

@@ -10,6 +10,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.DateRange
+import androidx.compose.material.icons.outlined.Notifications
+import androidx.compose.material.icons.outlined.Warning
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -23,6 +26,8 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.ipca.socialstore.data.models.BeneficiaryModel
 import com.ipca.socialstore.presentation.routes.AdminRoutes
+import com.ipca.socialstore.presentation.ui.theme.GreenIPCA
+import com.ipca.socialstore.presentation.ui.theme.IconTint
 import com.ipca.socialstore.presentation.ui.theme.SocialStoreTheme
 
 @Composable
@@ -91,11 +96,11 @@ fun BeneficiaryManagementContent(
 
         ManagementSectionCard(
             title = "Agendamentos",
-            icon = Icons.Default.DateRange,
-            iconColor = Color(0xFFA5D6A7),
+            icon = Icons.Outlined.DateRange,
+            iconColor = IconTint,
             badgeText = "${uiState.accept ?: 0} Próximos",
-            badgeColor = Color(0xFFE8F5E9),
-            badgeTextColor = Color(0xFF2E7D32),
+            badgeColor = Color(0xFFC7F7CC),
+            badgeTextColor = Color(0xFF295F3E),
             isExpanded = expandedSection == "agendamentos",
             onClick = { expandedSection = if (expandedSection == "agendamentos") null else "agendamentos" }
         ) {
@@ -131,10 +136,10 @@ fun BeneficiaryManagementContent(
 
         ManagementSectionCard(
             title = "Faltas / Justificações",
-            icon = Icons.Default.Warning,
-            iconColor = Color(0xFFEF9A9A),
+            icon = Icons.Outlined.Warning,
+            iconColor = Color(0xFFF55F5F),
             badgeText = "${uiState.cancel ?: 0} Pendentes",
-            badgeColor = Color(0xFFFFEBEE),
+            badgeColor = Color(0xFFFFD3D5),
             badgeTextColor = Color(0xFFC62828),
             isExpanded = expandedSection == "faltas",
             onClick = { expandedSection = if (expandedSection == "faltas") null else "faltas" }
@@ -166,8 +171,8 @@ fun BeneficiaryManagementContent(
 
         ManagementSectionCard(
             title = "Notas Próximo Agendamento",
-            icon = Icons.Default.Notifications,
-            iconColor = Color(0xFF90CAF9),
+            icon = Icons.Outlined.Notifications,
+            iconColor = Color(0xFF309DF5),
             isExpanded = expandedSection == "pedidos",
             onClick = { expandedSection = if (expandedSection == "pedidos") null else "pedidos" }
         ) {
@@ -218,7 +223,7 @@ fun BeneficiaryManagementContent(
                 .fillMaxWidth()
                 .height(56.dp),
             shape = RoundedCornerShape(12.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2E7D32)) // Verde Social Store
+            colors = ButtonDefaults.buttonColors(containerColor = GreenIPCA)
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(Icons.Default.Add, contentDescription = null, tint = Color.White)
@@ -272,7 +277,7 @@ fun ManagementSectionCard(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Surface(color = iconColor.copy(alpha = 0.4f), shape = CircleShape, modifier = Modifier.size(40.dp)) {
+                    Surface(color = iconColor.copy(alpha = 0.3f), shape = CircleShape, modifier = Modifier.size(40.dp)) {
                         Icon(icon, null, tint = iconColor, modifier = Modifier.padding(8.dp))
                     }
                     Spacer(modifier = Modifier.width(12.dp))

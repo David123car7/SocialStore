@@ -385,7 +385,7 @@ fun DefaultHomePreviewWithBars(){
             campaignList = emptyList(),
             isLoading = false
         )
-        SocialStoreScaffoldContent(navController = rememberNavController(), userRole = UserRole.DEFAULT, logout = {}) {
+        SocialStoreScaffoldContent(navController = rememberNavController(), userRole = UserRole.ADMIN, logout = {}) {
             DefaultHomeViewContent(
                 modifier = Modifier,
                 uiState = uiState,

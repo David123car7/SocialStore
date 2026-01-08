@@ -37,9 +37,11 @@ import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material.icons.outlined.FileOpen
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ButtonDefaults.buttonColors
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
@@ -83,6 +85,8 @@ import com.ipca.socialstore.presentation.ui.components.ApplicationData
 import com.ipca.socialstore.presentation.ui.components.ButtonTracedComponent
 import com.ipca.socialstore.presentation.ui.components.ExpandableSection
 import com.ipca.socialstore.presentation.ui.components.WarningComponent
+import com.ipca.socialstore.presentation.ui.theme.GreenIPCA
+import com.ipca.socialstore.presentation.ui.theme.IconTint
 import com.ipca.socialstore.presentation.ui.theme.SocialStoreTheme
 import com.ipca.socialstore.presentation.utils.files.getFileNameFromUri
 import com.ipca.socialstore.presentation.utils.navigation.NavigationLogic
@@ -270,6 +274,7 @@ fun ApplicationStateViewContent(
         ExpandableSection(
             title = "Meus Dados",
             icon = Icons.Outlined.Person,
+            iconColor = IconTint,
             isExpanded = isDataExpanded,
             onExpandChange = { isDataExpanded = it }
         ) {
@@ -336,7 +341,8 @@ fun ApplicationStateViewContent(
         }
         ExpandableSection(
             title = "Meus Documentos",
-            icon = Icons.Outlined.Person,
+            icon = Icons.Outlined.FileOpen,
+            iconColor = IconTint,
             isExpanded = isDocsExpanded,
             onExpandChange = { isDocsExpanded = it }
         ) {
@@ -434,6 +440,7 @@ fun ApplicationStateViewContent(
                 .fillMaxWidth()
                 .height(50.dp),
             shape = RoundedCornerShape(6.dp),
+            colors = buttonColors(GreenIPCA),
         ) {
             Text(
                 text = "Eliminar Candidatura",
