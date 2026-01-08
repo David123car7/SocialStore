@@ -418,7 +418,8 @@ fun ApplicationStateViewContent(
                 title = "Fase Final",
                 icon = Icons.Outlined.Person,
                 isExpanded = isFinalDocExpanded,
-                onExpandChange = { isFinalDocExpanded = it }
+                onExpandChange = { isFinalDocExpanded = it },
+                iconColor = IconTint,
             ) {
                 DocumentsList(
                     documentsList = uiState.documentsRequirement,

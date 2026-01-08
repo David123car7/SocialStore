@@ -81,6 +81,7 @@ import com.ipca.socialstore.presentation.ui.components.AlertInputComponent
 import com.ipca.socialstore.presentation.ui.components.ApplicationAdminData
 import com.ipca.socialstore.presentation.ui.components.ExpandableSection
 import com.ipca.socialstore.presentation.ui.theme.GreenIPCA
+import com.ipca.socialstore.presentation.ui.theme.IconTint
 import com.ipca.socialstore.presentation.utils.navigation.NavigationLogic
 import com.ipca.socialstore.presentation.utils.ui.getApplicationDataStateViewData
 import com.ipca.socialstore.presentation.utils.ui.getApplicationDocumentTypeStateViewData
@@ -316,8 +317,9 @@ fun ApplicationStateAdminContent(
                 title = "Dados da candidatura",
                 icon = Icons.Outlined.Person,
                 isExpanded = isDataExpanded,
-                onExpandChange = { isDataExpanded = it }
-            ) {
+                onExpandChange = { isDataExpanded = it },
+                iconColor = IconTint,
+                ) {
                 ApplicationAdminData(
                     application = uiState.application,
                     onSubmitMessage = onDenyData,
@@ -329,8 +331,9 @@ fun ApplicationStateAdminContent(
                 title = "Documentos da candidatura",
                 icon = Icons.Outlined.Person,
                 isExpanded = isDocsExpanded,
-                onExpandChange = { isDocsExpanded = it }
-            ) {
+                onExpandChange = { isDocsExpanded = it },
+                iconColor = IconTint,
+                ) {
                 ApplicationDocuments(
                     documentsList = uiState.documentsBankStatements,
                     documentsState = uiState.bankStatementDocsState,
@@ -420,8 +423,9 @@ fun ApplicationStateAdminContent(
                     title = "Fase Final",
                     icon = Icons.Outlined.Person,
                     isExpanded = isRequirementExpanded,
-                    onExpandChange = { isRequirementExpanded = it }
-                ) {
+                    onExpandChange = { isRequirementExpanded = it },
+                    iconColor = IconTint,
+                    ) {
                     ApplicationDocuments(
                         documentsList = uiState.documentsRequirement,
                         documentsState = uiState.documentsRequirementState,
