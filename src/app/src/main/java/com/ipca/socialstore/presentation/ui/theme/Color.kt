@@ -16,5 +16,9 @@ val CardBgColor = Color(0xFFE8F8E4)
 val CardBorderColor = Color(0xFFDCF0D8)
 val IconBgColor = Color(0xFFC4E9C2)
 val IconTint = Color(0xFF005F3C)
+val OutStock = Color(0xFFFFB7B7)
+val LowStock = Color(0xFFFAE1C5)
+val HighStock = Color(0xFFD0FCC7)
+
 
 

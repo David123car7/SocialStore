@@ -107,10 +107,68 @@ fun EditButton(
     }
 }
 
-@Preview(showBackground = true)
+/*
+@Preview(showBackground = true, name = "Editar Stock - Preenchido")
 @Composable
-fun Preview(){
-    SocialStoreTheme() {
+fun EditStockPreview() {
+    val mockItem = com.ipca.socialstore.data.models.ItemModel(
+        id = 1,
+        name = "Arroz Carolino",
+        itemType = "Alimentar"
+    )
+    val mockStockReceiver = com.ipca.socialstore.data.models.StockReceiverMode(
+        id = 10,
+        item = mockItem,
+        totalQuantity = 50,
+        expirationDate = "2025-12-30"
+    )
+    val mockUiState = EditState(
+        stock = mockStockReceiver,
+        quantity = "50",
+        error = null,
+        isEditing = true,
+        isLoading = false
+    )
 
+    SocialStoreTheme {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp)
+        ) {
+            EditStockContent(
+                modifier = Modifier.weight(1f),
+                uiState = mockUiState
+            )
+            androidx.compose.foundation.layout.Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = androidx.compose.foundation.layout.Arrangement.SpaceEvenly
+            ) {
+                CompleteButton(modifier = Modifier, onClick = {})
+                EditButton(modifier = Modifier, onClick = {})
+            }
+        }
     }
 }
+
+@Composable
+fun StockReceiverMode(id: Int, item: ItemModel, totalQuantity: Int, expirationDate: String) {
+    TODO("Not yet implemented")
+}
+
+@Preview(showBackground = true, name = "Editar Stock - Vazio/Loading")
+@Composable
+fun EditStockEmptyPreview() {
+    val emptyState = EditState(
+        stock = null,
+        isLoading = true
+    )
+
+    SocialStoreTheme {
+        EditStockContent(
+            modifier = Modifier.fillMaxSize(),
+            uiState = emptyState
+        )
+    }
+}
+*/

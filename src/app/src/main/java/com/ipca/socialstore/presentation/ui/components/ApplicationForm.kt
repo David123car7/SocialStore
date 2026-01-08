@@ -5,6 +5,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.CreditCard
+import androidx.compose.material.icons.outlined.DateRange
+import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.outlined.Phone
+import androidx.compose.material3.Button
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.HorizontalDivider
@@ -118,7 +123,7 @@ fun ApplicationForm(
             modifier = Modifier,
             label = "Name",
             value = name,
-            icon = Icons.Default.Star,
+            icon = Icons.Outlined.Person,
             onValueUpdate = onNameChange
         )
 
@@ -134,7 +139,7 @@ fun ApplicationForm(
             modifier = Modifier,
             label = "CC",
             value = cc,
-            icon = Icons.Default.Star,
+            icon = Icons.Outlined.CreditCard,
             onValueUpdate = onCcChange
         )
 
@@ -142,7 +147,7 @@ fun ApplicationForm(
             modifier = Modifier,
             label = "Telemovel",
             value = phoneNumber,
-            icon = Icons.Default.Star,
+            icon = Icons.Outlined.Phone,
             onValueUpdate = onPhoneChange
         )
 
@@ -150,7 +155,7 @@ fun ApplicationForm(
             modifier = Modifier,
             label = "Ano Letivo",
             value = schoolYear,
-            icon = Icons.Default.Star,
+            icon = Icons.Outlined.DateRange,
             onValueUpdate = onYearChange
         )
 
