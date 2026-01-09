@@ -16,7 +16,6 @@ class ListAllItemsStockService @Inject constructor(
     private val getFullStockUseCase: GetFullStockUseCase,
     private val getItemsFromStockUseCase: GetItemsFromStockUseCase
 ) {
-
     operator fun invoke(): Flow<ResultWrapper<List<StockReceiverModel>>> {
         return getFullStockUseCase()
             .map { stockResult ->

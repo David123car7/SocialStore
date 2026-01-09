@@ -3,6 +3,7 @@ package com.ipca.socialstore.presentation.views.application.createApplication
 import ApplicationForm
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -45,6 +46,7 @@ import com.ipca.socialstore.data.models.AcademicModel
 import com.ipca.socialstore.data.models.ApplicationModel
 import com.ipca.socialstore.presentation.routes.DefaultRoutes
 import com.ipca.socialstore.presentation.routes.GeneralRoutes
+import com.ipca.socialstore.presentation.ui.components.IntroductionComponent
 import com.ipca.socialstore.presentation.ui.components.SocialStoreDropdown
 import com.ipca.socialstore.presentation.ui.components.TextFieldDateComponent
 import com.ipca.socialstore.presentation.ui.components.TextFieldStringComponent
@@ -121,6 +123,11 @@ fun CreateApplicationViewContent(
         verticalArrangement = Arrangement.spacedBy(20.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        IntroductionComponent(
+            tittle = "Criar Candidatura",
+            dividerPadding = PaddingValues(horizontal = 8.dp)
+        )
+
         ApplicationForm(
             modifier = Modifier,
             name = uiState.application.name,

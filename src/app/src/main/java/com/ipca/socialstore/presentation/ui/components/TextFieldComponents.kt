@@ -108,7 +108,7 @@ fun TextFieldDateComponent(modifier: Modifier, label: String, date: String, onDa
         placeholder = { Text("DD/MM/AAAA") },
         leadingIcon = { Icon(Icons.Outlined.DateRange, null) },
         modifier = modifier
-            .clickable { showDatePicker = !showDatePicker },
+            .clickable { showDatePicker = !showDatePicker }.fillMaxWidth(),
         enabled = false,
         readOnly = true,
         shape = RoundedCornerShape(12.dp),

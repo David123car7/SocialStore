@@ -45,6 +45,9 @@ sealed class AdminRoutes {
 
     @Serializable
     object SelectStock : AdminRoutes()
+    @Serializable
+    object Reports : AdminRoutes()
+
 
     @Serializable
     object CreateScheduling : AdminRoutes()
