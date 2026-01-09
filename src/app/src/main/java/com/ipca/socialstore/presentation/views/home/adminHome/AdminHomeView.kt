@@ -57,8 +57,8 @@ fun AdminHomeContent(modifier: Modifier, navigateTo: (route: Any) -> Unit) {
     val menuItems = listOf(
         DashboardMenuItem(1, "Candidaturas", Icons.Outlined.Description, onClick = {navigateTo(AdminRoutes.ListApplications)}),
         DashboardMenuItem(2, "Doações", Icons.Outlined.Handshake, onClick = {navigateTo(AdminRoutes.CreateDonation)}),
-        DashboardMenuItem(3, "Campanhas", Icons.Outlined.Campaign, onClick = {navigateTo(AdminRoutes.ListAllDonations)}),
-        DashboardMenuItem(4, "Relatórios", Icons.Outlined.Analytics, onClick = {}),
+        DashboardMenuItem(3, "Campanhas", Icons.Outlined.Campaign, onClick = {navigateTo(AdminRoutes.CampaignList)}),
+        DashboardMenuItem(4, "Agendamentos", Icons.Outlined.AccessTime, onClick = {navigateTo(AdminRoutes.SchedulingMainPage)}),
         DashboardMenuItem(5, "Beneficiários", Icons.Outlined.People, onClick = {navigateTo(AdminRoutes.SchedulingManagement)}),
         DashboardMenuItem(6, "Definições", Icons.Outlined.Settings, onClick = {})
     )

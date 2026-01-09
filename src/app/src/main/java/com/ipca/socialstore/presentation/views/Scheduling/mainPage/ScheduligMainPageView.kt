@@ -53,7 +53,8 @@ fun SchedulingMainPageView(
         onCancelScheduling = { value -> viewModel.cancelScheduling(value) },
         onCreateScheduling = {viewModel.createScheduling()},
         onUpdateDate = {value -> viewModel.updateSchedulingDate(value)},
-        onUpdateBeneficiaryId = {value -> viewModel.updateBeneficiaryId(value)}
+        onUpdateBeneficiaryId = {value -> viewModel.updateBeneficiaryId(value)},
+        onUpdateNote = {value -> viewModel.updateSchedulingNote(note = value)}
     )
 }
 
@@ -66,6 +67,7 @@ fun SchedulingMainContent(
     onCancelScheduling: (value: Int) -> Unit,
     onCreateScheduling: () -> Unit,
     onUpdateDate : (String) -> Unit,
+    onUpdateNote : (String) -> Unit,
     onUpdateBeneficiaryId: (Int) -> Unit
 ){
     var showPopup by remember { mutableStateOf(false) }
@@ -170,8 +172,8 @@ fun SchedulingMainContent(
                             modifier = Modifier.fillMaxWidth()
                         )
                         OutlinedTextField(
-                            value = note,
-                            onValueChange = {  },
+                            value = uiState.newScheduling.note ?: "",
+                            onValueChange = onUpdateNote,
                             label = { Text("Notas Adicionais") },
                             modifier = Modifier.fillMaxWidth(),
                             minLines = 2
@@ -344,7 +346,8 @@ fun SchedulingMainPreview() {
             onCancelScheduling = {},
             onCreateScheduling = {},
             onUpdateBeneficiaryId = {},
-            onUpdateDate = {}
+            onUpdateDate = {},
+            onUpdateNote = {}
         )
     }
 }

@@ -1,5 +1,6 @@
 package com.ipca.socialstore.presentation.views.campaigns
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -27,7 +28,10 @@ import com.ipca.socialstore.data.enums.UserRole
 import com.ipca.socialstore.data.models.CampaignModel
 import com.ipca.socialstore.presentation.routes.AdminRoutes
 import com.ipca.socialstore.presentation.ui.components.AlertComponent
+import com.ipca.socialstore.presentation.ui.components.IntroductionComponent
 import com.ipca.socialstore.presentation.ui.components.SearchBarContent
+import com.ipca.socialstore.presentation.ui.theme.GreenIPCA
+import com.ipca.socialstore.presentation.ui.theme.IconTint
 import com.ipca.socialstore.presentation.utils.navigation.NavigationLogic
 import com.ipca.socialstore.presentation.views.campaign.adminList.CampaignsAdminListState
 import com.ipca.socialstore.presentation.views.campaign.adminList.CampaignsListState
@@ -74,7 +78,7 @@ fun CampaignsAdminListView(
 
 @Composable
 fun CampaignsAdminListContent(
-    modifier: Modifier = Modifier,
+    modifier: Modifier,
     uiState: CampaignsAdminListState,
     onCreateClick: () -> Unit,
     onItemClick: (CampaignModel) -> Unit,
@@ -104,17 +108,21 @@ fun CampaignsAdminListContent(
         }
     }
 
-    Box(modifier = modifier.fillMaxSize()) {
+    Box(modifier = modifier.fillMaxSize().padding(top = 18.dp, bottom = 18.dp)) {
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 12.dp)
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.SpaceEvenly
         ) {
+            IntroductionComponent(
+                tittle = "Candidaturas"
+            )
+
             SearchBarContent(
+                modifier = Modifier.padding(15.dp),
                 onSearchItem = { query -> searchQuery = query }
             )
 
-            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+            //HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
             Text(
                 text = "${filteredList.size} campanhas encontradas",
@@ -144,7 +152,7 @@ fun CampaignsAdminListContent(
                 ) {
                     items(filteredList) { campaign ->
                         CampaignAdminItemCard(
-                            modifier = Modifier.padding(),
+                            modifier = Modifier.padding(15.dp),
                             campaign = campaign,
                             onClick = { onItemClick(campaign) },
                             onEditClick = { onEditClick(campaign) },
@@ -178,7 +186,7 @@ fun CampaignsAdminListContent(
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .padding(16.dp),
-            containerColor = MaterialTheme.colorScheme.primary,
+            containerColor = GreenIPCA,
             contentColor = MaterialTheme.colorScheme.onPrimary,
             shape = CircleShape
         ) {
@@ -197,13 +205,8 @@ fun CampaignAdminItemCard(
 ) {
     val isActive = campaign.onGoing
 
-    val containerColor = if (isActive)
-        MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f)
-    else
-        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
-
     val statusText = if (isActive) "A Decorrer" else "Terminada"
-    val statusColor = if (isActive) MaterialTheme.colorScheme.primary else Color.Gray
+    val statusColor = if (isActive) GreenIPCA else Color.Gray
 
     val progress = if (campaign.goal > 0) {
         (campaign.currentDonations.toFloat() / campaign.goal.toFloat()).coerceIn(0f, 1f)
@@ -216,9 +219,12 @@ fun CampaignAdminItemCard(
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .clickable(onClick = onClick),
-        colors = CardDefaults.cardColors(containerColor = containerColor),
-        shape = MaterialTheme.shapes.medium
+            .clickable(onClick = onClick)
+            .padding(bottom = 16.dp),
+        shape = RoundedCornerShape(12.dp),
+        border = BorderStroke(1.dp, GreenIPCA),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(
             modifier = Modifier.padding(top = 16.dp, start = 16.dp, end = 16.dp, bottom = 8.dp)
@@ -239,17 +245,29 @@ fun CampaignAdminItemCard(
                     Spacer(modifier = Modifier.height(4.dp))
                     SuggestionChip(
                         onClick = {},
-                        label = { Text(campaign.category, style = MaterialTheme.typography.labelSmall) },
+                        label = {
+                            Text(
+                                text = campaign.category,
+                                style = MaterialTheme.typography.labelSmall,
+                                fontWeight = FontWeight.Medium // Um pouco de peso ajuda na leitura em fundos claros
+                            )
+                        },
                         modifier = Modifier.height(26.dp),
                         enabled = false,
+                        // 1. Remove a borda cinzenta padrão para ficar limpo
+                        border = null,
                         colors = SuggestionChipDefaults.suggestionChipColors(
-                            disabledContainerColor = MaterialTheme.colorScheme.surface
+                            // 2. Fundo suave (20% a 25% é o ideal para não "berrar")
+                            disabledContainerColor = GreenIPCA.copy(alpha = 0.2f),
+
+                            // 3. O TRUQUE: O texto tem de ser a cor SÓLIDA para haver contraste e ficar bonito
+                            disabledLabelColor = GreenIPCA
                         )
                     )
                 }
 
                 Surface(
-                    color = if(isActive) MaterialTheme.colorScheme.primary else Color.Gray,
+                    color = if(isActive) GreenIPCA else Color.Gray,
                     shape = CircleShape,
                     modifier = Modifier.padding(start = 8.dp)
                 ) {
@@ -338,14 +356,14 @@ fun CampaignAdminItemCard(
                         Icon(
                             imageVector = Icons.Default.Edit,
                             contentDescription = "Editar",
-                            tint = MaterialTheme.colorScheme.primary
+                            tint = IconTint
                         )
                     }
                     IconButton(onClick = onDeleteClick) {
                         Icon(
                             imageVector = Icons.Default.Delete,
                             contentDescription = "Eliminar",
-                            tint = MaterialTheme.colorScheme.error
+                            tint = Color.Red
                         )
                     }
                 }

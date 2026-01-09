@@ -1,5 +1,6 @@
 package com.ipca.socialstore.presentation.views.Scheduling.management
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -31,7 +32,9 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.ipca.socialstore.data.models.BeneficiaryModel
 import com.ipca.socialstore.presentation.routes.AdminRoutes
+import com.ipca.socialstore.presentation.ui.components.IntroductionComponent
 import com.ipca.socialstore.presentation.ui.components.SearchBarContent
+import com.ipca.socialstore.presentation.ui.theme.GreenIPCA
 
 @Composable
 fun SchedulingManagementView(
@@ -59,9 +62,17 @@ fun SchedulingManagementContent(
     onClick: (BeneficiaryModel) -> Unit,
 ) {
     Column(
-        modifier = modifier.fillMaxSize()
+        modifier = modifier.padding(top = 18.dp, bottom = 18.dp).fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.SpaceEvenly
     ) {
-        SearchBarContent({ value -> onSearchBeneficiary(value) })
+        IntroductionComponent(
+            tittle = "Candidaturas"
+        )
+
+        SearchBarContent(
+            modifier = Modifier.padding(15.dp),
+            { value -> onSearchBeneficiary(value) })
 
         Row(
             modifier = Modifier
@@ -122,9 +133,9 @@ fun BeneficiaryCard(
             .fillMaxWidth()
             .clickable { onClick() },
         shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = Color(0xFFF5F5F5)
-        )
+        border = BorderStroke(1.dp, GreenIPCA),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Row(
             modifier = Modifier
