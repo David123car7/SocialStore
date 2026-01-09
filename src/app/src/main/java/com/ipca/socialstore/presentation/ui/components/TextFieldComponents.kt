@@ -62,7 +62,7 @@ fun TextFieldValueComponent(modifier: Modifier, label: String, value: String, ic
     OutlinedTextField(
         value = value,
         onValueChange = onValueUpdate,
-        label = { label },
+        label = { Text(label) },
         leadingIcon = { Icon(icon, null) },
         modifier = modifier.fillMaxWidth(),
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
@@ -104,7 +104,7 @@ fun TextFieldDateComponent(modifier: Modifier, label: String, date: String, onDa
     OutlinedTextField(
         value = date,
         onValueChange = onDateUpdate,
-        label = { label },
+        label = { Text(label) },
         placeholder = { Text("DD/MM/AAAA") },
         leadingIcon = { Icon(Icons.Outlined.DateRange, null) },
         modifier = modifier
@@ -127,7 +127,7 @@ fun TextFieldPasswordComponent(modifier: Modifier, password: String, onPasswordU
     OutlinedTextField(
         value = password,
         onValueChange = onPasswordUpdate,
-        label = { "Palavra-passe" },
+        label = { Text("Palavra-passe") },
         leadingIcon = { Icon(Icons.Default.Lock, null) },
         trailingIcon = {
             val image = if (passwordVisible) Icons.Outlined.RemoveRedEye else Icons.Outlined.RemoveRedEye
@@ -164,7 +164,7 @@ fun <T> SocialStoreDropdown(
             value = if (selectedOption != null) getLabel(selectedOption) else "",
             onValueChange = {},
             readOnly = true,
-            label = { label },
+            label = { Text(label) },
             leadingIcon = { Icon(Icons.Default.Star, contentDescription = null) },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
             colors = OutlinedTextFieldDefaults.colors(),
