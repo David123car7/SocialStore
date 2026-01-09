@@ -349,5 +349,29 @@ class StockRepository @Inject constructor(private val supabase: SupabaseClient, 
             ResultWrapper.Error(exceptionMapper.map(e))
         }
     }
+
+    suspend fun addStockQuantity(stockId: Int, qty: Int): ResultWrapper<Boolean> {
+        return try {
+            val currentStock = supabase.from(DatabaseTables.STOCK)
+                .select { filter { eq("id", stockId) } }
+                .decodeSingleOrNull<StockModel>()
+
+            if (currentStock == null) return ResultWrapper.Error(AppError.DataNotFound)
+
+            val newQuantity = currentStock.quantity + qty
+
+            supabase.from(DatabaseTables.STOCK).update(
+                {
+                    set("quantity", newQuantity)
+                }
+            ) {
+                filter { eq("id", stockId) }
+            }
+
+            ResultWrapper.Success(true)
+        } catch (e: Exception) {
+            ResultWrapper.Error(exceptionMapper.map(e))
+        }
+    }
 }
 

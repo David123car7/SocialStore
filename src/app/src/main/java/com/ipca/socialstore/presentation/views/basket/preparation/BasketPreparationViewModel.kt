@@ -1,11 +1,16 @@
 package com.ipca.socialstore.presentation.views.basket.preparation
 
+import androidx.camera.core.Preview
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.Modifier
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ipca.socialstore.data.exceptions.AppError
 import com.ipca.socialstore.data.models.BeneficiaryModel
+import com.ipca.socialstore.data.models.ItemModel
 import com.ipca.socialstore.data.models.SchedulingModel
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
 import com.ipca.socialstore.domain.beneficiary.GetBeneficiaryByIdUseCase
@@ -248,3 +253,4 @@ class BasketPreparationViewModel @Inject constructor(
 
 
 }
+

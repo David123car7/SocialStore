@@ -3,6 +3,7 @@ package com.ipca.socialstore.presentation.views.item
 import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,6 +19,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Category
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Label
@@ -32,6 +34,8 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -54,15 +58,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.google.mlkit.vision.codescanner.GmsBarcodeScanning
+import com.ipca.socialstore.data.enums.ItemType
 import com.ipca.socialstore.presentation.ui.components.IntroductionComponent
 import com.ipca.socialstore.presentation.ui.components.TextFieldDateComponent
 import com.ipca.socialstore.presentation.ui.components.TextFieldStringComponent
 import com.ipca.socialstore.presentation.ui.theme.GreenIPCA
+import com.ipca.socialstore.presentation.ui.theme.SocialStoreTheme
 
 @Composable
 fun CreateItemView(modifier: Modifier, navController: NavController){
@@ -71,6 +78,9 @@ fun CreateItemView(modifier: Modifier, navController: NavController){
     var scanActivated by remember { mutableStateOf(false) }
     val context = LocalContext.current
 
+    LaunchedEffect(Unit) {
+        viewModel.getItems()
+    }
     if(scanActivated){
         SimpleBarcodeScanner(
             context = context,
@@ -97,7 +107,8 @@ fun CreateItemView(modifier: Modifier, navController: NavController){
             onScanBarcode =  {
                 scanActivated = true
             },
-            onItemBarcodeUpdate = {code -> viewModel.updateBarCode(code = code)}
+            onItemBarcodeUpdate = {code -> viewModel.updateBarCode(code = code)},
+            onSearchItem = {value -> viewModel.filterItem(value)}
         )
     }
 }
@@ -114,17 +125,20 @@ fun CreateItemViewContent(
     onRemoveFields: (Int) -> Unit,
     onClickCreate: () -> Unit,
     onScanBarcode: () -> Unit,
+    onSearchItem : (String) -> Unit,
 ) {
     val scrollState = rememberScrollState()
 
     var isBarcodeVisible by remember { mutableStateOf(false) }
+    var expanded by remember { mutableStateOf(false) }
+    var selectedOption by remember { mutableStateOf("Alimentação") }
+    val isAlimentacao = uiState.item.itemType.lowercase() == "alimentação"
 
     LaunchedEffect(uiState.item.barCode) {
         if (!uiState.item.barCode.isNullOrBlank()) {
             isBarcodeVisible = true
         }
     }
-
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -184,19 +198,48 @@ fun CreateItemViewContent(
 
             TextFieldStringComponent(
                 value = uiState.item.name,
-                onValueUpdate = onItemNameUpdate,
+                onValueUpdate = {value -> onItemNameUpdate(value)
+                                onSearchItem(value)},
                 label = "Nome do Item",
                 icon = Icons.Default.Label,
                 modifier = Modifier,
             )
 
-            TextFieldStringComponent(
-                value = uiState.item.itemType,
-                onValueUpdate = onItemTypeUpdate,
-                label = "Tipo / Categoria",
-                icon = Icons.Default.Category,
-                modifier = Modifier,
-            )
+            Box(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
+                OutlinedTextField(
+                    value = uiState.item.itemType.ifBlank { "Selecionar Categoria" },
+                    onValueChange = { },
+                    readOnly = true,
+                    label = { Text("Categoria") },
+                    trailingIcon = {
+                        Icon(Icons.Default.ArrowDropDown, "Abrir Menu")
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                Box(
+                    modifier = Modifier
+                        .matchParentSize()
+                        .clickable { expanded = !expanded }
+                )
+
+                DropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false },
+                    modifier = Modifier.fillMaxWidth(0.9f)
+                ) {
+                    ItemType.entries.forEach { category ->
+                        DropdownMenuItem(
+                            text = { Text( text = category.name) },
+                            onClick = {
+                                selectedOption = category.name
+                                expanded = false
+                                onItemTypeUpdate(category.name)
+                            }
+                        )
+                    }
+                }
+            }
         }
 
         HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
@@ -228,10 +271,12 @@ fun CreateItemViewContent(
                     ) {
                         TextFieldDateComponent(
                             modifier = Modifier.weight(1f),
-                            label = "Data",
-                            date = itemDate.date,
-                            onDateUpdate = { newValue -> onUpdateList(index, newValue, null) },
-                            onDatePickerUpdate = {}
+                            label = if (isAlimentacao) "Data (Obrigatória)" else "Data (Opcional)",
+                            date = itemDate.date ?: "",
+                            onDateUpdate = { newValue ->
+                                onUpdateList(index, newValue, null)
+                            },
+                            onDatePickerUpdate = {},
                         )
 
                         OutlinedTextField(
@@ -279,7 +324,16 @@ fun CreateItemViewContent(
                 .height(50.dp),
             shape = RoundedCornerShape(12.dp),
             elevation = ButtonDefaults.buttonElevation(4.dp),
-            enabled = uiState.item.name.isNotBlank() && uiState.listDate.any { it.date.isNotBlank() }
+            enabled = run {
+                val nameIsOk = uiState.item.name.isNotBlank()
+
+                if (selectedOption.lowercase() == "alimentacao") {
+                    val allDatesFilled = uiState.listDate.all { it.date.isNotBlank() }
+                    nameIsOk && allDatesFilled
+                } else {
+                    nameIsOk
+                }
+            }
         ) {
             Icon(Icons.Filled.Save, contentDescription = null, tint = Color.White)
             Spacer(Modifier.width(8.dp))
@@ -328,5 +382,37 @@ fun SimpleBarcodeScanner(
         CircularProgressIndicator()
         Spacer(Modifier.height(16.dp))
         Text("A abrir scanner...", modifier = Modifier.padding(top=60.dp))
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun CreateItemPreview() {
+    SocialStoreTheme {
+        val mockState = ItemState(
+            item = com.ipca.socialstore.data.models.ItemModel(
+                name = "Azeite Virgem 1L",
+                itemType = "Alimentação",
+                barCode = "5601234567890"
+            ),
+            listDate = listOf(
+                ExpirationDate(date = "12/10/2025", quantity = "10"),
+                ExpirationDate(date = "05/02/2026", quantity = "24")
+            )
+        )
+
+        CreateItemViewContent(
+            modifier = Modifier.fillMaxSize(),
+            uiState = mockState,
+            onItemNameUpdate = {},
+            onItemTypeUpdate = {},
+            onItemBarcodeUpdate = {},
+            onUpdateList = { _, _, _ -> },
+            onAddFields = {},
+            onRemoveFields = {},
+            onClickCreate = {},
+            onScanBarcode = {},
+            onSearchItem = {}
+        )
     }
 }

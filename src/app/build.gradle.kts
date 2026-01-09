@@ -61,6 +61,7 @@ dependencies {
     implementation(libs.androidx.compose.ui.text)
     implementation(libs.androidx.ui)
     implementation(libs.androidx.navigation.runtime.ktx)
+    implementation(libs.androidx.camera.core)
 
     val work_version = "2.11.0"
 

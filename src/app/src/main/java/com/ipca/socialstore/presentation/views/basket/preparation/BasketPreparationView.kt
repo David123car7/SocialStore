@@ -236,62 +236,68 @@ fun BasketItemRow(
 @Composable
 fun BasketPreparationPreview() {
     SocialStoreTheme {
-
         val mockUiState = BasketPreparationState(
             beneficiary = BeneficiaryModel(
                 id = 5,
                 name = "David Amorim Carvalho",
-                phoneNumber = "",
-                birthDate = "",
+                phoneNumber = "912345678",
+                birthDate = "1990-05-15",
                 academicId = 1
             ),
             scheduling = listOf(
                 SchedulingModel(
-                    schedulingDate = "2026-01-20",
+                    id = 1,
+                    schedulingDate = "20/01/2026",
                     state = "accept",
                     beneficiaryId = 5,
                     reason = null,
                     note = ""
                 ),
-               SchedulingModel(
-                    schedulingDate = "2026-01-25",
-                   state = "accept",
-                   beneficiaryId = 5,
-                   reason = null,
-                   note = ""
+                SchedulingModel(
+                    id = 2,
+                    schedulingDate = "25/01/2026",
+                    state = "accept",
+                    beneficiaryId = 5,
+                    reason = null,
+                    note = ""
                 )
             ),
             filteredList = listOf(
                 StockReceiverModel(
-                    item = ItemModel(name = "Arroz 1kg", barCode = "",itemType = "Alimentação"),
+                    item = ItemModel(name = "Arroz 1kg", barCode = "", itemType = "Alimentação"),
                     stockId = 1,
                     totalQuantity = 50,
                     quantityMap = emptyMap()
                 ),
                 StockReceiverModel(
-                    item = ItemModel(name = "Leite UHT 1L", barCode = "",itemType = "Alimentação"),
+                    item = ItemModel(name = "Leite UHT 1L", barCode = "", itemType = "Alimentação"),
                     stockId = 2,
                     totalQuantity = 24,
                     quantityMap = emptyMap()
                 ),
                 StockReceiverModel(
-                    item = ItemModel(name = "Sabonete", barCode = "",itemType = "Higiene"),
+                    item = ItemModel(name = "Sabonete", barCode = "", itemType = "Higiene"),
                     stockId = 3,
                     totalQuantity = 10,
                     quantityMap = emptyMap()
                 )
-            )
+            ),
+            selectedQuantities = mapOf(1 to 2, 2 to 5), // Simula itens já selecionados no cabaz
+            selectedCategory = "Tudo"
         )
 
-        BasketPreparationContent(
-            modifier = Modifier.padding(top = 16.dp),
-            uiState = mockUiState,
-            onClickDate = {},
-            onCategorySelected = {},
-            onUpdateQuantity = { _, _ -> },
-            onSearchItem = {},
-            onCreate = {},
-            onSelectDate = {}
-        )
+        // Chamamos o Content diretamente para evitar dependências de ViewModel na Preview
+        Box(modifier = Modifier.fillMaxSize()) {
+            BasketPreparationContent(
+                modifier = Modifier,
+                uiState = mockUiState,
+                onClickDate = {},
+                onCategorySelected = {},
+                onUpdateQuantity = { _, _ -> },
+                onSearchItem = {},
+                onCreate = {},
+                onSelectDate = {}
+            )
+        }
     }
 }

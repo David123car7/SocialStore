@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.ipca.socialstore.data.models.ItemModel
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
 import com.ipca.socialstore.domain.item.CreateItemUseCase
+import com.ipca.socialstore.domain.item.GetAllItemsUseCase
 import com.ipca.socialstore.domain.item.GetItemByCodeUseCase
 import com.ipca.socialstore.domain.services.stock.CreateItemStockService
 import com.ipca.socialstore.domain.stock.CreateItemStockUseCase
@@ -28,12 +29,15 @@ data class ItemState(
     val error: ErrorText? = null,
     val isCreated : Boolean  = false,
     val quantity : String? = null,
-    val date: String? = null
+    val date: String? = null,
+    val itemType: String? = null,
+    val items : List<ItemModel>? = emptyList(),
 )
 @HiltViewModel
 class CreateItemViewModel @Inject constructor(
     private val createItemStockService: CreateItemStockService,
-    private val getItemByCodeUseCase: GetItemByCodeUseCase
+    private val getItemByCodeUseCase: GetItemByCodeUseCase,
+    private val getAllItemsUseCase: GetAllItemsUseCase
 ): ViewModel(){
 
     val uiState = mutableStateOf(ItemState())
@@ -112,7 +116,6 @@ class CreateItemViewModel @Inject constructor(
             }
         }
     }
-
     fun createItem(){
         uiState.value = uiState.value.copy(
             isLoading = true,
@@ -137,6 +140,58 @@ class CreateItemViewModel @Inject constructor(
                     )
                 }
             }
+        }
+    }
+
+    fun getItems(){
+        viewModelScope.launch {
+            val result = getAllItemsUseCase()
+            when(result){
+                is ResultWrapper.Success -> {
+                    uiState.value = uiState.value.copy(
+                        isLoading = false,
+                        items = result.data
+                    )
+                }
+                is ResultWrapper.Error -> {
+                    uiState.value = uiState.value.copy(
+                        isLoading = false,
+                        error = result.error.asUiText(),
+                    )
+                }
+            }
+        }
+    }
+
+    fun filterItem(filter: String) {
+        if (filter.isBlank()) {
+            uiState.value = uiState.value.copy(
+                item = uiState.value.item.copy(
+                    name = "",
+                    itemType = "",
+                    barCode = ""
+                )
+            )
+            return
+        }
+
+        val allItems = uiState.value.items
+
+        val foundItem = allItems?.find {
+            it.name.equals(filter, ignoreCase = true) || it.barCode == filter
+        }
+
+        if (foundItem != null) {
+            uiState.value = uiState.value.copy(
+                item = foundItem
+            )
+        } else {
+            uiState.value = uiState.value.copy(
+                item = uiState.value.item.copy(
+                    name = filter,
+                    itemType = ""
+                )
+            )
         }
     }
 

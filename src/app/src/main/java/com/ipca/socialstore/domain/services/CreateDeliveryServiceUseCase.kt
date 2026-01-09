@@ -12,6 +12,7 @@ import com.ipca.socialstore.domain.deliveryItems.GetDeliveryItemsBySchedulingIdU
 import com.ipca.socialstore.domain.scheduling.GetSchedulingByIdUseCase
 import com.ipca.socialstore.domain.stock.WithdrawItemStockByExpirationUseCase
 import javax.inject.Inject
+import kotlin.math.abs
 
 class CreateDeliveryServiceUseCase @Inject constructor(
     private val createDeliveryUseCase: CreateDeliveryUseCase,
@@ -36,7 +37,6 @@ class CreateDeliveryServiceUseCase @Inject constructor(
         }
     suspend operator fun invoke(schedulingId: Int, stockMap: Map<Int, Int>): ResultWrapper<List<DeliveryItemsModel>> {
 
-        // 1. Criar a entrega (Header)
         val deliveryResult = createDeliveryUseCase(schedulingId)
         if (deliveryResult is ResultWrapper.Error) return ResultWrapper.Error(deliveryResult.error)
 
@@ -47,7 +47,6 @@ class CreateDeliveryServiceUseCase @Inject constructor(
         val itemsToUpdate = mutableListOf<DeliveryItemsModel>()
         val itemsToDelete = mutableListOf<Int>()
 
-        // 2. Sincronizar Itens da Entrega
         if (itemsResult is ResultWrapper.Success) {
             val dbItems = itemsResult.data
 
@@ -55,14 +54,26 @@ class CreateDeliveryServiceUseCase @Inject constructor(
                 val match = dbItems.find { it.stockId == stockId }
                 if (match == null) {
                     itemsToInsert.add(DeliveryItemsModel(deliveryId = deliveryId, stockId = stockId, quantity = qty))
-                } else if (match.quantity != qty) {
-                    itemsToUpdate.add(match.copy(quantity = qty))
+                    handleStockWithdrawal(stockId, qty)
+                } else{
+                    val diff = qty - match.quantity
+                    if (diff > 0){
+                        handleStockWithdrawal(stockId, diff)
+                        itemsToUpdate.add(match.copy(quantity = qty))
+                    }else if (diff < 0){
+                        val returnQty = abs(diff)
+                        stockRepository.addStockQuantity(stockId,returnQty)
+                        itemsToUpdate.add(match.copy(quantity = qty))
+                    }
                 }
             }
 
             dbItems.forEach { dbItem ->
                 if (!stockMap.contains(dbItem.stockId)) {
-                    dbItem.id?.let { itemsToDelete.add(it) }
+                    dbItem.id?.let {
+                        itemsToDelete.add(it)
+                        stockRepository.addStockQuantity(dbItem.id,dbItem.quantity)
+                    }
                 }
             }
         } else {
@@ -76,15 +87,16 @@ class CreateDeliveryServiceUseCase @Inject constructor(
         if (itemsToDelete.isNotEmpty()) deliveryItemsRepository.deleteDeliveryItems(itemsToDelete)
 
 
-        stockMap.forEach { (stockId, qty) ->
-            val stockInfo = stockRepository.getStock(stockId)
-            if (stockInfo is ResultWrapper.Success) {
-                val itemId = stockInfo.data.itemId
-                withdrawItemStockByExpirationUseCase(itemId, qty)
-            }
-        }
-
         return ResultWrapper.Success(itemsToInsert + itemsToUpdate)
     }
+
+    private suspend fun handleStockWithdrawal(stockId: Int, qty: Int) {
+        val stockInfo = stockRepository.getStock(stockId)
+        if (stockInfo is ResultWrapper.Success) {
+            withdrawItemStockByExpirationUseCase(stockInfo.data.itemId, qty)
+        }
+    }
 }
+
+
 

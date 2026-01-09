@@ -9,6 +9,7 @@ import com.ipca.socialstore.data.models.DonationModel
 import com.ipca.socialstore.data.models.ItemModel
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
 import com.ipca.socialstore.domain.campaign.GetAllCampaignsUseCase
+import com.ipca.socialstore.domain.item.GetAllItemsUseCase
 
 import com.ipca.socialstore.domain.services.donation.CreateDonationServiceUseCase
 import com.ipca.socialstore.presentation.models.CreateDonationHelperModel
@@ -22,31 +23,31 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class DonationState(
-// Campos de rascunho para a Doação (Cabeçalho)
+
     val donationDate: String = "",
     val donorName: String = "",
     val campaignId: Int? = null,
 
-    // Campos de rascunho para o Item
     val itemName: String = "",
     val itemType: String = "",
     val itemBarCode: String? = null,
     val quantity: Int = 0,
     val expirationDate: String = "",
 
-    // Listas e Estados de Controlo
     val donationHelper: List<CreateDonationHelperModel> = emptyList(),
     val campaigns: List<CampaignModel> = emptyList(),
     val isLoading: Boolean = false,
     val isCreated: Boolean = false,
     val error: ErrorText? = null,
 
-    val listDate: List<ExpirationDate> = listOf(ExpirationDate())
+    val listDate: List<ExpirationDate> = listOf(ExpirationDate()),
+    val items : List<ItemModel>? = emptyList(),
 )
 @HiltViewModel
 class CreateDonationViewModel @Inject constructor(
     private val getAllCampaignsUseCase: GetAllCampaignsUseCase,
     private val createDonationServiceUseCase: CreateDonationServiceUseCase,
+    private val getAllItemsUseCase : GetAllItemsUseCase
 ) : ViewModel(){
 
     val uiState = mutableStateOf(DonationState())
@@ -187,6 +188,57 @@ class CreateDonationViewModel @Inject constructor(
         if (index in updateList.indices) {
             updateList[index] = updateList[index].copy(quantity = value)
             uiState.value = uiState.value.copy(listDate = updateList)
+        }
+    }
+
+    fun getItems(){
+        uiState.value = uiState.value.copy(isLoading = true)
+        viewModelScope.launch {
+            val result = getAllItemsUseCase()
+            when (result) {
+                is ResultWrapper.Success -> {
+                    uiState.value = uiState.value.copy(
+                        isLoading = false,
+                        items = result.data
+                    )
+                }
+                is ResultWrapper.Error -> {
+                    uiState.value = uiState.value.copy(
+                        isLoading = false,
+                        error = result.error.asUiText()
+                    )
+                }
+            }
+        }
+    }
+
+    fun filterItem(filter: String) {
+        if (filter.isBlank()) {
+            uiState.value = uiState.value.copy(
+                itemName = "",
+                itemType = "",
+                itemBarCode = null
+            )
+            return
+        }
+
+        val allItems = uiState.value.items
+
+        val foundItem = allItems?.find {
+            it.name.equals(filter, ignoreCase = true) || it.barCode == filter
+        }
+
+        if (foundItem != null) {
+            uiState.value = uiState.value.copy(
+                itemName = foundItem.name,
+                itemType = foundItem.itemType,
+                itemBarCode = foundItem.barCode
+            )
+        } else {
+            uiState.value = uiState.value.copy(
+                itemName = filter,
+                itemType = ""
+            )
         }
     }
 }
