@@ -12,7 +12,7 @@ import com.ipca.socialstore.domain.item.CreateItemUseCase
 import com.ipca.socialstore.domain.item.GetItemByIdUseCase
 import com.ipca.socialstore.domain.stock.AddItemStockUseCase
 import javax.inject.Inject
-
+/*
 class AddDonationService @Inject constructor(
     private val createItemUseCase: CreateItemUseCase,
     private val getItemByIdUseCase: GetItemByIdUseCase,
@@ -57,13 +57,13 @@ class AddDonationService @Inject constructor(
             val stock = (stockResult as ResultWrapper.Success).data
 
 
-            // Relacionar cada Item á sua doacao (Rever isto)
             var currentDonationItem : DonationItemModel =
                 DonationItemModel(itemId = 0, donationId = 0)
             if (item.id != null && donation.id != null){
                 val donationItem = DonationItemModel(
                     itemId = itemId,
-                    donationId = donation.id
+                    donationId = donation.id,
+                    quantity =
                 )
                 currentDonationItem = donationItem
             }
@@ -78,3 +78,4 @@ class AddDonationService @Inject constructor(
 
     }
 }
+*/

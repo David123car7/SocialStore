@@ -286,14 +286,12 @@ fun DonationDetailSheet(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Informações principais em Cards pequenos ou linhas
             DetailInfoRow(Icons.Default.Person, "Doador", donationHelper.donation.donorName)
             DetailInfoRow(Icons.Default.Campaign, "Campanha", donationHelper.campaignName)
             DetailInfoRow(Icons.Default.Event, "Data da Entrega", donationHelper.donation.date)
 
             HorizontalDivider(modifier = Modifier.padding(vertical = 20.dp), thickness = 0.5.dp)
 
-            // Secção de Itens
             Text(
                 text = "Itens Doados",
                 style = MaterialTheme.typography.titleMedium,

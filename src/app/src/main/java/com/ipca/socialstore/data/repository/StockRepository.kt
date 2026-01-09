@@ -17,6 +17,7 @@ import com.ipca.socialstore.presentation.views.item.ExpirationDate
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.postgrest.query.Columns
+import io.github.jan.supabase.postgrest.query.Order
 import io.github.jan.supabase.realtime.selectAsFlow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -279,6 +280,71 @@ class StockRepository @Inject constructor(private val supabase: SupabaseClient, 
             }
             ResultWrapper.Success(result)
 
+        } catch (e: Exception) {
+            ResultWrapper.Error(exceptionMapper.map(e))
+        }
+    }
+
+    suspend fun withdrawItemStockByExpiration(itemId: Int, quantityToWithdraw: Int): ResultWrapper<Boolean> {
+        return try {
+
+            val stockList = supabase.from(DatabaseTables.STOCK)
+                .select {
+                    filter {
+                        eq("item_id", itemId)
+                        gt("quantity", 0)
+                    }
+                    order(column = "expiration_date", order = Order.ASCENDING)
+                }
+                .decodeList<StockModel>()
+
+            if (stockList.isEmpty()) return ResultWrapper.Error(AppError.DataNotFound)
+
+            val totalAvailable = stockList.sumOf { it.quantity }
+            if (totalAvailable < quantityToWithdraw) {
+                return ResultWrapper.Error(AppError.InsufficientStock)
+            }
+
+            var remaining = quantityToWithdraw
+
+            for (stock in stockList) {
+                if (remaining <= 0) break
+
+                val stockId = stock.id ?: continue
+
+                if (stock.quantity <= remaining) {
+                    remaining -= stock.quantity
+                    supabase.from(DatabaseTables.STOCK).delete {
+                        filter { eq("id", stockId) }
+                    }
+                } else {
+                    val newQty = stock.quantity - remaining
+                    supabase.from(DatabaseTables.STOCK).update(
+                        { set("quantity", newQty) }
+                    ) {
+                        filter { eq("id", stockId) }
+                    }
+                    remaining = 0
+                }
+            }
+
+            ResultWrapper.Success(true)
+
+        } catch (e: Exception) {
+            ResultWrapper.Error(exceptionMapper.map(e))
+        }
+    }
+
+    suspend fun getStock(stockId : Int) : ResultWrapper<StockModel> {
+        return try {
+            val result = supabase.from(DatabaseTables.STOCK)
+                .select {
+                    filter {
+                        eq("id", stockId)
+                    }
+                }.decodeSingle<StockModel>()
+
+            ResultWrapper.Success(result)
         } catch (e: Exception) {
             ResultWrapper.Error(exceptionMapper.map(e))
         }

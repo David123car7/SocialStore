@@ -69,5 +69,6 @@ fun AppError.asUiText(): ErrorText {
         is AppError.DataNotCreated -> ErrorText.StringResource(R.string.error_data_not_created)
         is AppError.DataNotUpdated -> ErrorText.StringResource(R.string.error_data_not_updated)
         is AppError.DifferentPassword -> ErrorText.StringResource(R.string.error_passwords_dont_match)
+        is AppError.InsufficientStock -> ErrorText.StringResource(R.string.InsufficientStock)
     }
 }
