@@ -159,7 +159,7 @@ fun SchedulingConfirmationContent(
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Button(
-                        onClick = { onConfirm() },
+                        onClick = { onAccept() },
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(56.dp),

@@ -55,6 +55,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.ipca.socialstore.data.models.ItemModel
+import com.ipca.socialstore.presentation.models.CreateDonationHelperModel
 import com.ipca.socialstore.presentation.models.DonationHelperModel
 import com.ipca.socialstore.presentation.ui.components.TextFieldDateComponent
 import com.ipca.socialstore.presentation.ui.theme.GreenIPCA
@@ -69,6 +71,9 @@ fun CreateDonationView(modifier: Modifier, navController: NavController) {
     LaunchedEffect(Unit) {
         viewModel.getCampaigns()
     }
+    LaunchedEffect(Unit) {
+        viewModel.getItems()
+    }
     CreateDonationViewContent(
         modifier,
         uiState,
@@ -80,7 +85,8 @@ fun CreateDonationView(modifier: Modifier, navController: NavController) {
         onUpdateQuantity = { index, newValue -> viewModel.updateQuantity(index = index, value = newValue) },
         onAddNewDate = { viewModel.onAddNewDate() },
         onAddItemHelper = { viewModel.addItemToDonationHelper() },
-        onUpdateDonor = {value -> viewModel.updateDonorName(value)}
+        onUpdateDonor = {value -> viewModel.updateDonorName(value)},
+        onSearchItem = {value -> viewModel.filterItem(value)}
     )
 }
 
@@ -96,7 +102,8 @@ fun CreateDonationViewContent(
     onClickCreate: () -> Unit,
     onAddNewDate: () -> Unit,
     onAddItemHelper: () -> Unit,
-    onUpdateDonor : (String) -> Unit
+    onUpdateDonor : (String) -> Unit,
+    onSearchItem :(String) -> Unit
 ) {
     var selectedCampaignName by remember { mutableStateOf("Selecionar Campanha") }
     var expanded by remember { mutableStateOf(false) }
@@ -217,7 +224,9 @@ fun CreateDonationViewContent(
                         value = uiState.itemName,
                         label = { Text("Nome Item") },
                         modifier = Modifier.weight(1f),
-                        onValueChange = { value -> onUpdateName(value) },
+                        onValueChange = { value -> onUpdateName(value)
+                                        onSearchItem(value)
+                                        },
                         shape = RoundedCornerShape(12.dp)
                     )
 
@@ -384,30 +393,68 @@ fun ItemsInBag(
 }
 
 
-
-@Preview(showBackground = true, name = "Formulário de Doação")
+@Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun PreviewCreateDonation() {
+    val mockCampaigns = listOf(
+        com.ipca.socialstore.data.models.CampaignModel(
+            id = 1, name = "Banco Alimentar", description = "Recolha Mensal", category = "Alimentação",
+            onGoing = true, goal = 1000, currentDonations = 100, startDate = "01/01/2026", endDate = "31/01/2026"
+        )
+    )
+
+    // Criar a lista de itens temporários para a "Bag"
+    val mockCreateDonationHelper = listOf(
+        CreateDonationHelperModel(
+            item = com.ipca.socialstore.data.models.ItemModel(
+                name = "Arroz Agulha",
+                barCode = "560123456789", // Adicionado o barCode conforme o teu Model
+                itemType = "Alimentação"
+            ),
+            quantity = 10,
+            expirationDate = "31/12/2026"
+        ),
+        CreateDonationHelperModel(
+            item = com.ipca.socialstore.data.models.ItemModel(
+                name = "Leite Meio Gordo",
+                barCode = null, // BarCode pode ser null conforme o teu Model
+                itemType = "Alimentação"
+            ),
+            quantity = 24,
+            expirationDate = "15/05/2026"
+        )
+    )
+
     val mockState = DonationState(
-        quantity = 10,
-        expirationDate = "10/12/2025"
+        donorName = "Maria Silva",
+        donationDate = "09/01/2026",
+        itemName = "Azeite",
+        itemType = "Alimentação",
+        campaigns = mockCampaigns,
+        donationHelper = mockCreateDonationHelper,
+        listDate = listOf(
+            com.ipca.socialstore.presentation.views.item.ExpirationDate("20/10/2027", "2")
+        )
     )
 
     SocialStoreTheme {
-        CreateDonationViewContent(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            uiState = mockState,
-            onUpdateDate = {},
-            onUpdateName = {},
-            onUpdateItemType = {},
-            onUpdateQuantity = {} as (Int, newValue: String) -> Unit,
-            onUpdateExpiration = {} as (Int, newValue: String) -> Unit,
-            onClickCreate = { },
-            onAddNewDate = {},
-            onAddItemHelper = {},
-            onUpdateDonor = {}
-        )
+        androidx.compose.material3.Surface(color = MaterialTheme.colorScheme.background) {
+            CreateDonationViewContent(
+                modifier = Modifier.fillMaxSize(),
+                uiState = mockState,
+                onUpdateDate = {},
+                onUpdateName = {},
+                onUpdateItemType = {},
+                onUpdateQuantity = { _, _ -> },
+                onUpdateExpiration = { _, _ -> },
+                onClickCreate = { },
+                onAddNewDate = {},
+                onAddItemHelper = {},
+                onUpdateDonor = {},
+                onSearchItem = {}
+            )
+        }
     }
 }
+
+

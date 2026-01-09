@@ -126,4 +126,15 @@ class ItemRepository @Inject constructor(private val supabase : SupabaseClient, 
             ResultWrapper.Error(exceptionMapper.map(e))
         }
     }
+
+    suspend fun getAllItems(): ResultWrapper<List<ItemModel>> {
+        return try {
+            val items = supabase.from(DatabaseTables.ITEM)
+                .select ()
+                .decodeList<ItemModel>()
+            ResultWrapper.Success(items)
+        } catch (e: Exception) {
+            ResultWrapper.Error(exceptionMapper.map(e))
+        }
+    }
 }

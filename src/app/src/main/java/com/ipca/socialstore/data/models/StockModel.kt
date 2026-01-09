@@ -18,6 +18,3 @@ data class StockModel(
     val quantity : Int,
 )
 
-fun StockModel.isValid() : Boolean{
-    return this.expirationDate.isNotEmpty() && this.quantity >= 0
-}

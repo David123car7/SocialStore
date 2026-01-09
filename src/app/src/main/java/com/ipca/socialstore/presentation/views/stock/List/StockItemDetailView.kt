@@ -97,7 +97,6 @@ fun StockItemDetail(
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        // --- CARD DE RESUMO SUPERIOR ---
         ElevatedCard(
             modifier = Modifier.fillMaxWidth(),
             elevation = CardDefaults.cardElevation(6.dp)
@@ -123,7 +122,7 @@ fun StockItemDetail(
                                 )
                             )
                             TextField(
-                                value = uiState.item.itemType!!,
+                                value = uiState.item.itemType,
                                 onValueChange = { value -> onUpdateType(value)},
                                 label = { Text("Tipo") },
                                 modifier = Modifier.fillMaxWidth(),
@@ -149,7 +148,7 @@ fun StockItemDetail(
                     Button(onClick = {
                         if (isEditing) {
                             onSave()
-                            showAddFields = false // Fecha o painel de adicionar ao salvar
+                            showAddFields = false
                         }
                         isEditing = !isEditing
                     }) {
@@ -184,12 +183,16 @@ fun StockItemDetail(
                     ) {
                         if (isEditing) {
                             TextField(
-                                value = date,
+                                value = if (date == "9999-12-31") "Sem validade" else date,
                                 onValueChange = {},
                                 label = { Text("Validade") },
                                 modifier = Modifier.weight(1f),
-                                readOnly = true // A data do lote geralmente é fixa
+                                readOnly = true,
+                                colors = if (date == "9999-12-31")
+                                    TextFieldDefaults.colors(focusedTextColor = Color.Gray)
+                                else TextFieldDefaults.colors()
                             )
+
                             TextField(
                                 value = if (uiStateEdit.date == date) {
                                     uiStateEdit.quantity ?: ""
@@ -202,17 +205,20 @@ fun StockItemDetail(
                                 modifier = Modifier.width(80.dp)
                             )
                         } else {
-                            Text(text = date, modifier = Modifier.weight(1f))
+                            Text(
+                                text = if (date == "9999-12-31") "Sem validade" else date,
+                                modifier = Modifier.weight(1f),
+                                style = if (date == "9999-12-31")
+                                    MaterialTheme.typography.bodyMedium.copy(color = Color.Gray)
+                                else MaterialTheme.typography.bodyMedium
+                            )
                             Text(text = "$quantity unid.", fontWeight = FontWeight.SemiBold)
-                            IconButton(
-                                onClick = {
-                                    onRemove(uiState.stockId.toString())
-                                }
-                            ) {
+
+                            IconButton(onClick = { onRemove(uiState.stockId.toString()) }) {
                                 Icon(
                                     imageVector = Icons.Default.Delete,
                                     contentDescription = "Remover lote",
-                                    tint = MaterialTheme.colorScheme.error // Cor vermelha para indicar perigo
+                                    tint = MaterialTheme.colorScheme.error
                                 )
                             }
                         }

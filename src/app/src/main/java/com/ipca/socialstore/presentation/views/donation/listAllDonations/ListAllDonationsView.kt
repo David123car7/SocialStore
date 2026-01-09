@@ -53,11 +53,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
+import com.ipca.socialstore.data.models.DonationModel
 import com.ipca.socialstore.presentation.models.DonationHelperModel
 import com.ipca.socialstore.presentation.routes.AdminRoutes
 
@@ -221,12 +224,15 @@ fun DonationCard(
                     fontWeight = FontWeight.SemiBold
                 )
 
-                Text(
-                    text = "Campanha: $campaignName",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = Color(0xFF136342), // Verde Social Store
-                    fontWeight = FontWeight.SemiBold
-                )
+                if (campaignName.isNotEmpty()){
+                    Text(
+                        text = "Campanha: $campaignName",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color(0xFF136342), // Verde Social Store
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
+
 
                 Spacer(modifier = Modifier.height(4.dp))
 
@@ -329,6 +335,74 @@ fun DetailInfoRow(icon: ImageVector, label: String, value: String) {
             Text(text = label, style = MaterialTheme.typography.labelSmall, color = Color.Gray)
             Text(text = value, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Medium)
         }
+    }
+}
+
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun ListAllDonationsPreview() {
+    // 1. Criar Mock de Campanhas usando o teu construtor
+    val mockCampaigns = listOf(
+        com.ipca.socialstore.data.models.CampaignModel(
+            id = 1,
+            name = "Campanha de Inverno",
+            description = "Recolha de agasalhos",
+            category = "Vestuário",
+            onGoing = true,
+            goal = 1000,
+            currentDonations = 450,
+            startDate = "01/01/2026",
+            endDate = "31/01/2026"
+        ),
+        com.ipca.socialstore.data.models.CampaignModel(
+            id = 2,
+            name = "Banco Alimentar",
+            description = "Recolha de bens não perecíveis",
+            category = "Alimentação",
+            onGoing = true,
+            goal = 5000,
+            currentDonations = 1200,
+            startDate = "01/01/2026",
+            endDate = "15/01/2026"
+        )
+    )
+
+    // 2. Criar Mock de Doações
+    val mockDonations = listOf(
+        DonationHelperModel(
+            donation = com.ipca.socialstore.data.models.DonationModel(
+                id = 1,
+                donorName = "Joaquim Alberto",
+                date = "09/01/2026",
+                campaignId = 1
+            ),
+            campaignName = "Campanha de Inverno"
+        ),
+        DonationHelperModel(
+            donation = com.ipca.socialstore.data.models.DonationModel(
+                id = 2,
+                donorName = "Maria Luísa",
+                date = "08/01/2026",
+                campaignId = 2
+            ),
+            campaignName = "Banco Alimentar"
+        )
+    )
+
+    val mockUiState = ListDonationsState(
+        joinedDonations = mockDonations,
+        campaigns = mockCampaigns,
+        filterDonations = null
+    )
+
+    MaterialTheme {
+        ListAllDonationsContent(
+            modifier = Modifier.fillMaxSize(),
+            uiState = mockUiState,
+            navController = rememberNavController(),
+            onFilterCampaign = {}
+        )
     }
 }
 

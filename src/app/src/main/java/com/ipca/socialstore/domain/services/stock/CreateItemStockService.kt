@@ -25,37 +25,41 @@ class CreateItemStockService @Inject constructor(
 ) {
     suspend operator fun invoke(item: ItemModel, list: List<ExpirationDate>): ResultWrapper<Boolean> {
         return try {
-
             val createItemResult = createItemUseCase(item)
             if (createItemResult is ResultWrapper.Error) return ResultWrapper.Error(createItemResult.error)
             val itemId = (createItemResult as ResultWrapper.Success).data
 
-            val datesForDb = list.map { formatToDbDate(it.date) }
-            val stockItemResult = getStockByItemIdUseCase(itemId, datesForDb)
 
-            val stockItem: List<StockModel> = when (stockItemResult) {
+            val datesForSearch = list.map { entry ->
+                if (entry.date.isBlank()) "9999-12-31" else formatToDbDate(entry.date)!!
+            }
+
+            val stockItemResult = getStockByItemIdUseCase(itemId, datesForSearch)
+            val dbStockList: List<StockModel> = when (stockItemResult) {
                 is ResultWrapper.Success -> stockItemResult.data
                 is ResultWrapper.Error -> {
                     if (stockItemResult.error == AppError.DataNotFound) emptyList()
                     else return ResultWrapper.Error(stockItemResult.error)
                 }
             }
-            println("Isto é o item $stockItem")
-            list.forEach { entry ->
-                println("Entry $entry")
-                if (entry.date.isNotBlank() && entry.quantity.isNotBlank()) {
 
-                    val dateInDbFormat = formatToDbDate(entry.date)
-                    val match = stockItem.find { it.expirationDate == dateInDbFormat }
-                    println(match?.expirationDate)
-                    println(dateInDbFormat)
+            list.forEach { entry ->
+                if (entry.quantity.isNotBlank()) {
+
+                    val dateForDb: String = if (entry.date.isBlank()) {
+                        "9999-12-31"
+                    } else {
+                        formatToDbDate(entry.date)!!
+                    }
+
+                    val match = dbStockList.find { it.expirationDate == dateForDb }
 
                     if (match != null) {
                         updateQuantityInStockByDateUseCase(match.id!!, entry.quantity.toInt())
                     } else {
                         val newStock = StockModel(
                             itemId = itemId,
-                            expirationDate = dateInDbFormat,
+                            expirationDate = dateForDb,
                             quantity = entry.quantity.toInt()
                         )
                         stockRepository.addStock(newStock)
@@ -67,24 +71,18 @@ class CreateItemStockService @Inject constructor(
             ResultWrapper.Error(exceptionMapper.map(e))
         }
     }
+    }
 
-    private fun formatToDbDate(uiDate: String): String {
+    private fun formatToDbDate(uiDate: String?): String? {
+        if (uiDate.isNullOrBlank()) return null
         return try {
             val normalizedDate = uiDate.replace("/", "-")
-
             val parts = normalizedDate.split("-")
             if (parts.size == 3) {
-                if (parts[0].length == 4) {
-                    normalizedDate
-                } else {
-                    // Se vier como 21-01-2026, inverte
-                    "${parts[2]}-${parts[1]}-${parts[0]}"
-                }
-            } else {
-                normalizedDate
-            }
+                if (parts[0].length == 4) normalizedDate
+                else "${parts[2]}-${parts[1]}-${parts[0]}"
+            } else normalizedDate
         } catch (e: Exception) {
             uiDate
         }
     }
-}

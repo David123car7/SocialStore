@@ -25,6 +25,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.ipca.socialstore.data.enums.ItemType
 import com.ipca.socialstore.data.models.ItemModel
 import com.ipca.socialstore.presentation.ui.components.SearchBarContent
 import com.ipca.socialstore.presentation.models.StockReceiverModel
@@ -159,16 +160,16 @@ private fun StockList(
                     )
                 }
 
-                items(itemTypes) { type ->
-                    val isSelected = selectedType.value == type
+                items(ItemType.entries) { type ->
+                    val isSelected = selectedType.value == type.name
                     FilterChip(
                         selected = isSelected,
                         onClick = {
                             val newType = if (isSelected) null else type
-                            selectedType.value = newType
-                            onSearchType(newType ?: "")
+                            selectedType.value = newType?.name
+                            onSearchType(newType?.name ?: "")
                         },
-                        label = { Text(type!!) },
+                        label = { Text(type.name) },
                     )
                 }
             }

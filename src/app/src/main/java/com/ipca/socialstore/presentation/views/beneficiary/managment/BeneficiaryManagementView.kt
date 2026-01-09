@@ -248,7 +248,7 @@ fun BeneficiaryManagementContent(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(Icons.Default.Add, contentDescription = null, tint = Color.White)
                 Spacer(modifier = Modifier.width(8.dp))
-                Text("Preparar a Tina", fontWeight = FontWeight.Bold, color = Color.White)
+                Text("Preparar Cabaz", fontWeight = FontWeight.Bold, color = Color.White)
             }
         }
 
