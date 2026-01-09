@@ -44,11 +44,9 @@ class SchedulingMainPageViewModel @Inject constructor(
 
     init {
         val id = if (beneficiaryId != null) beneficiaryId.toIntOrNull() else null
-
         id?.let {
             fetchBeneficiary(it)
         }
-
     }
     private fun fetchBeneficiary(id : Int) {
         uiState.value = uiState.value.copy(isLoading = true, error = null)
@@ -194,4 +192,12 @@ class SchedulingMainPageViewModel @Inject constructor(
              newScheduling = newId
         )
     }
-}
+
+    fun updateSchedulingNote(note : String){
+        val scheduling = uiState.value.newScheduling.copy(
+            note = note
+        )
+        uiState.value = uiState.value.copy(
+            newScheduling = scheduling
+        )
+    }}

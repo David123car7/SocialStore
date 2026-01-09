@@ -20,15 +20,15 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun SearchBarContent(
+    modifier: Modifier,
     onSearchItem: (value: String) -> Unit,
 ){
     val searchValueState = remember { mutableStateOf("") }
     val searchValue by searchValueState
 
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp, horizontal = 4.dp),
+        modifier = modifier
+            .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {

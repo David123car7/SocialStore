@@ -26,6 +26,9 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -39,6 +42,8 @@ import com.ipca.socialstore.data.enums.ApplicationStates
 import com.ipca.socialstore.data.enums.UserRole
 import com.ipca.socialstore.presentation.models.ApplicationModelReceiver
 import com.ipca.socialstore.presentation.routes.AdminRoutes
+import com.ipca.socialstore.presentation.ui.components.IntroductionComponent
+import com.ipca.socialstore.presentation.ui.components.SearchBarContent
 import com.ipca.socialstore.presentation.ui.theme.GreenIPCA
 import com.ipca.socialstore.presentation.utils.ui.getApplicationStateViewData
 
@@ -62,22 +67,42 @@ fun ListApplicationsContent(
     modifier: Modifier,
     uiState: ListApplicationsState,
     onAppSelected:(ApplicationModelReceiver) -> Unit) {
-
-    LazyColumn(
-        modifier = modifier.fillMaxSize(),
-        contentPadding = PaddingValues(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+    var searchQuery by remember { mutableStateOf("") }
+    val filteredList = remember(uiState.applications, searchQuery) {
+        uiState.applications.filter { application ->
+            application.name.contains(searchQuery, ignoreCase = true)
+        }
+    }
+    Column(
+        modifier = modifier.padding(top = 18.dp, bottom = 18.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.SpaceEvenly
     ) {
-        items(uiState.applications) { application ->
-            val ui = getApplicationStateViewData(state = application.applicationState.state)
-            CandidateCard(
-                candidateName = application.name,
-                createdAt = application.createdAt,
-                status = ui.text,
-                statusBgColor = ui.bgColor,
-                statusTextColor = ui.textColor,
-                onDetailsClick = {onAppSelected(application)},
-            )
+        IntroductionComponent(
+            tittle = "Candidaturas"
+        )
+
+        SearchBarContent(
+            modifier = Modifier.padding(15.dp),
+            onSearchItem = { query -> searchQuery = query }
+        )
+
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            items(filteredList) { application ->
+                val ui = getApplicationStateViewData(state = application.applicationState.state)
+                CandidateCard(
+                    candidateName = application.name,
+                    createdAt = application.createdAt,
+                    status = ui.text,
+                    statusBgColor = ui.bgColor,
+                    statusTextColor = ui.textColor,
+                    onDetailsClick = { onAppSelected(application) },
+                )
+            }
         }
     }
 }

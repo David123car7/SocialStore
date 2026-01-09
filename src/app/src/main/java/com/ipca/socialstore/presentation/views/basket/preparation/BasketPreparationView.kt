@@ -146,7 +146,7 @@ fun BasketPreparationContent(
             )
         }
         Text("Adicionar Itens ao Cabaz", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
-        SearchBarContent { value -> onSearchItem(value)}
+        SearchBarContent(modifier = Modifier) { value -> onSearchItem(value)}
 
         Column {
             Text("Filtrar por Categoria", style = MaterialTheme.typography.labelMedium, color = Color.Gray)
