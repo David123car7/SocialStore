@@ -1,6 +1,7 @@
 package com.ipca.socialstore.presentation.ui.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -18,7 +19,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun IntroductionComponent(tittle: String, description: String? = null, icon: ImageVector? = null){
+fun IntroductionComponent(
+    tittle: String,
+    description: String? = null,
+    icon: ImageVector? = null,
+    dividerPadding: PaddingValues = PaddingValues(horizontal = 16.dp)){
     if(icon != null){
         Icon(
             imageVector = icon,
@@ -50,5 +55,5 @@ fun IntroductionComponent(tittle: String, description: String? = null, icon: Ima
         )
     }
 
-    HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
+    HorizontalDivider(modifier = Modifier.padding(dividerPadding))
 }

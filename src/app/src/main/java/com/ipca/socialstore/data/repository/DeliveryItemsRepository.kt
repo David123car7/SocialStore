@@ -51,6 +51,21 @@ class DeliveryItemsRepository @Inject constructor(
         }
     }
 
+    suspend fun getDeliveryItemsByDeliveryIds(deliveryIds: List<Int>): ResultWrapper<List<DeliveryItemsModel>> {
+        return try {
+            val result = supabase.from(DatabaseTables.DELIVERY_ITEMS)
+                .select {
+                    filter {
+                        isIn("delivery_id", deliveryIds)
+                    }
+                }
+                .decodeList<DeliveryItemsModel>()
+            ResultWrapper.Success(result)
+        } catch (e: Exception) {
+            ResultWrapper.Error(exceptionMapper.map(e))
+        }
+    }
+
     suspend fun updateDeliveryItems(items: List<DeliveryItemsModel>): ResultWrapper<Unit> {
         return try {
             supabase.from(DatabaseTables.DELIVERY_ITEMS).upsert(items)

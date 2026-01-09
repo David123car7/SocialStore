@@ -5,6 +5,7 @@ import com.ipca.socialstore.data.exceptions.AppError
 import com.ipca.socialstore.data.exceptions.ExceptionMapper
 import com.ipca.socialstore.data.helpers.from
 import com.ipca.socialstore.data.models.DeliveriesModel
+import com.ipca.socialstore.data.models.StockModel
 import com.ipca.socialstore.data.models.TableIdModel
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
 import io.github.jan.supabase.SupabaseClient
@@ -55,5 +56,15 @@ class DeliveryRepository @Inject constructor(
         }
     }
 
-
+    suspend fun getAllDeliveriesByState(state: String) : ResultWrapper<List<DeliveriesModel>>{
+        return try {
+            val deliveries = supabase.from(DatabaseTables.DELIVERY)
+                .select{
+                    filter { eq("state", state) }
+                }.decodeList<DeliveriesModel>()
+            ResultWrapper.Success(deliveries)
+        }catch (e : Exception){
+            ResultWrapper.Error(exceptionMapper.map(e))
+        }
+    }
 }

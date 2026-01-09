@@ -60,7 +60,7 @@ fun AdminHomeContent(modifier: Modifier, navigateTo: (route: Any) -> Unit) {
         DashboardMenuItem(3, "Campanhas", Icons.Outlined.Campaign, onClick = {navigateTo(AdminRoutes.CampaignList)}),
         DashboardMenuItem(4, "Agendamentos", Icons.Outlined.AccessTime, onClick = {navigateTo(AdminRoutes.SchedulingMainPage)}),
         DashboardMenuItem(5, "Beneficiários", Icons.Outlined.People, onClick = {navigateTo(AdminRoutes.SchedulingManagement)}),
-        DashboardMenuItem(6, "Definições", Icons.Outlined.Settings, onClick = {})
+        DashboardMenuItem(6, "Relatorios", Icons.Outlined.FilePresent, onClick = {navigateTo(AdminRoutes.Reports)})
     )
 
     LazyVerticalGrid(
@@ -88,7 +88,6 @@ fun AdminHomeContent(modifier: Modifier, navigateTo: (route: Any) -> Unit) {
             )
         }
 
-        // --- Secção 3: Título Atividades ---
         item(span = { GridItemSpan(2) }) {
             Spacer(Modifier.height(8.dp))
             Text(
@@ -105,7 +104,6 @@ fun AdminHomeContent(modifier: Modifier, navigateTo: (route: Any) -> Unit) {
 
 @Composable
 fun ActivityListSection() {
-    // Container cinzento grande
     Card(
         colors = CardDefaults.cardColors(containerColor = Color(0xFFF3F2F4)), // Cinzento claro
         shape = RoundedCornerShape(16.dp),

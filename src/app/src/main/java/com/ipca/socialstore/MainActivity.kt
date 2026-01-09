@@ -67,6 +67,7 @@ import com.ipca.socialstore.presentation.views.home.beneficiaryHome.BeneficiaryH
 import com.ipca.socialstore.presentation.views.home.defaultHomeView.DefaultHomeView
 import com.ipca.socialstore.presentation.views.home.testHome.TestHomeView
 import com.ipca.socialstore.presentation.views.notification.NotificationHistoryView
+import com.ipca.socialstore.presentation.views.reports.ReportsView
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -145,6 +146,9 @@ class MainActivity : ComponentActivity() {
                         }
                         composable<AdminRoutes.CampaignList>{
                             CampaignsAdminListView(modifier = Modifier.padding(innerPadding), navController = navController, userRole = mainState.userRole)
+                        }
+                        composable<AdminRoutes.Reports>{
+                            ReportsView(modifier = Modifier.padding(innerPadding), navController = navController, userRole = mainState.userRole)
                         }
                         composable(
                             route = AdminRoutes.CampaignEdit::class.qualifiedName!! + "/{campaign_id}",

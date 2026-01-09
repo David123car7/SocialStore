@@ -1,9 +1,7 @@
 package com.ipca.socialstore.data.repository
 
 import android.icu.util.Calendar
-import android.os.Build
 import android.util.Log
-import androidx.annotation.RequiresApi
 import com.ipca.socialstore.data.enums.DatabaseTables
 import com.ipca.socialstore.data.enums.UnknownError
 import com.ipca.socialstore.data.exceptions.AppError
@@ -21,10 +19,8 @@ import io.github.jan.supabase.postgrest.query.Order
 import io.github.jan.supabase.realtime.selectAsFlow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import java.text.SimpleDateFormat
-import java.time.LocalDate
 import java.util.Locale
 
 import javax.inject.Inject
@@ -138,7 +134,7 @@ class StockRepository @Inject constructor(private val supabase: SupabaseClient, 
     }
 
     @OptIn(SupabaseExperimental::class)
-    fun getFullStock(): Flow<ResultWrapper<List<StockModel>>> {
+    fun getFullStockFlow(): Flow<ResultWrapper<List<StockModel>>> {
         return supabase
             .from(DatabaseTables.STOCK)
             .selectAsFlow(StockModel::id)
@@ -152,6 +148,16 @@ class StockRepository @Inject constructor(private val supabase: SupabaseClient, 
             .catch { e ->
                 emit(ResultWrapper.Error(exceptionMapper.map(e)))
             }
+    }
+
+    suspend fun getFullStock() : ResultWrapper<List<StockModel>>{
+        return try {
+            val stock = supabase.from(DatabaseTables.STOCK)
+                .select().decodeList<StockModel>()
+            ResultWrapper.Success(stock)
+        }catch (e : Exception){
+            ResultWrapper.Error(exceptionMapper.map(e))
+        }
     }
 
     suspend fun listStockToStock(list: List<StockModel>): ResultWrapper<List<ItemModel>> {

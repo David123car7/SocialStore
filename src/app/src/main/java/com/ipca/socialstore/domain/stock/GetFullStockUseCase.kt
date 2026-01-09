@@ -8,6 +8,6 @@ import javax.inject.Inject
 
 class GetFullStockUseCase @Inject constructor(private val stockRepository: StockRepository){
     operator fun invoke(): Flow<ResultWrapper<List<StockModel>>> {
-        return stockRepository.getFullStock()
+        return stockRepository.getFullStockFlow()
     }
 }
