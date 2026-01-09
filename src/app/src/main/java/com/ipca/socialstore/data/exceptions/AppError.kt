@@ -17,7 +17,7 @@ sealed class AppError {
     object UserNotLoggedIn : AppError()
     object InvalidResetToken : AppError()
     object InvalidFilesNumber: AppError()
-
+    object InsufficientStock: AppError()
     // Generic Errors
     data class EmptyField(val fieldLabelResId: Int) : AppError()
     data class InvalidField(val fieldLabelResId: Int) : AppError()
@@ -25,4 +25,7 @@ sealed class AppError {
     object NetworkError : AppError() // No internet
     object ParseError : AppError()   // Code doesn't match DB
     data class UnknownError(val message: String) : AppError()
+    companion object {
+
+    }
 }

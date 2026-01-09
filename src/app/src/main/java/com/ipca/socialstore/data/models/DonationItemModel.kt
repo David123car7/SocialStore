@@ -12,4 +12,7 @@ data class DonationItemModel(
 
     @SerialName("donation_id")
     val donationId : Int,
+
+    @SerialName("quantity")
+    val quantity : Int
 )

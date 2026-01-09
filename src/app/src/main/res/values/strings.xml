@@ -12,7 +12,7 @@
     <string name="course">Course</string>
     <string name="course_type">Course Type</string>
     <string name="student_number">StudentNumber</string>
-
+    <string name="InsufficientStock">InsufficientStock.</string>
     //Generic Errors
     <string name="error_field_empty">%1$s cannot be empty.</string>
     <string name="error_field_invalid">%1$s is invalid.</string>
@@ -38,4 +38,5 @@
     <string name="error_network">No internet connection. Please check your network.</string>
     <string name="error_technical">A technical error occurred. Please try again later.</string>
     <string name="error_unknown">An unknown error occurred.</string>
+
 </resources>
