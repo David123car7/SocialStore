@@ -136,7 +136,8 @@ private fun StockList(
     Box(modifier = modifier.fillMaxSize()) {
         Column(modifier = Modifier.fillMaxSize()) {
 
-            SearchBarContent { newValue -> onSearchItem(newValue) }
+            SearchBarContent(modifier = Modifier) {
+                newValue -> onSearchItem(newValue) }
             HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
             LazyRow(

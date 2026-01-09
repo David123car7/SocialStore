@@ -58,6 +58,7 @@ fun CampaignsListContent(
                 .padding(horizontal = 12.dp)
         ) {
             SearchBarContent(
+                modifier = Modifier,
                 onSearchItem = { query -> searchQuery = query }
             )
             HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
