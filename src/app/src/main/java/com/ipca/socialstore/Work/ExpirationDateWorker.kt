@@ -25,13 +25,10 @@ class ExpirationDateWorker @AssistedInject constructor(
 ) : CoroutineWorker(appContext, workerParams) {
 
     override suspend fun doWork(): Result {
-        Log.d("WORKER_TEST", "Worker arrancou!")
-
         return when (val result = workerExpirationDateUseCase()) {
             is ResultWrapper.Success -> {
                 val ids = result.data
                 if (ids.isNotEmpty()) {
-                    println("Dentro do if")
                     createStockNotificationService(ids)
                 } else {
                     Log.d("WORKER_TEST", "Nenhum item expira nos próximos 20 dias.")
@@ -39,7 +36,6 @@ class ExpirationDateWorker @AssistedInject constructor(
                 Result.success()
             }
             is ResultWrapper.Error -> {
-                Log.e("WORKER_TEST", "Erro na busca: ${result.error}")
                 Result.retry()
             }
         }
