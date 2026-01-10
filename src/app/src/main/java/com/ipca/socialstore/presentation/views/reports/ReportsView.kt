@@ -1,5 +1,7 @@
 package com.ipca.socialstore.presentation.views.reports
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -22,6 +24,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -33,15 +36,36 @@ import com.ipca.socialstore.presentation.ui.components.IntroductionComponent
 import com.ipca.socialstore.presentation.ui.theme.GreenIPCA // A tua cor personalizada
 
 @Composable
-fun ReportsView(modifier: Modifier, navController: NavController, userRole: UserRole){
+fun ReportsView(
+    modifier: Modifier = Modifier,
+    navController: NavController,
+    userRole: UserRole
+) {
     val viewModel: ReportsViewModel = hiltViewModel()
-    val uiState by viewModel.uiState
+    val uiState by viewModel.uiState // Assumindo que uiState é um MutableState
+    val context = LocalContext.current
+
+    var pendingCategory by remember { mutableStateOf<String?>(null) }
+
+    val exportLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.CreateDocument("text/csv")
+    ) { uri ->
+        if (uri != null && pendingCategory != null) {
+            viewModel.generateReport(uri, pendingCategory!!)
+        }
+    }
 
     ReportsContent(
         modifier = modifier,
         uiState = uiState,
-        onExportReport = {},
-        onFilterList = {value -> viewModel.updateSearchListType(value)}
+        onExportReport = { category ->
+            pendingCategory = category
+            val fileName = viewModel.generateFileName(itemType = category)
+            exportLauncher.launch(fileName)
+        },
+        onFilterList = { value ->
+            viewModel.updateSearchListType(value)
+        }
     )
 }
 
