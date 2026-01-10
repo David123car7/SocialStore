@@ -87,12 +87,12 @@ fun ReportsContent(
         modifier = modifier
             .fillMaxSize()
             .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
 
         IntroductionComponent(
-            tittle = "Relatórios de Stock",
-            description = "Consulte o balanço de entradas e saídas.",
+            tittle = "Relatórios",
             icon = Icons.Filled.Assessment
         )
 

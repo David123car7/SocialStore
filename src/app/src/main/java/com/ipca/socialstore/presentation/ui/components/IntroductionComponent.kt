@@ -17,6 +17,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.ipca.socialstore.presentation.ui.theme.IconTint
 
 @Composable
 fun IntroductionComponent(
@@ -28,11 +29,11 @@ fun IntroductionComponent(
         Icon(
             imageVector = icon,
             contentDescription = null,
-            tint = MaterialTheme.colorScheme.primary,
+            tint = IconTint,
             modifier = Modifier
                 .size(64.dp)
                 .background(
-                    color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f),
+                    color = IconTint.copy(alpha = 0.2f),
                     shape = CircleShape
                 )
                 .padding(12.dp)

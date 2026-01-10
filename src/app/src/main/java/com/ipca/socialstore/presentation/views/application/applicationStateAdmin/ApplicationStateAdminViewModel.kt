@@ -225,7 +225,6 @@ class ApplicationStateAdminViewModel @Inject constructor(
         viewModelScope.launch {
             uiState.value = uiState.value.copy(isLoading = true)
             val result = denyApplicationService(
-                applicationId = uiState.value.application.id!!,
                 appStateId = uiState.value.application.applicationState.id!!
             )
             when(result){

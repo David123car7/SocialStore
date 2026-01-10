@@ -216,8 +216,7 @@ fun ApplicationStateAdminContent(
             var showAlertAcceptDocument by remember { mutableStateOf(false) }
             var showAlertDenyDocument by remember { mutableStateOf(false) }
             var showAlertAlmostAcceptApplication by remember { mutableStateOf(false) }
-            var showAlertAlmostDenyApplication by remember { mutableStateOf(false) }
-            var showAlertAcceptApplication by remember { mutableStateOf(false) }
+             var showAlertAcceptApplication by remember { mutableStateOf(false) }
             var showAlertDenyApplication by remember { mutableStateOf(false) }
             var documentSelected by remember { mutableStateOf<DocumentReceiverModel?>(null) }
             var isDataExpanded by remember { mutableStateOf(false) }
@@ -244,16 +243,6 @@ fun ApplicationStateAdminContent(
                 message = "De certeza que queres rejeitar este documento?",
                 onConfirm = {msg -> onUpdateDocState(documentSelected, documentSelected!!.folderName ,false, msg)},
                 onDismiss = {showAlertDenyDocument = false}
-            )
-
-            AlertInputComponent(
-                show = showAlertAlmostDenyApplication,
-                title = "Rejeitar",
-                icon = Icons.Filled.Warning,
-                color = Color(0xFFCF1322),
-                message = "De certeza que não queres rejeitar todos os dados e documentos fornecidos?",
-                onConfirm = { msg -> onUpdateDocState(documentSelected, documentSelected!!.folderName,false, msg )},
-                onDismiss = {showAlertAlmostDenyApplication = false}
             )
 
             AlertComponent(
@@ -284,16 +273,6 @@ fun ApplicationStateAdminContent(
                 message = "De certeza que queres aceitar esta candidatura?",
                 onConfirm = {onAcceptApplication()},
                 onDismiss = {showAlertAcceptApplication = false}
-            )
-
-            AlertComponent(
-                show = showAlertDenyApplication,
-                title = "Não Aceitar",
-                icon = Icons.Filled.CheckBox,
-                color = GreenIPCA,
-                message = "De certeza que não queres aceitar esta candidatura?",
-                onConfirm = {onDenyApplication()},
-                onDismiss = {showAlertDenyApplication = false}
             )
 
             ExpandableSection(
@@ -442,7 +421,7 @@ fun ApplicationStateAdminContent(
                         Text("Aceitar")
                     }
                     Button(
-                        onClick = { showAlertAlmostDenyApplication = true },
+                        onClick = { showAlertDenyApplication = true },
                         modifier = Modifier
                             .padding(5.dp)
                             .weight(1f)
