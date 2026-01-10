@@ -52,9 +52,14 @@ fun getApplicationStateViewData(state: String): StateViewDataModel{
         bgColor = Color(0x43DAA210)
     }
     if(state == ApplicationStates.CORRECTION.status){
-        text = "Por Analisar"
+        text = "Por Corrigir"
         textColor = Color(0xFF0057D9)
         bgColor = Color(0x3C0057D9)
+    }
+    if(state == ApplicationStates.ALMOST_APPROVED.status){
+        text = "Fase Final"
+        textColor = Color(0xFFFF9A00)
+        bgColor = Color(0x27FF9A00)
     }
 
     return StateViewDataModel(text = text, textColor = textColor, bgColor = bgColor)

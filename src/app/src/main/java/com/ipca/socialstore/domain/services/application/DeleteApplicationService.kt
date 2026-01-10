@@ -83,6 +83,10 @@ class DeleteApplicationService @Inject constructor(
             return ResultWrapper.Error(error = removeAppDocTypes.error)
 
         if(scholarShipId != null){
+            val setScholarShipResult = applicationRepository.setScholarShipId(applicationId = applicationId, null)
+            if(setScholarShipResult is ResultWrapper.Error)
+                return ResultWrapper.Error(error = setScholarShipResult.error)
+
             val removeScholarShipResult = scholarshipRepository.deleteScholarship(id = scholarShipId)
             if(removeScholarShipResult is ResultWrapper.Error)
                 return ResultWrapper.Error(error = removeScholarShipResult.error)

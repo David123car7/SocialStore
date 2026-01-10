@@ -9,10 +9,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Campaign
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.Category
 import androidx.compose.material.icons.outlined.Description
@@ -85,12 +88,13 @@ fun CampaignEditContent(
     onUpdateCampaign:() -> Unit
 ){
     Column(
-        modifier = modifier,
+        modifier = modifier.padding(16.dp)
+            .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(20.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Icon(
-            imageVector = Icons.Default.Campaign, // Ou Icons.Default.Edit
+            imageVector = Icons.Default.Edit, // Ou Icons.Default.Edit
             contentDescription = null,
             tint = IconTint,
             modifier = Modifier

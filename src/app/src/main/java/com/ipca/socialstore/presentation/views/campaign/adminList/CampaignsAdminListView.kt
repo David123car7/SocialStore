@@ -96,7 +96,7 @@ fun CampaignsAdminListContent(
             title = "Eliminar Campanha",
             icon = Icons.Default.Warning,
             color = Color(0xFFFF5252),
-            message = "Tens a certeza que queres eliminar o ficheiro?",
+            message = "Tens a certeza que queres eliminar a campanha?",
             onConfirm = {onDeleteConfirm(campaignToDelete!!)},
             onDismiss = {showDeleteDialog = false}
         )
@@ -114,7 +114,7 @@ fun CampaignsAdminListContent(
             verticalArrangement = Arrangement.SpaceEvenly
         ) {
             IntroductionComponent(
-                tittle = "Candidaturas"
+                tittle = "Campanhas"
             )
 
             SearchBarContent(
