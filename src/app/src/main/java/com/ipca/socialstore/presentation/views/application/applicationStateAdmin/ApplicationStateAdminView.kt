@@ -377,6 +377,24 @@ fun ApplicationStateAdminContent(
                         }
                     )
                 }
+
+                if(uiState.application.scholarShip != null ){
+                    ApplicationDocuments(
+                        documentsList = uiState.documentsDGES,
+                        documentsState = uiState.dgesState,
+                        tittle = "Bolsa",
+                        bgColor = Color.White,
+                        onDownloadFile = onDownloadFile,
+                        onUpdateDocState = { doc, state ->
+                            documentSelected = doc
+                            if(state) showAlertAcceptDocument = true
+                            else showAlertDenyDocument = true
+                        },
+                        onUpdateTypeDocState = { id, state, type,msg ->
+                            onUpdateTypeDocState(id, state, type, msg)
+                        }
+                    )
+                }
             }
 
             if(uiState.application.applicationState.state == ApplicationStates.ALMOST_APPROVED.status ||

@@ -69,6 +69,23 @@ class ApplicationRepository @Inject constructor(
         }
     }
 
+    suspend fun setScholarShipId(applicationId: Int, scholarshipId: Int?): ResultWrapper<Unit> {
+        return try {
+            supabaseClient.from(DatabaseTables.APPLICATION).update(
+                {
+                    set("scholarship_id", scholarshipId)
+                }
+            ) {
+                filter {
+                    eq("id", applicationId)
+                }
+            }
+            ResultWrapper.Success(Unit)
+        } catch (e: Exception) {
+            ResultWrapper.Error(exceptionMapper.map(e))
+        }
+    }
+
     suspend fun getApplication(id: Int): ResultWrapper<ApplicationModel>{
         return try {
             val applicationResult = supabaseClient.from(DatabaseTables.APPLICATION).select {

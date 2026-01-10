@@ -48,6 +48,7 @@ data class ApplicationAdminState(
     val documentsPermanentExpenses: List<DocumentReceiverModel> = emptyList(),
     val documentsInternationalSupport: List<DocumentReceiverModel> = emptyList(),
     val documentsRequirement: List<DocumentReceiverModel> = emptyList(),
+    val documentsDGES: List<DocumentReceiverModel> = emptyList(),
 
     val bankStatementDocsState: ApplicationDocumentTypeModel = createEmptyDocumentTypeModel(),
     val incomeProofDocsState: ApplicationDocumentTypeModel = createEmptyDocumentTypeModel(),
@@ -55,6 +56,7 @@ data class ApplicationAdminState(
     val permanentExpensesDocsState: ApplicationDocumentTypeModel = createEmptyDocumentTypeModel(),
     val internationalSupportDocsState: ApplicationDocumentTypeModel = createEmptyDocumentTypeModel(),
     val documentsRequirementState: ApplicationDocumentTypeModel = createEmptyDocumentTypeModel(),
+    val dgesState: ApplicationDocumentTypeModel = createEmptyDocumentTypeModel(),
 
     val isLoading: Boolean = false,
     val error: ErrorText? = null,
@@ -347,9 +349,11 @@ class ApplicationStateAdminViewModel @Inject constructor(
             DocumentType.INTERNATIONAL_SUPPORT.folderName -> {
                 currentUiState.copy(internationalSupportDocsState = appDocType)
             }
-
             DocumentType.REQUERIMENT.folderName -> {
                 currentUiState.copy(documentsRequirementState = appDocType)
+            }
+            DocumentType.DGES.folderName -> {
+                currentUiState.copy(dgesState = appDocType)
             }
             else -> currentUiState
         }
@@ -386,13 +390,19 @@ class ApplicationStateAdminViewModel @Inject constructor(
                 documentType = DocumentType.REQUERIMENT.folderName
             )
 
+            val dgesDocs = getDocuments(
+                applicationId = applicationId,
+                documentType = DocumentType.DGES.folderName
+            )
+
             uiState.value = uiState.value.copy(
                 documentsBankStatements = docBankStatements,
                 documentsOtherIncome = docOtherIncome,
                 documentsIncomeProof = docIncomeProof,
                 documentsInternationalSupport = docInternationalSupport,
                 documentsPermanentExpenses = docPermanentExpenses,
-                documentsRequirement = requirementDocs
+                documentsRequirement = requirementDocs,
+                documentsDGES = dgesDocs
             )
             getAppDocTypeStates(applicationId = applicationId)
         }
@@ -430,6 +440,7 @@ class ApplicationStateAdminViewModel @Inject constructor(
                     DocumentType.PERMANENT_EXPENSES.folderName -> uiState.value.copy(documentsPermanentExpenses = documentsResult.data)
                     DocumentType.INTERNATIONAL_SUPPORT.folderName -> uiState.value.copy(documentsInternationalSupport = documentsResult.data)
                     DocumentType.REQUERIMENT.folderName -> uiState.value.copy(documentsRequirement = documentsResult.data)
+                    DocumentType.DGES.folderName -> uiState.value.copy(documentsDGES = documentsResult.data)
                     else -> uiState.value
                 }
 
@@ -506,7 +517,10 @@ class ApplicationStateAdminViewModel @Inject constructor(
                         ?: createEmptyDocumentTypeModel(),
 
                     documentsRequirementState = typesList.find { it.type == DocumentType.REQUERIMENT.folderName }
-                        ?: createEmptyDocumentTypeModel()
+                        ?: createEmptyDocumentTypeModel(),
+
+                    dgesState = typesList.find { it.type == DocumentType.DGES.folderName }
+                    ?: createEmptyDocumentTypeModel()
                 )
             }
             is ResultWrapper.Error -> {

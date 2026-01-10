@@ -97,6 +97,11 @@ fun SocialStoreScaffoldContent(
             isVisible = userRole == UserRole.DEFAULT
         ),
         BottomNavItem(
+            icon = Icons.Outlined.Campaign,
+            route = GeneralRoutes.CampaignsList,
+            isVisible = userRole == UserRole.DEFAULT || userRole == UserRole.GUEST
+        ),
+        BottomNavItem(
             icon = Icons.Filled.FileOpen,
             route = CandidateRoutes.ApplicationState,
             isVisible = userRole == UserRole.CANDIDATE

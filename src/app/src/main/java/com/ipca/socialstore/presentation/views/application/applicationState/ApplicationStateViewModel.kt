@@ -57,6 +57,7 @@ data class ApplicationState(
     val selectedOtherIncome: List<Uri> = emptyList(),
     val selectedPermanentExpenses: List<Uri> = emptyList(),
     val selectedInternationalSupport: List<Uri> = emptyList(),
+    val selectedDGES: List<Uri> = emptyList(),
     val selectedRequirement: List<Uri> = emptyList(),
 
     val documentsBankStatements: List<DocumentReceiverModel> = emptyList(),
@@ -64,6 +65,7 @@ data class ApplicationState(
     val documentsOtherIncome: List<DocumentReceiverModel> = emptyList(),
     val documentsPermanentExpenses: List<DocumentReceiverModel> = emptyList(),
     val documentsInternationalSupport: List<DocumentReceiverModel> = emptyList(),
+    val documentsDGES: List<DocumentReceiverModel> = emptyList(),
     val documentsRequirement: List<DocumentReceiverModel> = emptyList(),
 
     val bankStatementDocsState: ApplicationDocumentTypeModel = createEmptyDocumentTypeModel(),
@@ -71,8 +73,9 @@ data class ApplicationState(
     val otherIncomeDocsState: ApplicationDocumentTypeModel = createEmptyDocumentTypeModel(),
     val permanentExpensesDocsState: ApplicationDocumentTypeModel = createEmptyDocumentTypeModel(),
     val internationalSupportDocsState: ApplicationDocumentTypeModel = createEmptyDocumentTypeModel(),
-    val documentsRequirementState: ApplicationDocumentTypeModel = createEmptyDocumentTypeModel()
-    )
+    val documentsRequirementState: ApplicationDocumentTypeModel = createEmptyDocumentTypeModel(),
+    val dgesState: ApplicationDocumentTypeModel = createEmptyDocumentTypeModel()
+)
 
 @HiltViewModel
 class ApplicationStateViewModel @Inject constructor(
@@ -157,13 +160,19 @@ class ApplicationStateViewModel @Inject constructor(
                 documentType = DocumentType.REQUERIMENT.folderName
             )
 
+            val dgesDocs = getDocuments(
+                applicationId = applicationId,
+                documentType = DocumentType.DGES.folderName
+            )
+
             uiState.value = uiState.value.copy(
                 documentsBankStatements = docBankStatements,
                 documentsOtherIncome = docOtherIncome,
                 documentsIncomeProof = docIncomeProof,
                 documentsInternationalSupport = docInternationalSupport,
                 documentsPermanentExpenses = docPermanentExpenses,
-                documentsRequirement = requirementDocs
+                documentsRequirement = requirementDocs,
+                documentsDGES = dgesDocs
             )
             getAppDocTypeStates(applicationId = applicationId)
         }
@@ -401,6 +410,7 @@ class ApplicationStateViewModel @Inject constructor(
                     DocumentType.PERMANENT_EXPENSES.folderName -> uiState.value.copy(documentsPermanentExpenses = documentsResult.data)
                     DocumentType.INTERNATIONAL_SUPPORT.folderName -> uiState.value.copy(documentsInternationalSupport = documentsResult.data)
                     DocumentType.REQUERIMENT.folderName -> uiState.value.copy(documentsRequirement = documentsResult.data)
+                    DocumentType.DGES.folderName -> uiState.value.copy(documentsDGES = documentsResult.data)
                     else -> uiState.value
                 }
 
@@ -442,7 +452,10 @@ class ApplicationStateViewModel @Inject constructor(
                         ?: createEmptyDocumentTypeModel(),
 
                     documentsRequirementState = typesList.find { it.type == DocumentType.REQUERIMENT.folderName }
-                    ?: createEmptyDocumentTypeModel()
+                    ?: createEmptyDocumentTypeModel(),
+
+                    dgesState = typesList.find { it.type == DocumentType.DGES.folderName }
+                        ?: createEmptyDocumentTypeModel(),
                 )
             }
             is ResultWrapper.Error -> {
@@ -506,6 +519,11 @@ class ApplicationStateViewModel @Inject constructor(
                     selectedRequirement = currentState.selectedRequirement + uri
                 )
             }
+            DocumentType.DGES.folderName -> {
+                currentState.copy(
+                    selectedDGES = currentState.selectedDGES + uri
+                )
+            }
             else -> currentState
         }
     }
@@ -556,6 +574,11 @@ class ApplicationStateViewModel @Inject constructor(
                     selectedRequirement = currentState.selectedInternationalSupport - uri
                 )
             }
+            DocumentType.DGES.folderName -> {
+                currentState.copy(
+                    selectedDGES = currentState.selectedDGES - uri
+                )
+            }
             else -> currentState
         }
     }
@@ -587,6 +610,11 @@ class ApplicationStateViewModel @Inject constructor(
             DocumentType.INTERNATIONAL_SUPPORT.folderName -> {
                 currentState.copy(
                     documentsInternationalSupport = currentState.documentsInternationalSupport - document
+                )
+            }
+            DocumentType.DGES.folderName -> {
+                currentState.copy(
+                    documentsDGES = currentState.documentsDGES - document
                 )
             }
             else -> currentState
@@ -630,6 +658,7 @@ class ApplicationStateViewModel @Inject constructor(
                 DocumentType.PERMANENT_EXPENSES.folderName -> uiState.value.selectedPermanentExpenses
                 DocumentType.INTERNATIONAL_SUPPORT.folderName -> uiState.value.selectedInternationalSupport
                 DocumentType.REQUERIMENT.folderName -> uiState.value.selectedRequirement
+                DocumentType.DGES.folderName -> uiState.value.selectedDGES
                 else -> emptyList()
             }
             Log.d("App Debug", "GG2")
@@ -670,6 +699,7 @@ class ApplicationStateViewModel @Inject constructor(
             DocumentType.PERMANENT_EXPENSES.folderName -> uiState.value.copy(selectedPermanentExpenses = emptyList())
             DocumentType.INTERNATIONAL_SUPPORT.folderName -> uiState.value.copy(selectedInternationalSupport = emptyList())
             DocumentType.REQUERIMENT.folderName -> uiState.value.copy(selectedRequirement = emptyList())
+            DocumentType.DGES.folderName -> uiState.value.copy(selectedDGES = emptyList())
             else -> uiState.value
         }
         uiState.value = newState
@@ -724,6 +754,9 @@ class ApplicationStateViewModel @Inject constructor(
             }
             DocumentType.INTERNATIONAL_SUPPORT.folderName -> {
                 currentUiState.copy(internationalSupportDocsState = appDocType)
+            }
+            DocumentType.DGES.folderName -> {
+                currentUiState.copy(dgesState = appDocType)
             }
             else -> currentUiState
         }
@@ -800,6 +833,9 @@ class ApplicationStateViewModel @Inject constructor(
             return false
 
         if(state.internationalSupportDocsState.state == ApplicationDocumentTypeState.SOMETHING_WRONG.state)
+            return false
+
+        if(state.dgesState.state == ApplicationDocumentTypeState.SOMETHING_WRONG.state)
             return false
 
         if(state.application.applicationState.state == ApplicationStates.ALMOST_APPROVED.status)

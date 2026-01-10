@@ -8,6 +8,7 @@ enum class DocumentType(val folderName: String) {
     BANK_STATEMENTS("bank"),
     OTHER_INCOME("other_income"),
     INTERNATIONAL_SUPPORT("international"),
+    DGES("dges"),
 
     REQUERIMENT("requeriment"),
 }

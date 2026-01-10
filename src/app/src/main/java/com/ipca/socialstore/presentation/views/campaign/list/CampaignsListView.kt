@@ -2,6 +2,7 @@ package com.ipca.socialstore.presentation.views.campaign.list
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -23,13 +24,14 @@ import com.ipca.socialstore.presentation.views.campaign.adminList.CampaignsListS
 import com.ipca.socialstore.presentation.views.campaign.adminList.CampaignsListViewModel
 import androidx.compose.material.icons.outlined.DateRange
 import androidx.compose.ui.tooling.preview.Preview
+import com.ipca.socialstore.presentation.ui.components.IntroductionComponent
 import com.ipca.socialstore.presentation.ui.theme.GreenIPCA
 import com.ipca.socialstore.presentation.ui.theme.IconBgColor
 import com.ipca.socialstore.presentation.ui.theme.IconTint
 
 @Composable
 fun CampaignsListView(
-    modifier: Modifier = Modifier,
+    modifier: Modifier,
 ) {
     val campaignsViewModel: CampaignsListViewModel = hiltViewModel()
     val uiState by campaignsViewModel.uiState
@@ -42,7 +44,7 @@ fun CampaignsListView(
 
 @Composable
 fun CampaignsListContent(
-    modifier: Modifier = Modifier,
+    modifier: Modifier,
     uiState: CampaignsListState,
 ) {
     var searchQuery by remember { mutableStateOf("") }
@@ -51,66 +53,60 @@ fun CampaignsListContent(
             campaign.name.contains(searchQuery, ignoreCase = true)
         }
     }
-    Box(modifier = modifier.fillMaxSize()) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 12.dp)
-        ) {
-            SearchBarContent(
-                modifier = Modifier,
-                onSearchItem = { query -> searchQuery = query }
-            )
-            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-            Text(
-                text = "${filteredList.size} campanhas encontradas",
-                style = MaterialTheme.typography.titleSmall,
-                color = Color.Gray,
-                modifier = Modifier.padding(bottom = 8.dp)
-            )
-            if (filteredList.isEmpty() && !uiState.isLoading) {
-                Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxWidth(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = if (searchQuery.isNotEmpty()) "Nenhuma campanha encontrada." else "Não existem campanhas.",
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        style = MaterialTheme.typography.titleMedium
+
+    Column(
+        modifier = modifier.padding(top = 18.dp, bottom = 28.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        IntroductionComponent(tittle = "Campanhas")
+
+        SearchBarContent(
+            modifier = Modifier.padding(bottom = 25.dp,start = 15.dp, end = 15.dp),
+            onSearchItem = { query -> searchQuery = query }
+        )
+
+        if (filteredList.isEmpty() && !uiState.isLoading) {
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = if (searchQuery.isNotEmpty()) "Nenhuma campanha encontrada." else "Não existem campanhas.",
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    style = MaterialTheme.typography.titleMedium
+                )
+            }
+        } else {
+            LazyColumn(
+                contentPadding = PaddingValues(start = 15.dp,bottom = 80.dp, end = 15.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                items(filteredList) { campaign ->
+                    CampaignItemCard(
+                        modifier = Modifier.padding(),
+                        campaign = campaign,
                     )
                 }
-            } else {
-                LazyColumn(
-                    modifier = Modifier.weight(1f),
-                    contentPadding = PaddingValues(bottom = 80.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    items(filteredList) { campaign ->
-                        CampaignItemCard(
-                            modifier = Modifier.padding(),
-                            campaign = campaign,
-                        )
-                    }
-                }
-            }
-        }
-        if (uiState.isLoading) {
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator()
-            }
-        } else if (uiState.error != null) {
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text(
-                    text = uiState.error.asString(),
-                    color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.bodyLarge,
-                    modifier = Modifier.padding(16.dp)
-                )
             }
         }
     }
+    if (uiState.isLoading) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            CircularProgressIndicator()
+        }
+    } else if (uiState.error != null) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Text(
+                text = uiState.error.asString(),
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.padding(16.dp)
+            )
+        }
+    }
+
 }
 
 @Composable
@@ -139,9 +135,10 @@ fun CampaignItemCard(
     Card(
         modifier = modifier
             .fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = containerColor),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
-        shape = MaterialTheme.shapes.medium
+        shape = RoundedCornerShape(12.dp),
+        border = BorderStroke(1.dp, GreenIPCA),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(
             modifier = Modifier.padding(top = 16.dp, start = 16.dp, end = 16.dp, bottom = 8.dp)

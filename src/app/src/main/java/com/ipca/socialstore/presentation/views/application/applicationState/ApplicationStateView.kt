@@ -251,6 +251,12 @@ fun ApplicationStateViewContent(
         onAddSelectedFile(DocumentType.REQUERIMENT.folderName, uri)
     }
 
+    val dgesFilesPicker = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        onAddSelectedFile(DocumentType.DGES.folderName, uri)
+    }
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -407,6 +413,21 @@ fun ApplicationStateViewContent(
                     description = uiState.internationalSupportDocsState.description,
                     bgColor = Color.White,
                     filePicker = internationalSupportFilesPicker,
+                    onDeleteFile = onDeleteFile,
+                    onSubmitFile = onSubmitFile,
+                    onDownloadFile = onDownloadFile
+                )
+            }
+
+            if(uiState.application.scholarShip != null){
+                DocumentsList(
+                    documentsList = uiState.documentsDGES,
+                    documentsState = uiState.dgesState,
+                    files = uiState.selectedDGES,
+                    tittle = "Bolsa",
+                    description = uiState.dgesState.description,
+                    bgColor = Color.White,
+                    filePicker = dgesFilesPicker,
                     onDeleteFile = onDeleteFile,
                     onSubmitFile = onSubmitFile,
                     onDownloadFile = onDownloadFile
