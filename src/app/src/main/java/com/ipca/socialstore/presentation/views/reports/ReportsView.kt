@@ -25,6 +25,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.toLowerCase
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ipca.socialstore.presentation.models.ReportsHelperModel
@@ -39,7 +40,8 @@ fun ReportsView(modifier: Modifier, navController: NavController, userRole: User
     ReportsContent(
         modifier = modifier,
         uiState = uiState,
-        onExportReport = {}
+        onExportReport = {},
+        onFilterList = {value -> viewModel.updateSearchListType(value)}
     )
 }
 
@@ -47,31 +49,35 @@ fun ReportsView(modifier: Modifier, navController: NavController, userRole: User
 fun ReportsContent(
     modifier: Modifier,
     uiState: ReportsState,
-    onExportReport:(String)-> Unit){
-    var selectedCategory by remember { mutableStateOf("Todos") }
+    onExportReport: (String) -> Unit,
+    onFilterList: (String) -> Unit
+) {
 
+    var selectedCategory by remember { mutableStateOf("Alimentação") }
+
+    LaunchedEffect(uiState.reports, selectedCategory) {
+        onFilterList(selectedCategory)
+    }
 
     Column(
         modifier = modifier
             .fillMaxSize()
-            .verticalScroll(rememberScrollState())
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
 
-        // 1. Cabeçalho Geral
         IntroductionComponent(
             tittle = "Relatórios de Stock",
             description = "Consulte o balanço de entradas e saídas.",
             icon = Icons.Filled.Assessment
         )
 
-        // 2. Filtros (Chips de Categoria)
         CategoryFilterSection(
             selectedCategory = selectedCategory,
-            onCategorySelected = { selectedCategory = it }
+            onCategorySelected = { value -> selectedCategory = value }
         )
 
+        // Botão de Exportar
         Button(
             onClick = { onExportReport(selectedCategory) },
             modifier = Modifier.fillMaxWidth(),
@@ -84,30 +90,27 @@ fun ReportsContent(
             Text("Exportar Relatório (.csv)", color = Color.White)
         }
 
-        // 3. Tabela de Dados
-        // Usamos um Card para dar uma moldura bonita à tabela
+        // Tabela
         Card(
             colors = CardDefaults.cardColors(containerColor = Color.White),
             elevation = CardDefaults.cardElevation(2.dp),
             shape = RoundedCornerShape(12.dp),
             modifier = Modifier
                 .fillMaxWidth()
-                .weight(1f) // Ocupa o resto do ecrã
+                .weight(1f)
         ) {
             Column {
                 ReportTableHeader()
 
                 HorizontalDivider(color = Color.LightGray)
 
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    itemsIndexed(uiState.reports) { index, item ->
+                LazyColumn(modifier = Modifier.fillMaxSize()) {
+                    itemsIndexed(uiState.showReport) { index, item ->
                         ReportTableRow(
                             item = item,
-                            isEven = index % 2 == 0 // Para efeito zebrado (opcional)
+                            isEven = index % 2 == 0
                         )
-                        if (index < uiState.reports.lastIndex) {
+                        if (index < uiState.showReport.size - 1) {
                             HorizontalDivider(thickness = 0.5.dp, color = Color.LightGray.copy(alpha = 0.5f))
                         }
                     }
@@ -115,7 +118,6 @@ fun ReportsContent(
             }
         }
     }
-
 }
 
 
@@ -125,7 +127,7 @@ fun CategoryFilterSection(
     selectedCategory: String,
     onCategorySelected: (String) -> Unit
 ) {
-    val categories = listOf("Todos", "Alimentar", "Higiene", "Limpeza")
+    val categories = listOf("Alimentação", "Higiene", "Limpeza")
 
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -135,10 +137,10 @@ fun CategoryFilterSection(
             FilterChip(
                 selected = selectedCategory == category,
                 onClick = { onCategorySelected(category) },
-                label = { Text(category) },
+                label = { Text(category)},
                 colors = FilterChipDefaults.filterChipColors(
                     selectedContainerColor = GreenIPCA.copy(alpha = 0.2f),
-                    selectedLabelColor = GreenIPCA.copy(alpha = 1f), // Texto sólido
+                    selectedLabelColor = GreenIPCA.copy(alpha = 1f),
                     selectedLeadingIconColor = GreenIPCA
                 ),
                 border = FilterChipDefaults.filterChipBorder(
@@ -156,7 +158,7 @@ fun ReportTableHeader() {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color(0xFFF5F5F5)) // Fundo cinza claro para o cabeçalho
+            .background(Color(0xFFF5F5F5))
             .padding(vertical = 12.dp, horizontal = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {

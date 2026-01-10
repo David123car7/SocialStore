@@ -18,6 +18,7 @@ data class ReportsState(
     val typeData: String? = null,
     var error : ErrorText? = null,
     var isLoading : Boolean = false,
+    val showReport : List<ReportsHelperModel> = emptyList()
     )
 
 
@@ -51,5 +52,22 @@ class ReportsViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+
+    fun updateSearchListType(type: String) {
+        val allReports = uiState.value.reports
+        if (type.isEmpty() || allReports.isEmpty()) {
+            uiState.value = uiState.value.copy(
+                showReport = emptyList(),
+            )
+            return
+        }
+        val filteredList = allReports.filter { report ->
+            report.type.contains(type, ignoreCase = true)
+        }
+        uiState.value = uiState.value.copy(
+            showReport = filteredList,
+        )
     }
 }
