@@ -60,7 +60,8 @@ class GetReportDataService @Inject constructor(
                     name = item.name,
                     stock = qnt,
                     delivered = deliveredQnt,
-                    total = qnt + deliveredQnt
+                    total = qnt + deliveredQnt,
+                    type = item.itemType
                 )
             )
         }
