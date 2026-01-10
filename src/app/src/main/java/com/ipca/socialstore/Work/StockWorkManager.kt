@@ -25,7 +25,7 @@ class StockWorkManager(private val context: Context) {
 
     fun notificationExpirationDate() {
 
-        val syncRequest = PeriodicWorkRequestBuilder<ExpirationDateWorker>(15, TimeUnit.MINUTES)
+        val syncRequest = PeriodicWorkRequestBuilder<ExpirationDateWorker>(24, TimeUnit.HOURS)
             .addTag(TAG_SYNC)
             .build()
 
