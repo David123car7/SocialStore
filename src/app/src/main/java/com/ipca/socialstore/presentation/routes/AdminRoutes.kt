@@ -25,6 +25,9 @@ sealed class AdminRoutes {
     object  CreateItem : AdminRoutes()
 
     @Serializable
+    object EditItem: AdminRoutes()
+
+    @Serializable
     object GetSingleItem : AdminRoutes()
 
     // --- Donations ---

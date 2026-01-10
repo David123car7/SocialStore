@@ -29,7 +29,7 @@ import com.ipca.socialstore.presentation.routes.GeneralRoutes
 import com.ipca.socialstore.presentation.ui.SocialStoreScaffold
 import com.ipca.socialstore.presentation.views.stock.List.GetAllStockView
 import com.ipca.socialstore.presentation.views.stock.List.ListAllStockViewModel
-import com.ipca.socialstore.presentation.views.stock.List.StockItemDetailView
+import com.ipca.socialstore.presentation.views.stock.detail.StockItemDetailView
 import com.ipca.socialstore.presentation.ui.theme.SocialStoreTheme
 import com.ipca.socialstore.presentation.utils.navigation.NavigationLogic
 import com.ipca.socialstore.presentation.views.Scheduling.cancelByUser.JustificationScreenView
@@ -46,15 +46,6 @@ import com.ipca.socialstore.presentation.views.authentication.resetPassword.Rese
 import com.ipca.socialstore.presentation.views.basket.preparation.BasketPreparationView
 import com.ipca.socialstore.presentation.views.beneficiary.editProfile.BeneficiaryEditProfileView
 import com.ipca.socialstore.presentation.views.beneficiary.listDocuments.ListDocumentsView
-import com.ipca.socialstore.presentation.views.basket.preparation.BasketPreparationView
-import com.ipca.socialstore.presentation.views.beneficiary.editProfile.BeneficiaryEditProfileView
-import com.ipca.socialstore.presentation.views.beneficiary.listDocuments.ListDocumentsView
-import com.ipca.socialstore.presentation.views.basket.preparation.BasketPreparationView
-import com.ipca.socialstore.presentation.views.beneficiary.editProfile.BeneficiaryEditProfileView
-import com.ipca.socialstore.presentation.views.beneficiary.listDocuments.ListDocumentsView
-import com.ipca.socialstore.presentation.views.basket.preparation.BasketPreparationView
-import com.ipca.socialstore.presentation.views.beneficiary.editProfile.BeneficiaryEditProfileView
-import com.ipca.socialstore.presentation.views.beneficiary.listDocuments.ListDocumentsView
 import com.ipca.socialstore.presentation.views.beneficiary.managment.BeneficiaryManagementView
 import com.ipca.socialstore.presentation.views.beneficiary.profile.BeneficiaryProfileView
 import com.ipca.socialstore.presentation.views.campaign.create.CreateCampaignView
@@ -68,6 +59,7 @@ import com.ipca.socialstore.presentation.views.home.defaultHomeView.DefaultHomeV
 import com.ipca.socialstore.presentation.views.home.testHome.TestHomeView
 import com.ipca.socialstore.presentation.views.notification.NotificationHistoryView
 import com.ipca.socialstore.presentation.views.reports.ReportsView
+import com.ipca.socialstore.presentation.views.stock.edit.EditItemView
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -164,6 +156,18 @@ class MainActivity : ComponentActivity() {
                         composable <AdminRoutes.CreateItem>{
                             CreateItemView(modifier = Modifier.padding(innerPadding), navController = navController)
                         }
+                        composable(
+                            route = AdminRoutes.EditItem::class.qualifiedName!! + "/{item_id}",
+                            arguments = listOf(
+                                navArgument("item_id") { type = NavType.StringType }
+                            )
+                            ) {
+                                EditItemView(
+                                    modifier = Modifier.padding(innerPadding),
+                                    navController = navController,
+                                    userRole = mainState.userRole
+                                )
+                            }
                         composable <AdminRoutes.CreateDonation>{
                             CreateDonationView(modifier = Modifier.padding(innerPadding), navController = navController)
                         }

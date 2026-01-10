@@ -137,4 +137,24 @@ class ItemRepository @Inject constructor(private val supabase : SupabaseClient, 
             ResultWrapper.Error(exceptionMapper.map(e))
         }
     }
+
+    suspend fun updateItem(item: ItemModel): ResultWrapper<Int>{
+        val id = item.id
+            ?: return ResultWrapper.Error(AppError.UnknownError("Item Id Null"))
+        return try {
+            val result = supabase.from(DatabaseTables.ITEM)
+                .update(item) {
+                    filter {
+                        eq("id", id)
+                    }
+                    select(columns = Columns.list("id"))
+                }.decodeSingleOrNull<TableIdModel>()
+            if (result == null) {
+                return ResultWrapper.Error(AppError.DataNotFound)
+            }
+            ResultWrapper.Success(result.id)
+        } catch (e: Exception) {
+            ResultWrapper.Error(exceptionMapper.map(e))
+        }
+    }
 }
