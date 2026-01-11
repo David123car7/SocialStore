@@ -24,15 +24,45 @@ class StockWorkManager(private val context: Context) {
     }
 
     fun notificationExpirationDate() {
+        val calendar = java.util.Calendar.getInstance()
+        val now = calendar.timeInMillis
+
+        val nextTenAM = java.util.Calendar.getInstance().apply {
+            set(java.util.Calendar.HOUR_OF_DAY, 1)
+            set(java.util.Calendar.MINUTE, 20)
+            set(java.util.Calendar.SECOND, 0)
+
+            if (timeInMillis <= now) {
+                add(java.util.Calendar.DAY_OF_MONTH, 1)
+            }
+        }
+
+        val delay = nextTenAM.timeInMillis - now
+
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
 
         val syncRequest = PeriodicWorkRequestBuilder<ExpirationDateWorker>(24, TimeUnit.HOURS)
+            .setInitialDelay(delay, TimeUnit.MILLISECONDS)
+            .setConstraints(constraints)
             .addTag(TAG_SYNC)
             .build()
 
         workManager.enqueueUniquePeriodicWork(
             UNIQUE_SYNC_WORK,
-            ExistingPeriodicWorkPolicy.KEEP,
+            ExistingPeriodicWorkPolicy.REPLACE,
             syncRequest
         )
+    }
+
+    fun testImortalidade() {
+        val request = OneTimeWorkRequestBuilder<ExpirationDateWorker>()
+            .setInitialDelay(2, TimeUnit.MINUTES) // Dá-te 2 minutos de folga
+            .setConstraints(Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
+            .addTag("TESTE_IMORTAL")
+            .build()
+
+        workManager.enqueue(request)
     }
 }

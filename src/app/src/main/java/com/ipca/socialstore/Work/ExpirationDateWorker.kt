@@ -11,7 +11,7 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
 import com.ipca.socialstore.domain.notification.WorkerExpirationDateUseCase
-import com.ipca.socialstore.domain.services.donation.CreateStockNotificationService
+import com.ipca.socialstore.domain.services.CreateStockNotificationService
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 

@@ -114,28 +114,52 @@ class SchedulingConfirmationViewModel @Inject constructor(
 
 
 
-    fun acceptScheduling(){
+    fun acceptScheduling() {
+        // 1. Pegamos nos valores de forma segura antes de abrir a coroutine ou dentro dela
+        val currentScheduling = uiState.value.scheduling
+        val currentNote = uiState.value.note ?: ""
+
+        if (currentScheduling?.id == null) {
+            uiState.value = uiState.value.copy(error = ErrorText.DynamicString("Agendamento não encontrado"))
+            return
+        }
+
         uiState.value = uiState.value.copy(isLoading = true, error = null)
+
         viewModelScope.launch {
-            val result = acceptSchedulingDateUseCase(uiState.value.scheduling?.id!!,uiState.value.note!!)
+            // Usamos o ID que já validámos que existe
+            val result = acceptSchedulingDateUseCase(currentScheduling.id, currentNote)
             if (result is ResultWrapper.Success) {
                 uiState.value = uiState.value.copy(
-                    scheduling =  result.data,
+                    scheduling = result.data,
                     isLoading = false,
                 )
+            } else {
+                uiState.value = uiState.value.copy(isLoading = false)
             }
         }
     }
 
-    fun declineScheduling(){
+    fun declineScheduling() {
+        val currentScheduling = uiState.value.scheduling
+        val currentNote = uiState.value.note ?: ""
+
+        if (currentScheduling?.id == null) {
+            uiState.value = uiState.value.copy(error = ErrorText.DynamicString("Agendamento não encontrado"))
+            return
+        }
+
         uiState.value = uiState.value.copy(isLoading = true, error = null)
+
         viewModelScope.launch {
-            val result = declineSchedulingDateUseCase(uiState.value.scheduling?.id!!, uiState.value.note!!)
+            val result = declineSchedulingDateUseCase(currentScheduling.id, currentNote)
             if (result is ResultWrapper.Success) {
                 uiState.value = uiState.value.copy(
-                    scheduling =  result.data,
+                    scheduling = result.data,
                     isLoading = false,
                 )
+            } else {
+                uiState.value = uiState.value.copy(isLoading = false)
             }
         }
     }
