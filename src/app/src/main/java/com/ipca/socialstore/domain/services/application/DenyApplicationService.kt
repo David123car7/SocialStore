@@ -7,7 +7,7 @@ import com.ipca.socialstore.data.resultwrappers.ResultWrapper
 import javax.inject.Inject
 
 class DenyApplicationService @Inject constructor(private val applicationStateRepository: ApplicationStateRepository){
-    suspend operator fun invoke(applicationId: Int, appStateId: Int): ResultWrapper<Unit>{
+    suspend operator fun invoke(appStateId: Int): ResultWrapper<Unit>{
         val appStateResult = applicationStateRepository.updateApplicationState(
             applicationState = ApplicationStateModel(
                 id = appStateId, state =
@@ -16,7 +16,6 @@ class DenyApplicationService @Inject constructor(private val applicationStateRep
         )
         if(appStateResult is ResultWrapper.Error)
             return ResultWrapper.Error(appStateResult.error)
-
 
         return ResultWrapper.Success(Unit)
     }

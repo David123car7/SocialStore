@@ -10,6 +10,7 @@ import com.ipca.socialstore.data.models.ItemModel
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
 import com.ipca.socialstore.domain.campaign.GetAllCampaignsUseCase
 import com.ipca.socialstore.domain.item.GetAllItemsUseCase
+import com.ipca.socialstore.domain.item.GetItemByCodeUseCase
 
 import com.ipca.socialstore.domain.services.donation.CreateDonationServiceUseCase
 import com.ipca.socialstore.presentation.models.CreateDonationHelperModel
@@ -47,6 +48,7 @@ data class DonationState(
 class CreateDonationViewModel @Inject constructor(
     private val getAllCampaignsUseCase: GetAllCampaignsUseCase,
     private val createDonationServiceUseCase: CreateDonationServiceUseCase,
+    private val getItemByCodeUseCase: GetItemByCodeUseCase,
     private val getAllItemsUseCase : GetAllItemsUseCase
 ) : ViewModel(){
 
@@ -111,7 +113,29 @@ class CreateDonationViewModel @Inject constructor(
         )
     }
 
+    fun getItemByCode(barCode: String){
+        viewModelScope.launch {
+            val result = getItemByCodeUseCase(barCode = barCode)
+            when(result){
+                is ResultWrapper.Success -> {
+                    uiState.value = uiState.value.copy(
+                        isLoading = false,
+                        itemName = result.data.name,
+                        itemType = result.data.itemType,
+                        itemBarCode = result.data.barCode
+                    )
+                }
+                is ResultWrapper.Error -> {
+                    uiState.value = uiState.value.copy(
+                        isLoading = false,
+                        error = result.error.asUiText(),
+                        isCreated = false,
 
+                    )
+                }
+            }
+        }
+    }
 
     fun createDonation() {
         val state = uiState.value
@@ -189,6 +213,10 @@ class CreateDonationViewModel @Inject constructor(
             updateList[index] = updateList[index].copy(quantity = value)
             uiState.value = uiState.value.copy(listDate = updateList)
         }
+    }
+
+    fun updateBarCode(code : String) {
+        uiState.value = uiState.value.copy(itemBarCode = code)
     }
 
     fun getItems(){

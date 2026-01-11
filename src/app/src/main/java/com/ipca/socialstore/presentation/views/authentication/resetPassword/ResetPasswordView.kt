@@ -23,6 +23,7 @@ import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.Email
+import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material.icons.outlined.Token
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults.buttonColors
@@ -158,7 +159,7 @@ fun ResetPasswordViewContent(
                         modifier = Modifier,
                         label = "Email",
                         value = uiState.email,
-                        icon = Icons.Default.Star,
+                        icon = Icons.Outlined.Lock,
                         onValueUpdate = onEmailUpdate
                     )
 
@@ -167,6 +168,7 @@ fun ResetPasswordViewContent(
                             onClickSendEmail()
                         },
                         modifier = Modifier.fillMaxWidth().height(50.dp),
+                        colors = buttonColors(GreenIPCA),
                         shape = RoundedCornerShape(12.dp)
                     ) {
                         Text("Enviar Código")

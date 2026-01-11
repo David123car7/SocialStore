@@ -1,6 +1,7 @@
 package com.ipca.socialstore.presentation.views.donation.listAllDonations
 
 import android.R.attr.text
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -63,6 +64,8 @@ import androidx.navigation.compose.rememberNavController
 import com.ipca.socialstore.data.models.DonationModel
 import com.ipca.socialstore.presentation.models.DonationHelperModel
 import com.ipca.socialstore.presentation.routes.AdminRoutes
+import com.ipca.socialstore.presentation.ui.components.IntroductionComponent
+import com.ipca.socialstore.presentation.ui.theme.GreenIPCA
 
 
 @Composable
@@ -101,8 +104,12 @@ fun ListAllDonationsContent(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp)
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            IntroductionComponent("Doações")
+
             Box(modifier = Modifier.fillMaxWidth()) {
                 OutlinedTextField(
                     value = selectedCampaignName,
@@ -204,9 +211,8 @@ fun DonationCard(
             .fillMaxWidth()
             .clickable(onClick = onClick),
         shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = Color(0xFFF5F5F5)
-        ),
+        border = BorderStroke(1.dp, GreenIPCA),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Row(
@@ -220,7 +226,6 @@ fun DonationCard(
                 Text(
                     text = "Doador: $donorName",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = Color(0xFF136342),
                     fontWeight = FontWeight.SemiBold
                 )
 
@@ -228,7 +233,6 @@ fun DonationCard(
                     Text(
                         text = "Campanha: $campaignName",
                         style = MaterialTheme.typography.bodyMedium,
-                        color = Color(0xFF136342), // Verde Social Store
                         fontWeight = FontWeight.SemiBold
                     )
                 }
