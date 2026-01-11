@@ -1,5 +1,7 @@
 package com.ipca.socialstore.presentation.views.donation.create
 
+import android.widget.Toast
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -22,6 +24,8 @@ import androidx.compose.material.icons.filled.AddCircleOutline
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Event
+import androidx.compose.material.icons.filled.QrCode
+import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ButtonDefaults.buttonColors
@@ -35,6 +39,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -49,6 +54,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
@@ -59,14 +65,17 @@ import com.ipca.socialstore.data.models.ItemModel
 import com.ipca.socialstore.presentation.models.CreateDonationHelperModel
 import com.ipca.socialstore.presentation.models.DonationHelperModel
 import com.ipca.socialstore.presentation.ui.components.TextFieldDateComponent
+import com.ipca.socialstore.presentation.ui.components.TextFieldStringComponent
 import com.ipca.socialstore.presentation.ui.theme.GreenIPCA
 import com.ipca.socialstore.presentation.ui.theme.SocialStoreTheme
+import com.ipca.socialstore.presentation.views.item.SimpleBarcodeScanner
 
 @Composable
 fun CreateDonationView(modifier: Modifier, navController: NavController) {
-
+    var scanActivated by remember { mutableStateOf(false) }
     val viewModel: CreateDonationViewModel = hiltViewModel()
     val uiState by viewModel.uiState
+    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         viewModel.getCampaigns()
@@ -74,20 +83,37 @@ fun CreateDonationView(modifier: Modifier, navController: NavController) {
     LaunchedEffect(Unit) {
         viewModel.getItems()
     }
-    CreateDonationViewContent(
-        modifier,
-        uiState,
-        onUpdateDate = { newValue -> viewModel.updateDonationDate(newValue) },
-        onClickCreate = { viewModel.createDonation() },
-        onUpdateName = { newValue -> viewModel.updateItemName(newValue) },
-        onUpdateItemType = { newValue -> viewModel.updateItemType(newValue) },
-        onUpdateExpiration = { index, newValue -> viewModel.updateExpiration(index, newValue) },
-        onUpdateQuantity = { index, newValue -> viewModel.updateQuantity(index = index, value = newValue) },
-        onAddNewDate = { viewModel.onAddNewDate() },
-        onAddItemHelper = { viewModel.addItemToDonationHelper() },
-        onUpdateDonor = {value -> viewModel.updateDonorName(value)},
-        onSearchItem = {value -> viewModel.filterItem(value)}
-    )
+
+    if(scanActivated){
+        SimpleBarcodeScanner(
+            context = context,
+            onBarcodeScanned = { barcode ->
+                viewModel.getItemByCode(barCode = barcode)
+                Toast.makeText(context, "Código lido: $barcode", Toast.LENGTH_SHORT).show()
+                scanActivated = false
+            },
+            onCancel = {scanActivated = false}
+        )
+    }
+    else{
+        CreateDonationViewContent(
+            modifier,
+            uiState,
+            onUpdateDate = { newValue -> viewModel.updateDonationDate(newValue) },
+            onClickCreate = { viewModel.createDonation() },
+            onUpdateName = { newValue -> viewModel.updateItemName(newValue) },
+            onUpdateItemType = { newValue -> viewModel.updateItemType(newValue) },
+            onUpdateExpiration = { index, newValue -> viewModel.updateExpiration(index, newValue) },
+            onUpdateQuantity = { index, newValue -> viewModel.updateQuantity(index = index, value = newValue) },
+            onAddNewDate = { viewModel.onAddNewDate() },
+            onAddItemHelper = { viewModel.addItemToDonationHelper() },
+            onUpdateDonor = {value -> viewModel.updateDonorName(value)},
+            onSearchItem = {value -> viewModel.filterItem(value)},
+            onScanBarcode =  {
+                scanActivated = true
+            },
+        )
+    }
 }
 
 @Composable
@@ -103,7 +129,8 @@ fun CreateDonationViewContent(
     onAddNewDate: () -> Unit,
     onAddItemHelper: () -> Unit,
     onUpdateDonor : (String) -> Unit,
-    onSearchItem :(String) -> Unit
+    onSearchItem :(String) -> Unit,
+    onScanBarcode:() -> Unit
 ) {
     var selectedCampaignName by remember { mutableStateOf("Selecionar Campanha") }
     var expanded by remember { mutableStateOf(false) }
@@ -133,6 +160,13 @@ fun CreateDonationViewContent(
                 modifier = Modifier.padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
+                Text(
+                    text = "Dados da Doação",
+                    style = MaterialTheme.typography.labelLarge,
+                    color = Color.Gray,
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                )
+
                 Box(modifier = Modifier.fillMaxWidth()) {
                     OutlinedTextField(
                         value = selectedCampaignName,
@@ -216,6 +250,15 @@ fun CreateDonationViewContent(
                         }
                     }
                 }
+
+                Text(
+                    text = "Item",
+                    style = MaterialTheme.typography.labelLarge,
+                    color = Color.Gray,
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                )
+
+
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -225,8 +268,8 @@ fun CreateDonationViewContent(
                         label = { Text("Nome Item") },
                         modifier = Modifier.weight(1f),
                         onValueChange = { value -> onUpdateName(value)
-                                        onSearchItem(value)
-                                        },
+                            onSearchItem(value)
+                        },
                         shape = RoundedCornerShape(12.dp)
                     )
 
@@ -239,18 +282,24 @@ fun CreateDonationViewContent(
                     )
                 }
 
-                HorizontalDivider(
-                    modifier = Modifier.padding(vertical = 8.dp),
-                    thickness = 1.dp,
-                    color = Color.LightGray.copy(alpha = 0.5f)
-                )
+                OutlinedButton(
+                    onClick = onScanBarcode,
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary)
+                ) {
+                    Icon(Icons.Default.QrCodeScanner, contentDescription = null)
+                    Spacer(Modifier.width(8.dp))
+                    Text("Ler Código de Barras (Câmara)")
+                }
 
                 Text(
-                    text = "Informações Item",
+                    text = "Datas da Validade",
                     style = MaterialTheme.typography.labelLarge,
                     color = Color.Gray,
                     modifier = Modifier.align(Alignment.CenterHorizontally)
                 )
+
 
                 uiState.listDate.forEachIndexed { index, date ->
                     Row(
@@ -451,7 +500,8 @@ fun PreviewCreateDonation() {
                 onAddNewDate = {},
                 onAddItemHelper = {},
                 onUpdateDonor = {},
-                onSearchItem = {}
+                onSearchItem = {},
+                onScanBarcode = {}
             )
         }
     }

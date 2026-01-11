@@ -85,7 +85,7 @@ fun createEmptyCampaign(): CampaignModel {
         name = "",
         description = "",
         category = "",
-        onGoing = false, // Default to not started
+        onGoing = true, // Default to not started
         startDate = "",  // Or use LocalDate.now().toString()
         endDate = "",
         goal = 100,
