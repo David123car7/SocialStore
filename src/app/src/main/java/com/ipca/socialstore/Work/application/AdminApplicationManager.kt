@@ -11,7 +11,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class AdminSchedulingManager @Inject constructor(
+class AdminApplicationManager @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
     companion object {
@@ -39,6 +39,6 @@ class AdminSchedulingManager @Inject constructor(
     }
 
     fun stopAdminMonitoring() {
-        workManager.cancelUniqueWork("admin_schedule_monitor")
+        workManager.cancelUniqueWork("admin_application_monitor")
     }
 }

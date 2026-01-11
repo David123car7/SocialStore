@@ -98,6 +98,8 @@ dependencies {
     implementation("io.github.jan-tennert.supabase:postgrest-kt")
     implementation("io.github.jan-tennert.supabase:storage-kt")
     implementation("io.github.jan-tennert.supabase:realtime-kt")
+    implementation("io.github.jan-tennert.supabase:functions-kt")
+
 
     // Ktor 3.x (compatível com Supabase)
     implementation("io.ktor:ktor-client-core:3.3.2")
@@ -106,6 +108,7 @@ dependencies {
     implementation("io.ktor:ktor-client-cio:3.3.2")      // motor CIO
     implementation("io.ktor:ktor-client-websockets:3.3.2") // suporte WebSocket
     implementation("io.ktor:ktor-utils:3.3.2")
+
 
     implementation("androidx.work:work-runtime-ktx:${work_version}")
     implementation("androidx.hilt:hilt-work:1.2.0")

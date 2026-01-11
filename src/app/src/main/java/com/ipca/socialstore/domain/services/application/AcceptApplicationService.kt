@@ -6,19 +6,23 @@ import com.ipca.socialstore.data.enums.UserRole
 import com.ipca.socialstore.data.models.ApplicationModel
 import com.ipca.socialstore.data.models.ApplicationStateModel
 import com.ipca.socialstore.data.models.BeneficiaryModel
+import com.ipca.socialstore.data.models.NotificationScheduledModel
 import com.ipca.socialstore.data.pdfbox.PdfGenerator
 import com.ipca.socialstore.data.repository.ApplicationStateRepository
 import com.ipca.socialstore.data.repository.AuthRepository
 import com.ipca.socialstore.data.repository.BeneficiaryRepository
+import com.ipca.socialstore.data.repository.NotificationRepository
 import com.ipca.socialstore.data.repository.UserRepository
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
+import com.ipca.socialstore.domain.notificationSchedule.CreateInitialNotificationUseCase
 import javax.inject.Inject
 
 class AcceptApplicationService @Inject constructor(
     private val applicationStateRepository: ApplicationStateRepository,
     private val beneficiaryRepository: BeneficiaryRepository,
     private val authRepository: AuthRepository,
-    private val userRepository: UserRepository){
+    private val userRepository: UserRepository,
+    private val createInitialNotificationUseCase: CreateInitialNotificationUseCase){
     suspend operator fun invoke(application: ApplicationModel): ResultWrapper<Unit>{
         val uidResult = authRepository.getUserUid()
         if (uidResult is ResultWrapper.Error) return ResultWrapper.Error(uidResult.error)
@@ -51,6 +55,19 @@ class AcceptApplicationService @Inject constructor(
         val userBenIdResult = userRepository.setBeneficiaryId(uid = uid, beneficiaryId = benificiaryId)
         if(userBenIdResult is ResultWrapper.Error)
             return ResultWrapper.Error(userBenIdResult.error)
+
+        val uniqueKey = "${application.id}_${benificiaryId}"
+        val notification = NotificationScheduledModel(
+            subject = "A sua candidatura foi aceite",
+            isRead = false,
+            title = "Candidatura",
+            notificationKey = uniqueKey,
+            beneficiaryId = benificiaryId
+        )
+        val createNotificationResult = createInitialNotificationUseCase(notification)
+        if (createNotificationResult is ResultWrapper.Error) {
+            println("Erro ao criar notificação: ${createNotificationResult.error}")
+        }
 
         return ResultWrapper.Success(Unit)
     }

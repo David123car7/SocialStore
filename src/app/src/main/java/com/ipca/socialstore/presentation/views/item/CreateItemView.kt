@@ -205,15 +205,17 @@ fun CreateItemViewContent(
                 modifier = Modifier,
             )
 
-            Box(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
+            Box(modifier = Modifier.fillMaxWidth()) {
                 OutlinedTextField(
                     value = uiState.item.itemType.ifBlank { "Selecionar Categoria" },
                     onValueChange = { },
                     readOnly = true,
                     label = { Text("Categoria") },
+                    shape = RoundedCornerShape(12.dp),
                     trailingIcon = {
                         Icon(Icons.Default.ArrowDropDown, "Abrir Menu")
                     },
+                    singleLine = true,
                     modifier = Modifier.fillMaxWidth()
                 )
 
@@ -271,7 +273,7 @@ fun CreateItemViewContent(
                     ) {
                         TextFieldDateComponent(
                             modifier = Modifier.weight(1f),
-                            label = if (isAlimentacao) "Data (Obrigatória)" else "Data (Opcional)",
+                            label = "Data",
                             date = itemDate.date ?: "",
                             onDateUpdate = { newValue ->
                                 onUpdateList(index, newValue, null)

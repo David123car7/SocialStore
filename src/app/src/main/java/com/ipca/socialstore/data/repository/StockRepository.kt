@@ -58,6 +58,20 @@ class StockRepository @Inject constructor(private val supabase: SupabaseClient, 
         }
     }
 
+    suspend fun removeStockByDate(id: Int, expirationDate: String): ResultWrapper<Unit> {
+        return try {
+            supabase.from(DatabaseTables.STOCK).delete {
+                filter {
+                    eq("item_id", id)
+                    eq("expiration_date", expirationDate)
+                }
+            }
+            ResultWrapper.Success(Unit)
+        } catch (e: Exception) {
+            ResultWrapper.Error(exceptionMapper.map(e))
+        }
+    }
+
     suspend fun getItemQuantity(itemId : Int) : ResultWrapper<Int>{
         return try {
             val stock = supabase.from(DatabaseTables.STOCK)
@@ -278,6 +292,25 @@ class StockRepository @Inject constructor(private val supabase: SupabaseClient, 
                     filter {
                         eq("item_id", itemId)
                         isIn("expiration_date", listExpirationDate)
+                    }
+                }
+                .decodeList<StockModel>()
+            if (result.isEmpty()) {
+                return ResultWrapper.Error(AppError.DataNotFound)
+            }
+            ResultWrapper.Success(result)
+
+        } catch (e: Exception) {
+            ResultWrapper.Error(exceptionMapper.map(e))
+        }
+    }
+
+    suspend fun getStockByItemId(itemId: Int): ResultWrapper<List<StockModel>> {
+        return try {
+            val result = supabase.from(DatabaseTables.STOCK)
+                .select {
+                    filter {
+                        eq("item_id", itemId)
                     }
                 }
                 .decodeList<StockModel>()

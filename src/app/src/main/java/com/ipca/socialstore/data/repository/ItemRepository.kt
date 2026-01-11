@@ -1,5 +1,6 @@
 package com.ipca.socialstore.data.repository
 
+import android.util.Log
 import com.ipca.socialstore.data.enums.DatabaseTables
 import com.ipca.socialstore.data.exceptions.AppError
 import com.ipca.socialstore.data.helpers.from
@@ -8,7 +9,9 @@ import com.ipca.socialstore.data.resultwrappers.ResultWrapper
 import io.github.jan.supabase.SupabaseClient
 import javax.inject.Inject
 import com.ipca.socialstore.data.exceptions.ExceptionMapper
+import com.ipca.socialstore.data.models.AcademicModel
 import com.ipca.socialstore.data.models.TableIdModel
+import com.ipca.socialstore.data.room.entitys.toEntity
 import io.github.jan.supabase.postgrest.query.Columns
 import kotlinx.serialization.Serializable
 
@@ -45,6 +48,23 @@ class ItemRepository @Inject constructor(private val supabase : SupabaseClient, 
             ResultWrapper.Success(itemResult)
         }
         catch (e : Exception){
+            ResultWrapper.Error(exceptionMapper.map(e))
+        }
+    }
+
+    suspend fun updateItem(item: ItemModel): ResultWrapper<Int> {
+        if(item.id == null)
+            return ResultWrapper.Error(AppError.UnknownError("Item Id Null"))
+        Log.d("App Debug", "${item.id}")
+        return try {
+            val itemResult = supabase.from(DatabaseTables.ITEM).update(item) {
+                filter {
+                    eq("id", item.id)
+                }
+                select(columns = Columns.list("id"))
+            }.decodeSingle<TableIdModel>()
+            ResultWrapper.Success(item.id)
+        } catch (e: Exception) {
             ResultWrapper.Error(exceptionMapper.map(e))
         }
     }

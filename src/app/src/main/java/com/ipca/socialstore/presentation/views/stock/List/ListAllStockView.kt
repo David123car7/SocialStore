@@ -23,6 +23,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.ipca.socialstore.data.enums.ItemType
@@ -41,19 +42,21 @@ import kotlin.collections.mutableMapOf
 import com.ipca.socialstore.presentation.ui.theme.SocialStoreTheme
 
 @Composable
-fun GetAllStockView(modifier: Modifier, navController: NavController, viewModel: ListAllStockViewModel){
+fun GetAllStockView(modifier: Modifier, navController: NavController){
+    val viewModel: ListAllStockViewModel = hiltViewModel()
     val uiState by viewModel.uiState
-    LaunchedEffect(Unit) {
-        viewModel.getAllStock()
-    }
+
     GetAllStockViewContent(
         modifier,
         uiState,
         navController,
-        onItemClick = { value -> viewModel.selectStock(value) },
+        onItemClick = { value ->
+            val routeName = AdminRoutes.StockDetails::class.qualifiedName!!
+            navController.navigate("$routeName/${value.item.id}")
+        },
         onSearchItem = {value -> viewModel.updateSearchList(value)},
         onSearchType = {value -> viewModel.updateSearchListType(value)},
-        onGetItemId = {value -> viewModel.updateItemId(value)}
+        onGetItemId = {}
     )
 }
 
@@ -71,7 +74,6 @@ fun GetAllStockViewContent(
 
     Box(modifier = modifier.fillMaxSize()) {
 
-        // 1. CONTEÚDO DINÂMICO (Loading, Erro ou Lista)
         when {
             uiState.isLoading -> {
                 LoadingIndicator()
@@ -197,7 +199,6 @@ private fun StockList(
                             onClick = {
                                 onItemClick(stockHelper)
                                 onGetItemId(stockHelper.stockId.toString())
-                                navController.navigate(AdminRoutes.SelectStock)
                             },
                             uiState = stockHelper,
                         )

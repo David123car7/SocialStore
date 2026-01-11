@@ -1,4 +1,4 @@
-package com.ipca.socialstore.Work.scheduling
+package com.ipca.socialstore.Work.application
 
 import android.content.Context
 import androidx.hilt.work.HiltWorker
@@ -12,7 +12,7 @@ import dagger.assisted.AssistedInject
 import kotlinx.coroutines.delay
 
 @HiltWorker
-class AdminScheduleWorker @AssistedInject constructor(
+class AdminApplicationWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted params: WorkerParameters,
     private val repository: SchedulingRepository,

@@ -18,6 +18,7 @@ import com.ipca.socialstore.data.repository.ApplicationDataStateRepository
 import com.ipca.socialstore.data.repository.ApplicationRepository
 import com.ipca.socialstore.data.repository.ApplicationStateRepository
 import com.ipca.socialstore.data.repository.AuthRepository
+import com.ipca.socialstore.data.repository.NotificationRepository
 import com.ipca.socialstore.data.repository.ScholarshipRepository
 import com.ipca.socialstore.data.repository.UserRepository
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
@@ -33,7 +34,8 @@ class CreateApplicationService @Inject constructor(
     private val applicationStateRepository: ApplicationStateRepository,
     private val createAllAppDocTypesUseCase: CreateAllAppDocTypesUseCase,
     private val applicationDataStateRepository: ApplicationDataStateRepository,
-    private val scholarshipRepository: ScholarshipRepository) {
+    private val scholarshipRepository: ScholarshipRepository,
+    private val notificationRepository: NotificationRepository) {
     suspend operator fun invoke(applicationModel: ApplicationModel, academicModel: AcademicModel?, scholarshipModel: ScholarshipModel?): ResultWrapper<Int> {
         val emailResult = authRepository.getUserEmail()
         if (emailResult is ResultWrapper.Error) return ResultWrapper.Error(emailResult.error)

@@ -58,6 +58,18 @@ fun TextFieldStringComponent(modifier: Modifier, label: String, value: String, i
 }
 
 @Composable
+fun TextFieldStringComponent2(modifier: Modifier, label: String, value: String,onValueUpdate:(newValue: String)->Unit) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = onValueUpdate,
+        label = { Text(label) },
+        modifier = modifier,
+        shape = RoundedCornerShape(12.dp),
+        singleLine = true
+    )
+}
+
+@Composable
 fun TextFieldValueComponent(modifier: Modifier, label: String, value: String, icon: ImageVector, onValueUpdate:(newValue: String)->Unit) {
     OutlinedTextField(
         value = value,
@@ -109,6 +121,56 @@ fun TextFieldDateComponent(modifier: Modifier, label: String, date: String, onDa
         leadingIcon = { Icon(Icons.Outlined.DateRange, null) },
         modifier = modifier
             .clickable { showDatePicker = !showDatePicker }.fillMaxWidth(),
+        enabled = false,
+        readOnly = true,
+        shape = RoundedCornerShape(12.dp),
+        colors = OutlinedTextFieldDefaults.colors(
+            disabledTextColor = MaterialTheme.colorScheme.onSurface,
+            disabledBorderColor = MaterialTheme.colorScheme.outline,
+            disabledLeadingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    )
+}
+
+@Composable
+fun TextFieldDateComponent2(modifier: Modifier, label: String, date: String, onDateUpdate:(newValue: String)->Unit, onDatePickerUpdate:() -> Unit){
+    var showDatePicker by remember { mutableStateOf(false) }
+    val datePickerState = rememberDatePickerState()
+
+    if (showDatePicker) {
+        DatePickerDialog(
+            onDismissRequest = { showDatePicker = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    datePickerState.selectedDateMillis?.let { millis ->
+                        val date = Date(millis)
+                        val format = SimpleDateFormat("yyyy/MM/dd", Locale.getDefault())
+                        onDateUpdate(format.format(date))
+                    }
+                    showDatePicker = false
+                }) {
+                    Text("OK")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDatePicker = false }) {
+                    Text("Cancelar")
+                }
+            }
+        ) {
+            DatePicker(state = datePickerState)
+        }
+    }
+
+    OutlinedTextField(
+        value = date,
+        onValueChange = onDateUpdate,
+        label = { Text(label) },
+        placeholder = { Text("DD/MM/AAAA") },
+        leadingIcon = { Icon(Icons.Outlined.DateRange, null) },
+        modifier = modifier
+            .clickable { showDatePicker = !showDatePicker },
         enabled = false,
         readOnly = true,
         shape = RoundedCornerShape(12.dp),

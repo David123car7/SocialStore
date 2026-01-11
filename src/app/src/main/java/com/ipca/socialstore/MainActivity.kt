@@ -29,7 +29,6 @@ import com.ipca.socialstore.presentation.routes.GeneralRoutes
 import com.ipca.socialstore.presentation.ui.SocialStoreScaffold
 import com.ipca.socialstore.presentation.views.stock.List.GetAllStockView
 import com.ipca.socialstore.presentation.views.stock.List.ListAllStockViewModel
-import com.ipca.socialstore.presentation.views.stock.List.StockItemDetailView
 import com.ipca.socialstore.presentation.ui.theme.SocialStoreTheme
 import com.ipca.socialstore.presentation.utils.navigation.NavigationLogic
 import com.ipca.socialstore.presentation.views.Scheduling.cancelByUser.JustificationScreenView
@@ -46,15 +45,6 @@ import com.ipca.socialstore.presentation.views.authentication.resetPassword.Rese
 import com.ipca.socialstore.presentation.views.basket.preparation.BasketPreparationView
 import com.ipca.socialstore.presentation.views.beneficiary.editProfile.BeneficiaryEditProfileView
 import com.ipca.socialstore.presentation.views.beneficiary.listDocuments.ListDocumentsView
-import com.ipca.socialstore.presentation.views.basket.preparation.BasketPreparationView
-import com.ipca.socialstore.presentation.views.beneficiary.editProfile.BeneficiaryEditProfileView
-import com.ipca.socialstore.presentation.views.beneficiary.listDocuments.ListDocumentsView
-import com.ipca.socialstore.presentation.views.basket.preparation.BasketPreparationView
-import com.ipca.socialstore.presentation.views.beneficiary.editProfile.BeneficiaryEditProfileView
-import com.ipca.socialstore.presentation.views.beneficiary.listDocuments.ListDocumentsView
-import com.ipca.socialstore.presentation.views.basket.preparation.BasketPreparationView
-import com.ipca.socialstore.presentation.views.beneficiary.editProfile.BeneficiaryEditProfileView
-import com.ipca.socialstore.presentation.views.beneficiary.listDocuments.ListDocumentsView
 import com.ipca.socialstore.presentation.views.beneficiary.managment.BeneficiaryManagementView
 import com.ipca.socialstore.presentation.views.beneficiary.profile.BeneficiaryProfileView
 import com.ipca.socialstore.presentation.views.campaign.create.CreateCampaignView
@@ -68,13 +58,13 @@ import com.ipca.socialstore.presentation.views.home.defaultHomeView.DefaultHomeV
 import com.ipca.socialstore.presentation.views.home.testHome.TestHomeView
 import com.ipca.socialstore.presentation.views.notification.NotificationHistoryView
 import com.ipca.socialstore.presentation.views.reports.ReportsView
+import com.ipca.socialstore.presentation.views.stock.detail.StockItemDetailView
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
     private val mainViewModel: MainViewModel by viewModels()
-    private val stockViewModel: ListAllStockViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -168,7 +158,7 @@ class MainActivity : ComponentActivity() {
                             CreateDonationView(modifier = Modifier.padding(innerPadding), navController = navController)
                         }
                         composable <AdminRoutes.GetStock>{
-                            GetAllStockView(modifier = Modifier.padding(innerPadding), navController = navController, viewModel = stockViewModel)
+                            GetAllStockView(modifier = Modifier.padding(innerPadding), navController = navController)
                         }
                         composable(
                             route = AdminRoutes.ApplicationState::class.qualifiedName!! + "/{applicationId}",
@@ -177,9 +167,6 @@ class MainActivity : ComponentActivity() {
                             )
                         ) {
                             ApplicationStateAdminView(modifier = Modifier.padding(innerPadding), navController = navController, userRole = mainState.userRole)
-                        }
-                        composable <AdminRoutes.SelectStock>{
-                            StockItemDetailView(modifier = Modifier.padding(innerPadding), navController = navController, viewModel = stockViewModel)
                         }
                         composable <AdminRoutes.NotificationHistory>{
                             NotificationHistoryView(modifier = Modifier.padding(innerPadding), navController = navController)
@@ -217,7 +204,14 @@ class MainActivity : ComponentActivity() {
                                 userRole = mainState.userRole
                             )
                         }
-
+                        composable(
+                            route = AdminRoutes.StockDetails::class.qualifiedName!! + "/{item_id}",
+                            arguments = listOf(
+                                navArgument("item_id") { type = NavType.StringType }
+                            )
+                        ) {
+                            StockItemDetailView(modifier = Modifier.padding(innerPadding),navController = navController)
+                        }
                         composable<BeneficiaryRoutes.Documents>{
                             ListDocumentsView(modifier = Modifier.padding(innerPadding), navController = navController, userRole = mainState.userRole)
                         }
