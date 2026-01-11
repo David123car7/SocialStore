@@ -143,32 +143,33 @@ class SchedulingMainPageViewModel @Inject constructor(
         }
     }
 
-    fun createScheduling(){
-        val scheduling = uiState.value.newScheduling
-        if (scheduling.id == -1){
+    fun createScheduling() {
+        val schedulingData = uiState.value.newScheduling
+
+        // Validação: Verificamos se o beneficiaryId foi preenchido no objeto (pelo Dropdown ou Rota)
+        if (schedulingData.beneficiaryId <= 0) {
             uiState.value = uiState.value.copy(
-                error = ErrorText.DynamicString("Selecione um Beneficiário Válido")
+                error = ErrorText.DynamicString("Selecione um beneficiário válido")
             )
+            return
         }
-        uiState.value = uiState.value.copy(
-            isLoading = true,
-            error = null
-        )
+
+        uiState.value = uiState.value.copy(isLoading = true, error = null)
 
         viewModelScope.launch {
-            println("EStou AQui ${uiState.value.newScheduling}")
-            val result = createSchedulingServiceUseCase(uiState.value.newScheduling)
-            when(result){
-                is ResultWrapper.Success ->{
+            val result = createSchedulingServiceUseCase(schedulingData)
+
+            when(result) {
+                is ResultWrapper.Success -> {
                     uiState.value = uiState.value.copy(
                         isLoading = false,
-                        error = null,
+                        error = null
                     )
                 }
                 is ResultWrapper.Error -> {
                     uiState.value = uiState.value.copy(
                         isLoading = false,
-                        error = result.error.asUiText(),
+                        error = result.error.asUiText()
                     )
                 }
             }

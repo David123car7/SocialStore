@@ -21,14 +21,15 @@ class SchedulingRepository @Inject constructor(
 
     suspend fun createScheduling(scheduling : SchedulingModel) : ResultWrapper<SchedulingModel> {
         return try {
-            val scheduling = supabase.from(DatabaseTables.SCHEDULING)
+            val result = supabase.from(DatabaseTables.SCHEDULING)
                 .insert(scheduling) {
                     select()
-                }.decodeAsOrNull<SchedulingModel>()
-            if (scheduling == null) return ResultWrapper.Error(AppError.DataNotCreated)
-            ResultWrapper.Success(scheduling)
+                }.decodeSingle<SchedulingModel>()
+
+            ResultWrapper.Success(result)
         } catch (e: Exception) {
-            Log.d("App Debug", "KAZZIO $e}")
+            Log.e("App Debug", "KAZZIO Erro no Insert: ${e.message}")
+            e.printStackTrace()
             ResultWrapper.Error(exceptionMapper.map(e))
         }
     }
@@ -172,11 +173,11 @@ class SchedulingRepository @Inject constructor(
                     {
                         set("state", "accept")
                         set("note", note)
+                        set("notified_admin", true)
                     }
                 ) {
-                    filter {
-                        eq("id", schedulingId)
-                    }
+                    filter { eq("id", schedulingId) }
+                    select()
                 }.decodeSingle<SchedulingModel>()
 
             ResultWrapper.Success(result)
@@ -194,15 +195,39 @@ class SchedulingRepository @Inject constructor(
                         set("reason", reason)
                     }
                 ) {
-                    filter {
-                        eq("id", schedulingId)
-                    }
+                    filter { eq("id", schedulingId) }
+                    select()
                 }.decodeSingle<SchedulingModel>()
 
             ResultWrapper.Success(result)
         } catch (e: Exception) {
             ResultWrapper.Error(exceptionMapper.map(e))
         }
+    }
+
+
+    suspend fun getUnnotifiedSchedules(): ResultWrapper<List<SchedulingModel>> {
+        return try {
+            val result = supabase.from(DatabaseTables.SCHEDULING)
+                .select{
+                    filter {
+                    eq("notified_admin", false)
+                }
+                }
+                .decodeList<SchedulingModel>()
+            ResultWrapper.Success(result)
+        } catch (e: Exception) {
+            ResultWrapper.Error(exceptionMapper.map(e))
+        }
+    }
+
+    suspend fun markAsNotified(id: Int) {
+        try {
+            supabase.from(DatabaseTables.SCHEDULING)
+                .update(mapOf("notified_admin" to true)) {
+                filter { eq("id", id) }
+            }
+        } catch (e: Exception) { }
     }
 
 

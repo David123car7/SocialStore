@@ -154,10 +154,13 @@ fun SchedulingMainContent(
                                         DropdownMenuItem(
                                             text = { Text(beneficiary.name) },
                                             onClick = {
+                                                println(beneficiary.id)
                                                 selectedBeneficiary = beneficiary
-                                                onUpdateBeneficiaryId(beneficiary.id!!)
-                                                expanded = false
+                                                beneficiary.id?.let { id ->
+                                                    onUpdateBeneficiaryId(id)
+                                                }
 
+                                                expanded = false
                                             }
                                         )
                                     }

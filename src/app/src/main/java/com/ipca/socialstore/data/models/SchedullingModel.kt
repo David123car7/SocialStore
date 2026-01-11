@@ -21,7 +21,11 @@ data class SchedulingModel(
     val reason : String?,
 
     @SerialName("note")
-    val note : String?
+    val note : String?,
+
+    @SerialName("notified_admin")
+    val notifiedAdmin : Boolean? = false,
+
 
 )
 

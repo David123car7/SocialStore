@@ -14,38 +14,50 @@ class CreateSchedulingServiceUseCase @Inject constructor(
     private val createSchedulingUseCase: CreateSchedulingUseCase,
     private val createInitialNotificationUseCase: CreateInitialNotificationUseCase,
     private val exceptionMapper: ExceptionMapper,
-){
-    suspend operator fun invoke(scheduling : SchedulingModel): ResultWrapper<SchedulingModel> {
-
+) {
+    suspend operator fun invoke(scheduling: SchedulingModel): ResultWrapper<SchedulingModel> {
         return try {
-
+            // 1. Preparar o objeto para a BD
             val newScheduling = SchedulingModel(
                 schedulingDate = scheduling.schedulingDate,
                 beneficiaryId = scheduling.beneficiaryId,
                 state = "in_Progress",
                 reason = null,
-                note = null
+                note = null,
+                notifiedAdmin = false
             )
-            val schedulingResult = createSchedulingUseCase(newScheduling)
-            if (schedulingResult is ResultWrapper.Error)
-                return ResultWrapper.Error(schedulingResult.error)
-            val scheduling = (schedulingResult as ResultWrapper.Success).data
 
+            val schedulingResult = createSchedulingUseCase(newScheduling)
+
+
+            val createdScheduling = when (schedulingResult) {
+                is ResultWrapper.Success -> schedulingResult.data
+                is ResultWrapper.Error -> return ResultWrapper.Error(schedulingResult.error)
+            }
+
+            println("Agendamento criado com ID: ${createdScheduling.id}")
+
+            val uniqueKey = "${createdScheduling.id}_${createdScheduling.schedulingDate}"
             val notification = NotificationScheduledModel(
-                subject = "Tem uma entrega agendada para o ${scheduling.schedulingDate}",
+                subject = "Tem uma entrega agendada para o ${createdScheduling.schedulingDate}",
                 isRead = false,
-                title = "Novo Agendamento"
+                title = "Novo Agendamento",
+                notificationKey = uniqueKey,
+                beneficiaryId = createdScheduling.beneficiaryId
             )
 
             val createNotificationResult = createInitialNotificationUseCase(notification)
-            if (createNotificationResult is ResultWrapper.Error)
-                return ResultWrapper.Error(createNotificationResult.error)
-            val notificationId = (createNotificationResult as ResultWrapper.Success).data
 
-            ResultWrapper.Success(scheduling)
+            if (createNotificationResult is ResultWrapper.Error) {
+                println("Erro ao criar notificação: ${createNotificationResult.error}")
+            }
+
+            ResultWrapper.Success(createdScheduling)
+
         } catch (e: Exception) {
+            println("ERRO NO TRY: ${e.message}")
+            e.printStackTrace()
             ResultWrapper.Error(exceptionMapper.map(e))
         }
-
     }
 }
