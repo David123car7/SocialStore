@@ -14,4 +14,4 @@ data class BeneficiaryEntity(
 )
 
 fun BeneficiaryModel.toEntity() = BeneficiaryEntity(id!!, name, phoneNumber, birthDate, academicId)
-fun BeneficiaryEntity.toModel() = BeneficiaryModel(id, name, phoneNumber, birthDate, academicId)
+fun BeneficiaryEntity.toModel() = BeneficiaryModel(id, name, phoneNumber, birthDate, academicId, missedAppointments = 0)

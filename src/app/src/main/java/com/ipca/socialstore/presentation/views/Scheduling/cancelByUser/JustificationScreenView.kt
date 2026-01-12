@@ -1,6 +1,7 @@
 package com.ipca.socialstore.presentation.views.Scheduling.cancelByUser
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -23,6 +24,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -51,12 +53,18 @@ fun JustificationScreenView(
     val viewModel : JustificationScreenViewModel = hiltViewModel()
     val uiState by viewModel.uiState
 
+    LaunchedEffect(uiState.isSuccess) {
+        if (uiState.isSuccess) {
+            navController.popBackStack()
+        }
+    }
     JustificationScreenContent(
         modifier = modifier,
         uiState = uiState,
-        updateReason = {value -> viewModel.updateReasonUi(value)},
+        updateReason = {value -> viewModel.updateReasonUi(value) },
         onUpdate = {viewModel.updateReason()},
         userRole = userRole,
+        onAcceptJustification = {viewModel.onAdminAccept()}
     )
 }
 
@@ -66,9 +74,14 @@ fun JustificationScreenContent(
     uiState: JustificationState,
     updateReason : (value : String) -> Unit,
     onUpdate : () -> Unit,
-    userRole: UserRole
+    userRole: UserRole,
+    onAcceptJustification : () -> Unit
 ){
     val isJustified = uiState.scheduling?.state == "justified"
+
+    var localReason by remember { mutableStateOf(uiState.reason ?: "") }
+
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -126,10 +139,10 @@ fun JustificationScreenContent(
             modifier = Modifier.padding(bottom = 8.dp)
         )
 
-        if (userRole == UserRole.ADMIN){
+        if (userRole == UserRole.ADMIN) {
             OutlinedTextField(
                 value = uiState.reason ?: "",
-                onValueChange = { value -> if (!isJustified) updateReason(value)},
+                onValueChange = { value -> if (!isJustified) updateReason(value) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(200.dp),
@@ -141,11 +154,14 @@ fun JustificationScreenContent(
                     unfocusedContainerColor = Color.White
                 )
             )
-        }
-        else{
+        } else {
             OutlinedTextField(
                 value = uiState.reason ?: "",
-                onValueChange = { value -> if (!isJustified) updateReason(value)},
+                onValueChange = { value ->
+                    if (!isJustified) {
+                        updateReason(value)
+                    }
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(200.dp),
@@ -159,8 +175,8 @@ fun JustificationScreenContent(
         }
         Spacer(modifier = Modifier.weight(1f))
 
-        if (userRole == UserRole.BENEFICIARY){
-            if (!isJustified){
+        if (userRole == UserRole.BENEFICIARY) {
+            if (!isJustified) {
                 Button(
                     onClick = { onUpdate() },
                     modifier = Modifier
@@ -171,11 +187,35 @@ fun JustificationScreenContent(
                 ) {
                     Text("Enviar Justificação", fontWeight = FontWeight.Bold, color = Color.White)
                 }
+            }
+        } else {
+            // Visão do ADMIN
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Button(
+                    onClick = { /* Aqui podes chamar uma função de rejeição futuramente */ },
+                    modifier = Modifier.weight(1f).height(56.dp),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.LightGray)
+                ) {
+                    Text("Rejeitar", color = Color.Black)
+                }
+
+                Button(
+                    onClick = { onAcceptJustification() },
+                    modifier = Modifier.weight(1f).height(56.dp),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = GreenIPCA)
+                ) {
+                    Text("Aceitar", fontWeight = FontWeight.Bold, color = Color.White)
+                }
+            }
         }
-
-
     }
-}
 }
 @Preview(showBackground = true, name = "1. Ecrã de Justificação (Por preencher)")
 @Composable
@@ -214,7 +254,8 @@ fun JustificationScreenPreviewEditable() {
             uiState = uiState,
             updateReason = {},
             onUpdate = {},
-            userRole = UserRole.BENEFICIARY
+            userRole = UserRole.BENEFICIARY,
+            onAcceptJustification = {}
         )
     }
 }
@@ -253,7 +294,8 @@ fun JustificationScreenPreviewJustified() {
             uiState = uiState,
             updateReason = {},
             onUpdate = {},
-            userRole = UserRole.BENEFICIARY
+            userRole = UserRole.BENEFICIARY,
+            onAcceptJustification = {}
         )
     }
 }

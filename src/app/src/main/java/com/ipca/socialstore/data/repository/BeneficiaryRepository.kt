@@ -2,6 +2,7 @@ package com.ipca.socialstore.data.repository
 
 import android.util.Log
 import com.ipca.socialstore.data.enums.DatabaseTables
+import com.ipca.socialstore.data.enums.UserRole
 import com.ipca.socialstore.data.exceptions.AppError
 import com.ipca.socialstore.data.exceptions.ExceptionMapper
 import com.ipca.socialstore.data.helpers.from
@@ -75,7 +76,6 @@ class BeneficiaryRepository  @Inject constructor(
                 .decodeList<BeneficiaryModel>()
             ResultWrapper.Success(result)
         }catch (e : Exception){
-            Log.d("App Debug", "Error: ${e}")
             return ResultWrapper.Error(exceptionMapper.map(e))
         }
     }
@@ -120,6 +120,45 @@ class BeneficiaryRepository  @Inject constructor(
                 beneficiaryInterface.insertBeneficiary(result.toEntity())
             }
             ResultWrapper.Success(result)
+        } catch (e: Exception) {
+            ResultWrapper.Error(exceptionMapper.map(e))
+        }
+    }
+
+    suspend fun forgiveAbsence(beneficiaryId: Int): ResultWrapper<Boolean> {
+        return try {
+            val beneficiary = supabase.from(DatabaseTables.BENEFICIARY)
+                .select { filter { eq("id", beneficiaryId) } }
+                .decodeSingle<BeneficiaryModel>()
+
+            val currentMissed = beneficiary.missedAppointments ?: 0
+            val newCount = if (currentMissed >= 3) 2 else currentMissed
+
+            supabase.from(DatabaseTables.BENEFICIARY)
+                .update({
+                    set("missed_appointments", newCount)
+                }) {
+                    filter { eq("id", beneficiaryId) }
+                }
+            ResultWrapper.Success(true)
+        } catch (e: Exception) {
+            ResultWrapper.Error(exceptionMapper.map(e))
+        }
+    }
+
+    suspend fun suspendBeneficiary(beneficiaryId: Int): ResultWrapper<Boolean> {
+        return try {
+            supabase.from(DatabaseTables.BENEFICIARY).update({
+                set("state", "suspended")
+            }) {
+                filter { eq("id", beneficiaryId) }
+            }
+            supabase.from(DatabaseTables.USER).update({
+                set("role", UserRole.DEFAULT)
+            }) {
+                filter { eq("beneficiary_id", beneficiaryId) }
+            }
+            ResultWrapper.Success(true)
         } catch (e: Exception) {
             ResultWrapper.Error(exceptionMapper.map(e))
         }

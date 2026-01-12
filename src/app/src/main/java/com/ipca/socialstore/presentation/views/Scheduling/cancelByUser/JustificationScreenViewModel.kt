@@ -9,6 +9,7 @@ import com.ipca.socialstore.data.models.BeneficiaryModel
 import com.ipca.socialstore.data.models.SchedulingModel
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
 import com.ipca.socialstore.domain.beneficiary.GetBeneficiaryBySchedulingUseCase
+import com.ipca.socialstore.domain.scheduling.AcceptJustificationUseCase
 import com.ipca.socialstore.domain.scheduling.GetSchedulingByIdUseCase
 import com.ipca.socialstore.domain.scheduling.UpdateReasonUseCase
 import com.ipca.socialstore.domain.services.beneficiary.GetBeneficiaryBySchedulingIdServiceUseCase
@@ -22,6 +23,7 @@ data class JustificationState(
     val isLoading : Boolean ?= false,
     val error : AppError? = null,
     val reason : String? = null,
+    val isSuccess : Boolean = false
 )
 
 @HiltViewModel
@@ -29,6 +31,7 @@ class JustificationScreenViewModel @Inject constructor(
     private val updateReasonUseCase: UpdateReasonUseCase,
     private val getBeneficiaryBySchedulingIdServiceUseCase: GetBeneficiaryBySchedulingIdServiceUseCase,
     private val getSchedulingByIdUseCase: GetSchedulingByIdUseCase,
+    private val acceptJustificationUseCase: AcceptJustificationUseCase,
     savedStateHandle: SavedStateHandle
 ): ViewModel(){
     val uiState = mutableStateOf(JustificationState())
@@ -47,19 +50,34 @@ class JustificationScreenViewModel @Inject constructor(
 
     fun updateReason(){
         val id = schedulingId?.toIntOrNull()
+        val currentReason = uiState.value.reason
 
-        if (id == null) {
+        if (id == null || currentReason.isNullOrBlank()) {
             uiState.value = uiState.value.copy(error = AppError.ParseError)
             return
         }
+
         uiState.value = uiState.value.copy(isLoading = true, error = null)
+
         viewModelScope.launch {
-            val result = updateReasonUseCase(id, uiState.value.reason!!)
-            if (result is ResultWrapper.Success) {
-                uiState.value = uiState.value.copy(
-                    scheduling = result.data,
-                    isLoading = false
-                )
+            val result = updateReasonUseCase(id, currentReason)
+
+            when (result) {
+                is ResultWrapper.Success -> {
+                    println("SUCESSO: Justificação guardada!")
+                    uiState.value = uiState.value.copy(
+                        scheduling = result.data,
+                        isLoading = false,
+                        isSuccess = true
+                    )
+                }
+                is ResultWrapper.Error -> {
+                    println("ERRO AO GUARDAR: ${result.error}")
+                    uiState.value = uiState.value.copy(
+                        isLoading = false,
+                        error = result.error
+                    )
+                }
             }
         }
     }
@@ -79,6 +97,16 @@ class JustificationScreenViewModel @Inject constructor(
                     beneficiary =  result.data,
                     isLoading = false
                 )
+            }
+        }
+    }
+
+    fun onAdminAccept() {
+        val id = schedulingId?.toIntOrNull() ?: return
+        viewModelScope.launch {
+            val result = acceptJustificationUseCase(id)
+            if (result is ResultWrapper.Success) {
+                uiState.value = uiState.value.copy(isSuccess = true)
             }
         }
     }

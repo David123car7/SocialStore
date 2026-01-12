@@ -50,9 +50,12 @@ fun SchedulingConfirmationView(
         modifier = modifier,
         uiState = uiState,
         updateObservation = { value -> viewModel.updateNoteUi(value)},
-        onConfirm = {viewModel.updateNote() },
-        onAccept = {viewModel.acceptScheduling()},
-        onDecline = {viewModel.declineScheduling()},
+        onConfirm = {viewModel.updateNote()
+                    navController.popBackStack()},
+        onAccept = {viewModel.acceptScheduling()
+                    navController.popBackStack()},
+        onDecline = {viewModel.declineScheduling()
+                    navController.popBackStack()},
         userRole = userRole
     )
 }
@@ -139,61 +142,46 @@ fun SchedulingConfirmationContent(
 
         Spacer(modifier = Modifier.weight(1f))
 
-        if (userRole == UserRole.BENEFICIARY){
-            if (uiState.scheduling?.state == "accept"){
+        if (userRole == UserRole.BENEFICIARY) {
+            if (uiState.scheduling?.state == "in_Progress") {
                 Button(
-                    onClick = { onConfirm() },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(56.dp),
+                    onClick = { onAccept() },
+                    modifier = Modifier.fillMaxWidth().height(56.dp),
                     shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = GreenIPCA)
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2E7D32))
                 ) {
-
-                    Text("Enviar", fontWeight = FontWeight.Bold, color = Color.White)
+                    Text("Confirmar Agendamento", fontWeight = FontWeight.Bold, color = Color.White)
                 }
             }
-            if (uiState.scheduling?.state == "in_Progress") {
+            else if (uiState.scheduling?.state == "accept") {
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Button(
-                        onClick = { onAccept() },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(56.dp),
+                        onClick = { onDecline() },
+                        modifier = Modifier.weight(1f).height(56.dp),
                         shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2E7D32))
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD32F2F))
                     ) {
-
-                        Text("Enviar", fontWeight = FontWeight.Bold, color = Color.White)
+                        Text("Cancelar", fontWeight = FontWeight.Bold, color = Color.White)
                     }
-                }
-            } else {
-                if (uiState.scheduling?.state == "accept") {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+
+                    Button(
+                        onClick = { onConfirm() },
+                        modifier = Modifier.weight(1f).height(56.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = GreenIPCA)
                     ) {
-                        Button(
-                            onClick = { onDecline() },
-                            modifier = Modifier
-                                .weight(1f)
-                                .height(56.dp),
-                            shape = RoundedCornerShape(12.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD32F2F))
-                        ) {
-                            Text("Cancelar", fontWeight = FontWeight.Bold, color = Color.White)
-                        }
+                        Text("Enviar Notas", fontWeight = FontWeight.Bold, color = Color.White)
                     }
                 }
             }
+        }
 
 
         }
     }
-}
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
@@ -232,7 +220,7 @@ fun SchedulingConfirmationPreview() {
             onConfirm = {},
             onDecline = {},
             onAccept = {},
-            userRole = UserRole.ADMIN
+            userRole = UserRole.BENEFICIARY
         )
     }
 }

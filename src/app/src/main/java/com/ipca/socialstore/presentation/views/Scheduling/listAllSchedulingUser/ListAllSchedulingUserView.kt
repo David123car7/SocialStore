@@ -49,6 +49,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.ipca.socialstore.data.enums.UserRole
 import com.ipca.socialstore.data.models.BeneficiaryModel
@@ -65,6 +66,12 @@ fun ListAllSchedulingUserView(
 ){
     val viewModel : ListAllSchedulingUserViewModel = hiltViewModel()
     val uiState by viewModel.uiState
+
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+
+    LaunchedEffect(navBackStackEntry) {
+        viewModel.refreshData()
+    }
     ListAllSchedulingUserContent(
         modifier = modifier,
         uiState = uiState,
@@ -158,7 +165,7 @@ fun ListAllSchedulingUserContent(
                 },
                 label = {
                     if (userRole == UserRole.BENEFICIARY){
-                        Text("Cancelados (${uiState.cancel})")
+                        Text("Cancelados")
                     }
                     else{
                         Text("Cancelados")
@@ -196,7 +203,7 @@ fun ListAllSchedulingUserContent(
                             val routeName = BeneficiaryRoutes.SchedulingConfirmation::class.qualifiedName
                             navController.navigate("$routeName/${item.id}")
                         }
-                        if (item.state == "canceled" || item.state == "justified"){
+                        if (item.state == "decline" || item.state == "justified"){
                             val routeName = BeneficiaryRoutes.JustifyScheduling::class.qualifiedName
                             navController.navigate("$routeName/${item.id}")
                         }
@@ -271,8 +278,6 @@ fun SchedulingTimelineItem(
     }
 }
 
-
-
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun ListAllSchedulingUserPreview() {
@@ -281,7 +286,8 @@ fun ListAllSchedulingUserPreview() {
         name = "David",
         birthDate = "1990-05-15",
         academicId = 1,
-        phoneNumber = "954525458"
+        phoneNumber = "954525458",
+        missedAppointments = 0
 
     )
 

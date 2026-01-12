@@ -7,6 +7,8 @@ import androidx.lifecycle.viewModelScope
 import com.ipca.socialstore.data.models.BeneficiaryModel
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
 import com.ipca.socialstore.domain.beneficiary.GetAllBeneficiaryUseCase
+import com.ipca.socialstore.domain.beneficiary.ForgiveAbsenceUseCase // Importa o novo UseCase
+import com.ipca.socialstore.domain.beneficiary.SuspendBeneficiaryUseCase
 import com.ipca.socialstore.presentation.utils.errors.ErrorText
 import com.ipca.socialstore.presentation.utils.errors.asUiText
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -17,11 +19,17 @@ data class SchedulingManagementState(
     val beneficiaries : List<BeneficiaryModel>? = null,
     val filteredBeneficiaries: List<BeneficiaryModel>? = null,
     val isLoading : Boolean? = false,
-    val error : ErrorText? = null
+    val error : ErrorText? = null,
+    val showDecisionDialog: Boolean = false,
+    val selectedBeneficiary: BeneficiaryModel? = null
 )
 
 @HiltViewModel
-class SchedulingManagementViewModel @Inject constructor(private val getAllBeneficiaryUseCase: GetAllBeneficiaryUseCase) : ViewModel(){
+class SchedulingManagementViewModel @Inject constructor(
+    private val getAllBeneficiaryUseCase: GetAllBeneficiaryUseCase,
+    private val forgiveAbsenceUseCase: ForgiveAbsenceUseCase,
+    private val suspendBeneficiaryUseCase: SuspendBeneficiaryUseCase
+) : ViewModel(){
 
     val uiState = mutableStateOf(SchedulingManagementState())
 
@@ -39,11 +47,12 @@ class SchedulingManagementViewModel @Inject constructor(private val getAllBenefi
             val result = getAllBeneficiaryUseCase()
             when(result){
                 is ResultWrapper.Success ->{
+                    val activeBeneficiaries = result.data.filter { it.state != "suspended" }
                     uiState.value = uiState.value.copy(
                         isLoading = false,
                         error = null,
-                        beneficiaries = result.data,
-                        filteredBeneficiaries = result.data
+                        beneficiaries = activeBeneficiaries,
+                        filteredBeneficiaries = activeBeneficiaries
                     )
                 }
                 is ResultWrapper.Error -> {
@@ -57,8 +66,43 @@ class SchedulingManagementViewModel @Inject constructor(private val getAllBenefi
         }
     }
 
+    fun openDecisionDialog(beneficiary: BeneficiaryModel) {
+        uiState.value = uiState.value.copy(
+            selectedBeneficiary = beneficiary,
+            showDecisionDialog = true
+        )
+    }
+
+    fun dismissDialog() {
+        uiState.value = uiState.value.copy(
+            showDecisionDialog = false,
+            selectedBeneficiary = null
+        )
+    }
+
+    fun forgiveBeneficiary() {
+        val beneficiary = uiState.value.selectedBeneficiary ?: return
+
+        uiState.value = uiState.value.copy(isLoading = true)
+
+        viewModelScope.launch {
+            val result = forgiveAbsenceUseCase(beneficiary.id!!)
+            when(result) {
+                is ResultWrapper.Success -> {
+                    dismissDialog()
+                    getAllBeneficiaries()
+                }
+                is ResultWrapper.Error -> {
+                    uiState.value = uiState.value.copy(
+                        isLoading = false,
+                        error = result.error.asUiText()
+                    )
+                }
+            }
+        }
+    }
+
     fun onSearchBeneficiary(query : String) {
-        println("Query $query")
         val listToFilter = uiState.value.beneficiaries ?: emptyList()
 
         val filtered = if (query.isEmpty()) {
@@ -66,9 +110,7 @@ class SchedulingManagementViewModel @Inject constructor(private val getAllBenefi
         } else {
             listToFilter.filter { beneficiary ->
                 val matchesName = beneficiary.name.contains(query, ignoreCase = true)
-
                 val matchesProcess = beneficiary.id.toString().contains(query)
-
                 matchesName || matchesProcess
             }
         }
@@ -76,6 +118,27 @@ class SchedulingManagementViewModel @Inject constructor(private val getAllBenefi
         uiState.value = uiState.value.copy(
             filteredBeneficiaries = filtered,
         )
-        println(uiState.value.filteredBeneficiaries)
+    }
+
+    fun confirmSuspension() {
+        val beneficiary = uiState.value.selectedBeneficiary ?: return
+        uiState.value = uiState.value.copy(isLoading = true)
+
+        viewModelScope.launch {
+            val result = suspendBeneficiaryUseCase(beneficiary.id!!)
+
+            when(result) {
+                is ResultWrapper.Success -> {
+                    dismissDialog()
+                    getAllBeneficiaries()
+                }
+                is ResultWrapper.Error -> {
+                    uiState.value = uiState.value.copy(
+                        isLoading = false,
+                        error = result.error.asUiText()
+                    )
+                }
+            }
+        }
     }
 }
