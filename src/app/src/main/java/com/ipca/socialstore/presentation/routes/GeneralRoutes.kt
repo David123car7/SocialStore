@@ -21,6 +21,9 @@ sealed class GeneralRoutes {
     object TestDocuments : GeneralRoutes()
 
     @Serializable
+    object NotificationHistory: GeneralRoutes()
+
+    @Serializable
     object ResetView : GeneralRoutes()
 
     @Serializable

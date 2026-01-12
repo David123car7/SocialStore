@@ -29,7 +29,7 @@ enum class DatabaseTables(val tableName: String) {
 
     NOTIFICATION_ADMIN("notification_admin"),
 
-    NOTIFICATION_BENEFICIARY("notification_beneficiary");
+    NOTIFICATION_BENEFICIARY("notification_user");
 
 
     override fun toString() = tableName

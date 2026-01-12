@@ -1,12 +1,15 @@
 package com.ipca.socialstore.domain.services.application
 
 import com.ipca.socialstore.data.enums.ApplicationStates
+import com.ipca.socialstore.data.enums.NotificationTypes
 import com.ipca.socialstore.data.models.ApplicationStateModel
 import com.ipca.socialstore.data.repository.ApplicationStateRepository
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
+import com.ipca.socialstore.domain.notificationUser.CreateUserNotificationUseCase
 import javax.inject.Inject
 
-class DenyApplicationService @Inject constructor(private val applicationStateRepository: ApplicationStateRepository){
+class DenyApplicationService @Inject constructor(
+    private val applicationStateRepository: ApplicationStateRepository){
     suspend operator fun invoke(appStateId: Int): ResultWrapper<Unit>{
         val appStateResult = applicationStateRepository.updateApplicationState(
             applicationState = ApplicationStateModel(

@@ -10,15 +10,16 @@ import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.ipca.socialstore.R
 import com.ipca.socialstore.data.repository.UserRepository
+import dagger.hilt.android.AndroidEntryPoint
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.auth
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class FirebaseMessagingService: FirebaseMessagingService() {
     @Inject
     lateinit var userRepository: UserRepository
@@ -26,10 +27,8 @@ class FirebaseMessagingService: FirebaseMessagingService() {
     lateinit var supabase: SupabaseClient
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
-        Log.d("Notification", "GG")
         super.onMessageReceived(remoteMessage)
 
-        // Extrair título e corpo
         val title = remoteMessage.notification?.title ?: "Loja Social"
         val body = remoteMessage.notification?.body ?: "Nova notificação"
 

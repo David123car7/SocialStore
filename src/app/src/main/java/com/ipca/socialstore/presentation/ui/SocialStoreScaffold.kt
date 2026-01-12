@@ -1,6 +1,5 @@
 package com.ipca.socialstore.presentation.ui
 
-import android.graphics.drawable.Icon
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -15,15 +14,10 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.ipca.socialstore.data.enums.UserRole
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Accessibility
-import androidx.compose.material.icons.filled.Assignment
-import androidx.compose.material.icons.filled.Camera
-import androidx.compose.material.icons.filled.Campaign
 import androidx.compose.material.icons.filled.FileOpen
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Schedule
-import androidx.compose.material.icons.filled.Storage
 import androidx.compose.material.icons.outlined.Assignment
 import androidx.compose.material.icons.outlined.Campaign
 import androidx.compose.material.icons.outlined.FileOpen
@@ -48,7 +42,9 @@ import com.ipca.socialstore.presentation.routes.GeneralRoutes
 import com.ipca.socialstore.presentation.ui.theme.SocialStoreTheme
 import com.ipca.socialstore.presentation.ui.theme.GreenIPCA
 import com.ipca.socialstore.R
-import com.ipca.socialstore.presentation.ui.theme.IconTint
+import com.ipca.socialstore.presentation.ui.notifications.NotificationItem
+import com.ipca.socialstore.presentation.ui.notifications.NotificationsContent
+import com.ipca.socialstore.presentation.ui.notifications.NotificationsView
 
 data class BottomNavItem(
     val icon: ImageVector,
@@ -169,14 +165,30 @@ fun SocialStoreScaffoldContent(
                         }) { Text("Entrar", fontWeight = FontWeight.Bold, color = Color.White)}
                     }
                     else {
-                        if (userRole == UserRole.ADMIN){
-                            IconButton(onClick = {navController.navigate(AdminRoutes.NotificationHistory)}) {
+                        var showNotifications by remember { mutableStateOf(false) }
+
+                        // Mock data for demonstration (Replace with your ViewModel data)
+                        val notifications = listOf(
+                            NotificationItem(
+                                "Pedido Aceito",
+                                "O seu pedido #123 foi aprovado.",
+                                "10 min"
+                            ),
+                            NotificationItem("Novo Evento", "Workshop de Android amanhã.", "1h atrás"),
+                            NotificationItem("Alerta", "A sua sessão vai expirar em breve.", "2h atrás")
+                        )
+
+                        // BOX is crucial here to anchor the menu to the Icon
+                        Box {
+                            IconButton(onClick = { showNotifications = true }) {
                                 Icon(
                                     imageVector = Icons.Default.Notifications,
                                     contentDescription = "Notificações",
                                     tint = Color.White
                                 )
                             }
+
+                            NotificationsView(navController = navController, userRole = userRole)
                         }
                     }
                 }
