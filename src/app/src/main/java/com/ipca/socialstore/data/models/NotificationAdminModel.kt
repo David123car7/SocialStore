@@ -10,8 +10,10 @@ class NotificationAdminModel(
     val tittle: String,
     @SerialName("description")
     val description: String,
-    @SerialName("sended")
-    val sended: Boolean,
+    @SerialName("read")
+    val read: Boolean,
+    @SerialName("type")
+    val type: String,
     @SerialName("created_at")
     val created_at: String,
 )

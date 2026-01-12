@@ -11,7 +11,7 @@ class NotificationBeneficiaryModel(
     @SerialName("description")
     val description: String,
     @SerialName("sended")
-    val sended: Boolean,
+    val read: Boolean,
     @SerialName("created_at")
     val created_at: String,
     @SerialName("beneficiary_id")

@@ -5,12 +5,14 @@ import androidx.annotation.RequiresApi
 import com.ipca.socialstore.R
 import com.ipca.socialstore.data.enums.ApplicationDataStatus
 import com.ipca.socialstore.data.enums.ApplicationStates
+import com.ipca.socialstore.data.enums.NotificationTypes
 import com.ipca.socialstore.data.enums.UserRole
 import com.ipca.socialstore.data.exceptions.AppError
 import com.ipca.socialstore.data.models.AcademicModel
 import com.ipca.socialstore.data.models.ApplicationDataStateModel
 import com.ipca.socialstore.data.models.ApplicationModel
 import com.ipca.socialstore.data.models.ApplicationStateModel
+import com.ipca.socialstore.data.models.NotificationAdminModel
 import com.ipca.socialstore.data.models.ScholarshipModel
 import com.ipca.socialstore.data.pdfbox.PdfGenerator
 import com.ipca.socialstore.data.repository.AcademicRepository
@@ -18,6 +20,7 @@ import com.ipca.socialstore.data.repository.ApplicationDataStateRepository
 import com.ipca.socialstore.data.repository.ApplicationRepository
 import com.ipca.socialstore.data.repository.ApplicationStateRepository
 import com.ipca.socialstore.data.repository.AuthRepository
+import com.ipca.socialstore.data.repository.NotificationAdminRepository
 import com.ipca.socialstore.data.repository.NotificationRepository
 import com.ipca.socialstore.data.repository.ScholarshipRepository
 import com.ipca.socialstore.data.repository.UserRepository
@@ -35,7 +38,7 @@ class CreateApplicationService @Inject constructor(
     private val createAllAppDocTypesUseCase: CreateAllAppDocTypesUseCase,
     private val applicationDataStateRepository: ApplicationDataStateRepository,
     private val scholarshipRepository: ScholarshipRepository,
-    private val notificationRepository: NotificationRepository) {
+    private val notificationAdminRepository: NotificationAdminRepository) {
     suspend operator fun invoke(applicationModel: ApplicationModel, academicModel: AcademicModel?, scholarshipModel: ScholarshipModel?): ResultWrapper<Int> {
         val emailResult = authRepository.getUserEmail()
         if (emailResult is ResultWrapper.Error) return ResultWrapper.Error(emailResult.error)
@@ -118,6 +121,16 @@ class CreateApplicationService @Inject constructor(
 
         val docTypesResult = createAllAppDocTypesUseCase(applicationId = applicationId)
         if(docTypesResult is ResultWrapper.Error) return ResultWrapper.Error(docTypesResult.error)
+
+
+        notificationAdminRepository.createNotification(notification =
+            NotificationAdminModel(
+                tittle = "Candidatura criada",
+                description = "Candidatura submetida pelo ${applicationModel.name}",
+                read = false,
+                created_at = currentDate,
+                type = NotificationTypes.APPLICATION.type)
+        )
 
         return applicationResult
     }

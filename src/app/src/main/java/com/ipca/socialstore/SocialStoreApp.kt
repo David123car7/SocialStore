@@ -7,7 +7,6 @@ import androidx.work.Configuration
 import androidx.work.WorkManager
 import androidx.work.WorkerFactory
 import com.ipca.socialstore.Work.StockWorkManager
-import com.ipca.socialstore.Work.scheduling.AdminNotificationManager
 import com.ipca.socialstore.Work.scheduling.AdminSchedulingManager
 import com.tom_roush.pdfbox.android.PDFBoxResourceLoader
 import dagger.hilt.android.HiltAndroidApp
