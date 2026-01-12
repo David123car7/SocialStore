@@ -5,10 +5,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.Badge
 import androidx.compose.material.icons.outlined.CreditCard
 import androidx.compose.material.icons.outlined.DateRange
+import androidx.compose.material.icons.outlined.EuroSymbol
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Phone
+import androidx.compose.material.icons.outlined.School
 import androidx.compose.material3.Button
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
@@ -222,7 +225,7 @@ fun ApplicationForm(
                     modifier = Modifier,
                     label = "Nome do Curso",
                     value = academicCourseName,
-                    icon = Icons.Default.Star,
+                    icon = Icons.Outlined.School,
                     onValueUpdate = onAcademicCourseChange
                 )
 
@@ -230,7 +233,7 @@ fun ApplicationForm(
                     modifier = Modifier,
                     label = "Numero de Estudante",
                     value = academicStudentNumber,
-                    icon = Icons.Default.Star,
+                    icon = Icons.Outlined.Badge,
                     onValueUpdate = onAcademicNumberChange
                 )
             }
@@ -269,7 +272,7 @@ fun ApplicationForm(
                     modifier = Modifier,
                     label = "Valor",
                     value = scholarShipValue,
-                    icon = Icons.Default.Star,
+                    icon = Icons.Outlined.EuroSymbol,
                     onValueUpdate = onScholarShipValueUpdate
                 )
             }
