@@ -144,7 +144,7 @@ fun BeneficiaryManagementContent(
             title = "Faltas / Justificações",
             icon = Icons.Outlined.Warning,
             iconColor = Color(0xFFF55F5F),
-            badgeText = "${uiState.cancel ?: 0} Pendentes",
+            badgeText = "${uiState.cancel ?: 0} ",
             badgeColor = Color(0xFFFFD3D5),
             badgeTextColor = Color(0xFFC62828),
             isExpanded = expandedSection == "faltas",
@@ -159,13 +159,13 @@ fun BeneficiaryManagementContent(
                 Text("Faltas", style = MaterialTheme.typography.labelSmall, color = Color.Gray)
                 Spacer(modifier = Modifier.height(12.dp))
 
-                uiState.scheduling?.filter { it.state == "canceled" || it.state == "justified" }?.take(3)?.forEachIndexed { index, item ->
+                uiState.scheduling?.filter { it.state == "decline" || it.state == "justified" }?.take(3)?.forEachIndexed { index, item ->
                     SchedulingItem(date = item.schedulingDate)
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
                 Button(
-                    onClick = { /* Navegação para histórico */ },
+                    onClick = {onMoreScheduling() },
                     modifier = Modifier.fillMaxWidth().height(45.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE0E0E0)),
                     shape = RoundedCornerShape(10.dp)
@@ -195,7 +195,6 @@ fun BeneficiaryManagementContent(
         }
 
         if (uiState.declined?.isNotEmpty() == true){
-            println(uiState.declined)
             ManagementSectionCard(
                 title = "Recusados/Por Aceitar",
                 icon = Icons.Default.Notifications,

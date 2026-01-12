@@ -50,6 +50,13 @@ class ListAllSchedulingUserViewModel @Inject constructor(
         }
     }
 
+    fun refreshData() {
+        if (beneficiaryId == null || beneficiaryId == "null") {
+            getBeneficiary()
+        } else {
+            getBeneficiaryById()
+        }
+    }
     fun fetchInfo(){
         println(beneficiaryId)
         uiState.value = uiState.value.copy(isLoading = true, error = null)
@@ -108,7 +115,6 @@ class ListAllSchedulingUserViewModel @Inject constructor(
 
 
     fun getBeneficiary(){
-        println("estou ca")
         uiState.value = uiState.value.copy(isLoading = true, error = null)
         viewModelScope.launch {
             val result = getBeneficiaryByUidUseCase()
@@ -139,7 +145,7 @@ class ListAllSchedulingUserViewModel @Inject constructor(
     fun selectListCanceled(){
         val schedules = uiState.value.scheduling
         uiState.value = uiState.value.copy(
-            showList = schedules.filter { it.state == "canceled" },
+            showList = schedules.filter { it.state == "decline" },
         )
     }
 

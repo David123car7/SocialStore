@@ -5,6 +5,7 @@ import com.ipca.socialstore.data.enums.DatabaseTables
 import com.ipca.socialstore.data.exceptions.AppError
 import com.ipca.socialstore.data.exceptions.ExceptionMapper
 import com.ipca.socialstore.data.helpers.from
+import com.ipca.socialstore.data.models.BeneficiaryModel
 import com.ipca.socialstore.data.models.SchedulingModel
 import com.ipca.socialstore.data.models.TableIdModel
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
@@ -83,6 +84,8 @@ class SchedulingRepository @Inject constructor(
         }
     }
 
+
+
     suspend fun getSchedulingByBeneficiaryId(id: Int): ResultWrapper<List<SchedulingModel>>{
         return try {
             val result = supabase.from(DatabaseTables.SCHEDULING)
@@ -100,19 +103,22 @@ class SchedulingRepository @Inject constructor(
 
     suspend fun updateReason(schedulingId: Int, newReason: String): ResultWrapper<SchedulingModel> {
         return try {
-            val result = supabase.from(DatabaseTables.SCHEDULING)
+            supabase.from(DatabaseTables.SCHEDULING)
                 .update(
                     {
                         set("reason", newReason)
                         set("state", "justified")
                     }
                 ) {
-                    filter {
-                        eq("id", schedulingId)
-                    }
+                    filter { eq("id", schedulingId) }
+                }
+
+            val updatedItem = supabase.from(DatabaseTables.SCHEDULING)
+                .select() {
+                    filter { eq("id", schedulingId) }
                 }.decodeSingle<SchedulingModel>()
 
-            ResultWrapper.Success(result)
+            ResultWrapper.Success(updatedItem)
         } catch (e: Exception) {
             ResultWrapper.Error(exceptionMapper.map(e))
         }
@@ -188,6 +194,7 @@ class SchedulingRepository @Inject constructor(
 
     suspend fun declineSchedulingDate(schedulingId : Int, reason : String) : ResultWrapper<SchedulingModel>{
         return try {
+            // 1. Atualiza o agendamento e obtém os dados do mesmo (incluindo o beneficiary_id)
             val result = supabase.from(DatabaseTables.SCHEDULING)
                 .update(
                     {
@@ -199,8 +206,33 @@ class SchedulingRepository @Inject constructor(
                     select()
                 }.decodeSingle<SchedulingModel>()
 
+            // 2. Agora que temos o result, sabemos o ID do beneficiário
+            val beneficiaryId = result.beneficiaryId
+
+            // 3. Vamos buscar o contador atual do beneficiário
+            val currentBeneficiary = supabase.from(DatabaseTables.BENEFICIARY)
+                .select {
+                    filter { eq("id", beneficiaryId) }
+                }.decodeSingle<BeneficiaryModel>()
+
+            // 4. Incrementamos o valor (tratando o NULL da imagem como 0)
+            val newCount = (currentBeneficiary.missedAppointments ?: 0) + 1
+
+            // 5. Atualizamos a tabela do beneficiário com o nome exato da coluna da BD
+            supabase.from(DatabaseTables.BENEFICIARY)
+                .update(
+                    {
+                        set("missed_appointments", newCount)
+                    }
+                ) {
+                    filter { eq("id", beneficiaryId) }
+                }
+
+            // 6. Retornamos o agendamento atualizado com sucesso
             ResultWrapper.Success(result)
+
         } catch (e: Exception) {
+            Log.e("App Debug", "Erro ao recusar agendamento: ${e.message}")
             ResultWrapper.Error(exceptionMapper.map(e))
         }
     }
@@ -230,5 +262,38 @@ class SchedulingRepository @Inject constructor(
         } catch (e: Exception) { }
     }
 
+    suspend fun adminAcceptJustification(schedulingId: Int): ResultWrapper<SchedulingModel> {
+
+        return try {
+            val updatedScheduling = supabase.from(DatabaseTables.SCHEDULING)
+                .update({
+                    set("state", "justified")
+                }) {
+                    filter { eq("id", schedulingId) }
+                    select()
+                }.decodeSingle<SchedulingModel>()
+
+            val beneficiaryId = updatedScheduling.beneficiaryId
+
+            val beneficiary = supabase.from(DatabaseTables.BENEFICIARY)
+                .select {
+                    filter { eq("id", beneficiaryId) }
+                }.decodeSingle<BeneficiaryModel>()
+
+            val currentMissed = beneficiary.missedAppointments ?: 0
+            val newCount = if (currentMissed > 0) currentMissed - 1 else 0
+            supabase.from(DatabaseTables.BENEFICIARY)
+                .update({
+                    set("missed_appointments", newCount)
+                }) {
+                    filter { eq("id", beneficiaryId) }
+                }
+
+            ResultWrapper.Success(updatedScheduling)
+        } catch (e: Exception) {
+            Log.e("App Debug", "Erro ao aceitar justificação: ${e.message}")
+            ResultWrapper.Error(exceptionMapper.map(e))
+        }
+    }
 
 }

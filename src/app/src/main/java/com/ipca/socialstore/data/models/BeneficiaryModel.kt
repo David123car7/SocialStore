@@ -14,5 +14,9 @@ data class BeneficiaryModel(
     val birthDate : String,
     @SerialName("academic_id")
     val academicId : Int?,
+    @SerialName("missed_appointments")
+    val missedAppointments: Int? = 0,
+    @SerialName("state")
+    val state : String? = "on_Day"
 )
 
