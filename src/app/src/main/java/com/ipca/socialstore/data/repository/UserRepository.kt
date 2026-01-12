@@ -1,5 +1,6 @@
 package com.ipca.socialstore.data.repository
 
+import android.annotation.SuppressLint
 import com.ipca.socialstore.data.enums.DatabaseTables
 import com.ipca.socialstore.data.enums.UnknownError
 import com.ipca.socialstore.data.enums.UserRole
@@ -19,6 +20,7 @@ import javax.inject.Inject
 
 class UserRepository @Inject constructor(private val supabase: SupabaseClient, private val exceptionMapper: ExceptionMapper){
 
+    @SuppressLint("SuspiciousIndentation")
     suspend fun getUserRole(): ResultWrapper<UserRole> {
         return try {
             val userId = supabase.auth.currentUserOrNull()?.id
@@ -54,6 +56,23 @@ class UserRepository @Inject constructor(private val supabase: SupabaseClient, p
             ResultWrapper.Success(userResult.id)
         }
         catch (e: Exception) {
+            ResultWrapper.Error(exceptionMapper.map(e))
+        }
+    }
+
+    suspend fun saveFcmToken(userId: String, token: String): ResultWrapper<Unit> {
+        return try {
+            supabase.from(DatabaseTables.USER).update(
+                {
+                    set("fcm_token", token)
+                }
+            ) {
+                filter {
+                    eq("id", userId)
+                }
+            }
+            ResultWrapper.Success(Unit)
+        } catch (e: Exception) {
             ResultWrapper.Error(exceptionMapper.map(e))
         }
     }

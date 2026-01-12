@@ -29,7 +29,7 @@ class RegisterUseCase @Inject constructor(
         if(registerResult is ResultWrapper.Error) return ResultWrapper.Error(error = registerResult.error)
         val newUserId = (registerResult as ResultWrapper.Success).data
 
-        val user = UserModel(id = newUserId, role = UserRole.DEFAULT.value,  applicationId = null,beneficiaryId = null)
+        val user = UserModel(id = newUserId, role = UserRole.DEFAULT.value,  applicationId = null,beneficiaryId = null, fcmToken = null)
         return userRepository.createUser(user)
     }
 }

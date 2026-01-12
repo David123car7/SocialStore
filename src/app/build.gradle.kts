@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     id("com.google.dagger.hilt.android")
     id("com.google.devtools.ksp")
+    id("com.google.gms.google-services")
     kotlin("plugin.serialization") version "2.2.21"
 }
 
@@ -123,6 +124,10 @@ dependencies {
 
     //BarCode Scanner
     implementation("com.google.android.gms:play-services-code-scanner:16.1.0")
+
+    // Importar a BOM do Firebase
+    implementation(platform("com.google.firebase:firebase-bom:32.7.0"))
+    implementation("com.google.firebase:firebase-messaging")
 }
 
 

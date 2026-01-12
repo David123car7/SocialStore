@@ -16,4 +16,7 @@ data class UserModel(
 
     @SerialName("beneficiary_id")
     val beneficiaryId : Int?,
+
+    @SerialName("fcm_token")
+    val fcmToken: String?,
 )

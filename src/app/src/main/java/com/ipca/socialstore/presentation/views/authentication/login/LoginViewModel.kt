@@ -1,10 +1,14 @@
 package com.ipca.socialstore.presentation.views.authentication.login
 
+import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.messaging.FirebaseMessaging
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
+import com.ipca.socialstore.domain.auth.GetUserIdUseCase
 import com.ipca.socialstore.domain.auth.LoginUseCase
+import com.ipca.socialstore.domain.usecases.user.SetUserTokenUseCase
 import com.ipca.socialstore.presentation.utils.errors.ErrorText
 import com.ipca.socialstore.presentation.utils.errors.asUiText
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -21,7 +25,9 @@ data class LoginState (
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val loginUseCase: LoginUseCase): ViewModel() {
+    private val loginUseCase: LoginUseCase,
+    private val getUserIdUseCase: GetUserIdUseCase,
+    private val setUserTokenUseCase: SetUserTokenUseCase): ViewModel() {
     var uiState = mutableStateOf(LoginState())
 
     fun updateEmail(email : String) {
@@ -43,6 +49,7 @@ class LoginViewModel @Inject constructor(
                         isLoading = false,
                         isLoggedIn = true
                     )
+                    updateToken()
                 }
                 is ResultWrapper.Error -> {
                     uiState.value = uiState.value.copy(
@@ -51,6 +58,25 @@ class LoginViewModel @Inject constructor(
                         error = result.error.asUiText()
                     )
                 }
+            }
+        }
+    }
+
+    private fun updateToken() {
+        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+            if (!task.isSuccessful) {
+                Log.w("FCM", "Falha ao obter token", task.exception)
+                return@addOnCompleteListener
+            }
+            val token = task.result
+
+            val userResult = getUserIdUseCase()
+            if(userResult is ResultWrapper.Success){
+                val userId = userResult.data
+                viewModelScope.launch {
+                    setUserTokenUseCase(userId, token)
+                }
+                Log.d("FCM", "Token enviado para a BD: $token")
             }
         }
     }

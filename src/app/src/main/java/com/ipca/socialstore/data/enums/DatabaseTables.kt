@@ -25,7 +25,12 @@ enum class DatabaseTables(val tableName: String) {
 
     DELIVERY("deliveries"),
 
-    DELIVERY_ITEMS("delivery_items");
-	
+    DELIVERY_ITEMS("delivery_items"),
+
+    NOTIFICATION_ADMIN("notification_admin"),
+
+    NOTIFICATION_BENEFICIARY("notification_beneficiary");
+
+
     override fun toString() = tableName
 }
