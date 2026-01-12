@@ -21,10 +21,9 @@ class AcceptApplicationService @Inject constructor(
     private val applicationStateRepository: ApplicationStateRepository,
     private val beneficiaryRepository: BeneficiaryRepository,
     private val authRepository: AuthRepository,
-    private val userRepository: UserRepository,
-    private val createInitialNotificationUseCase: CreateInitialNotificationUseCase){
+    private val userRepository: UserRepository){
     suspend operator fun invoke(application: ApplicationModel): ResultWrapper<Unit>{
-        val uidResult = authRepository.getUserUid()
+        val uidResult = authRepository.getUserUidByApplicationId(appId = application.id!!)
         if (uidResult is ResultWrapper.Error) return ResultWrapper.Error(uidResult.error)
         val uid = (uidResult as ResultWrapper.Success).data
 
@@ -55,19 +54,6 @@ class AcceptApplicationService @Inject constructor(
         val userBenIdResult = userRepository.setBeneficiaryId(uid = uid, beneficiaryId = benificiaryId)
         if(userBenIdResult is ResultWrapper.Error)
             return ResultWrapper.Error(userBenIdResult.error)
-
-        val uniqueKey = "${application.id}_${benificiaryId}"
-        val notification = NotificationScheduledModel(
-            subject = "A sua candidatura foi aceite",
-            isRead = false,
-            title = "Candidatura",
-            notificationKey = uniqueKey,
-            beneficiaryId = benificiaryId
-        )
-        val createNotificationResult = createInitialNotificationUseCase(notification)
-        if (createNotificationResult is ResultWrapper.Error) {
-            println("Erro ao criar notificação: ${createNotificationResult.error}")
-        }
 
         return ResultWrapper.Success(Unit)
     }

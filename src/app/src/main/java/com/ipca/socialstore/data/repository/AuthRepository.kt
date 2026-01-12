@@ -1,7 +1,11 @@
 package com.ipca.socialstore.data.repository
 
+import com.ipca.socialstore.data.enums.DatabaseTables
 import com.ipca.socialstore.data.exceptions.AppError
 import com.ipca.socialstore.data.exceptions.ExceptionMapper
+import com.ipca.socialstore.data.helpers.from
+import com.ipca.socialstore.data.models.NotificationAdminModel
+import com.ipca.socialstore.data.models.UserModel
 import com.ipca.socialstore.data.resultwrappers.ResultFlowWrapper
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
 import io.github.jan.supabase.SupabaseClient
@@ -59,6 +63,19 @@ class AuthRepository @Inject constructor(
             ResultWrapper.Success(user.id)
         }
         catch (e: Exception) {
+            ResultWrapper.Error(exceptionMapper.map(e))
+        }
+    }
+
+    suspend fun getUserUidByApplicationId(appId: Int): ResultWrapper<String>{
+        return try {
+            val result = supabase.from(DatabaseTables.USER).select {
+                filter {
+                    eq("application_id", appId)
+                }
+            }.decodeSingle<UserModel>()
+            ResultWrapper.Success(result.id!!)
+        } catch (e: Exception) {
             ResultWrapper.Error(exceptionMapper.map(e))
         }
     }

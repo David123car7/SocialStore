@@ -190,6 +190,7 @@ class ApplicationStateAdminViewModel @Inject constructor(
         viewModelScope.launch {
             uiState.value = uiState.value.copy(isLoading = true)
             val app = ApplicationModel(
+                id = uiState.value.application.id,
                 name = uiState.value.application.name,
                 schoolYear = uiState.value.application.schoolYear,
                 cc = uiState.value.application.cc,
