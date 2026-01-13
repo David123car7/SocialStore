@@ -93,7 +93,7 @@ fun SchedulingManagementContent(
             .padding(top = 18.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        IntroductionComponent(tittle = "Gestão de Faltas")
+        IntroductionComponent(tittle = "Beneficiarios")
 
         SearchBarContent(
             modifier = Modifier.padding(15.dp),

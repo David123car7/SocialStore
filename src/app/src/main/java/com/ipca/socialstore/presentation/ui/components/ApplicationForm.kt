@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.School
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.Badge
 import androidx.compose.material.icons.outlined.CreditCard
@@ -218,7 +219,8 @@ fun ApplicationForm(
                     onOptionSelected = { newEnum -> onAcademicTypeChange(newEnum.label) },
                     options = TypeCourse.entries,
                     label = "Curso",
-                    getLabel = { it.label }
+                    getLabel = { it.label },
+                    icon = Icons.Outlined.School
                 )
 
                 TextFieldStringComponent(

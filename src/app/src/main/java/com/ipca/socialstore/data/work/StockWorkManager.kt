@@ -1,17 +1,15 @@
-package com.ipca.socialstore.Work
+package com.ipca.socialstore.data.work
 
 import android.content.Context
-import androidx.work.BackoffPolicy
 import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.PeriodicWorkRequest
 
 
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
-import androidx.work.WorkRequest
+import java.util.Calendar
 import java.util.concurrent.TimeUnit
 
 class StockWorkManager(private val context: Context) {
@@ -24,16 +22,16 @@ class StockWorkManager(private val context: Context) {
     }
 
     fun notificationExpirationDate() {
-        val calendar = java.util.Calendar.getInstance()
+        val calendar = Calendar.getInstance()
         val now = calendar.timeInMillis
 
-        val nextTenAM = java.util.Calendar.getInstance().apply {
-            set(java.util.Calendar.HOUR_OF_DAY, 1)
-            set(java.util.Calendar.MINUTE, 20)
-            set(java.util.Calendar.SECOND, 0)
+        val nextTenAM = Calendar.getInstance().apply {
+            set(Calendar.HOUR_OF_DAY, 1)
+            set(Calendar.MINUTE, 20)
+            set(Calendar.SECOND, 0)
 
             if (timeInMillis <= now) {
-                add(java.util.Calendar.DAY_OF_MONTH, 1)
+                add(Calendar.DAY_OF_MONTH, 1)
             }
         }
 

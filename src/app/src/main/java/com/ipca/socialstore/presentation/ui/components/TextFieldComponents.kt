@@ -215,19 +215,20 @@ fun <T> SocialStoreDropdown(
     onOptionSelected: (T) -> Unit,
     options: List<T>,           // Nova: A lista de opções
     label: String,              // Nova: O texto "Tipo de Pedido"
-    getLabel: (T) -> String     // Nova: Como extrair o texto de cada opção
+    getLabel: (T) -> String,     // Nova: Como extrair o texto de cada opção
+    icon: ImageVector,
 ) {
     ExposedDropdownMenuBox(
         expanded = expanded,
         onExpandedChange = onExpandedChange,
-        modifier = modifier.fillMaxWidth()
+        modifier = modifier.fillMaxWidth(),
     ) {
         OutlinedTextField(
             value = if (selectedOption != null) getLabel(selectedOption) else "",
             onValueChange = {},
             readOnly = true,
             label = { Text(label) },
-            leadingIcon = { Icon(Icons.Default.Star, contentDescription = null) },
+            leadingIcon = { Icon(icon, contentDescription = null) },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
             colors = OutlinedTextFieldDefaults.colors(),
             modifier = Modifier
