@@ -1,10 +1,8 @@
-package com.ipca.socialstore.Work
+package com.ipca.socialstore.data.work
 
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 
 
 class BootReceiver : BroadcastReceiver() {
