@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -13,10 +14,17 @@ import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.icons.Icons
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.Campaign
 import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.Mail
 import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.outlined.Schedule
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -32,12 +40,16 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.ipca.socialstore.data.enums.UserRole
+import com.ipca.socialstore.presentation.models.NotificationReceiverModel
 import com.ipca.socialstore.presentation.routes.BeneficiaryRoutes
 import com.ipca.socialstore.presentation.routes.GeneralRoutes
 import com.ipca.socialstore.presentation.ui.components.DashboardCard
 import com.ipca.socialstore.presentation.ui.theme.SocialStoreTheme
 import com.ipca.socialstore.presentation.utils.navigation.NavigationLogic
+import com.ipca.socialstore.presentation.views.home.adminHome.ActivityListSection
+import com.ipca.socialstore.presentation.views.home.adminHome.ActivityRow
 import com.ipca.socialstore.presentation.views.home.adminHome.DashboardMenuItem
+import com.ipca.socialstore.presentation.views.home.adminHome.getIconForType
 
 data class BeneficiaryMenuItem(
     val id: Int,
@@ -68,6 +80,16 @@ fun BeneficiaryHomeView(modifier: Modifier, navController: NavController,userRol
                 userRole = userRole,
                 route = BeneficiaryRoutes.Profile
             )
+        },
+        onClickCampaign = {
+
+        },
+        onClickSchedule = {
+            NavigationLogic.navigateTo(
+                navController = navController,
+                userRole = userRole,
+                route = BeneficiaryRoutes.Scheduling::class.qualifiedName!!
+            )
         }
     )
 }
@@ -77,12 +99,14 @@ fun BeneficiaryHomeView(modifier: Modifier, navController: NavController,userRol
     modifier: Modifier,
     uiState: BeneficiaryHomeState,
     onClickDocuments:() -> Unit,
-    onClickProfile:() -> Unit){
+    onClickProfile:() -> Unit,
+    onClickCampaign:() -> Unit,
+    onClickSchedule:() -> Unit){
         val menuItems = listOf(
             BeneficiaryMenuItem(1, "Documentos", Icons.Outlined.Add, onClick = onClickDocuments),
             BeneficiaryMenuItem(2, "Dados Pessoais", Icons.Outlined.Person, onClick = onClickProfile),
-            BeneficiaryMenuItem(3, "Mensagens", Icons.Outlined.Mail, onClick = {}),
-            BeneficiaryMenuItem(4, "Historico", Icons.Outlined.History, onClick = {}),
+            BeneficiaryMenuItem(3, "Campanhas", Icons.Outlined.Campaign, onClick = onClickCampaign),
+            BeneficiaryMenuItem(4, "Agendamentos", Icons.Outlined.Schedule, onClick = onClickSchedule),
         )
 
         LazyVerticalGrid(
@@ -123,8 +147,57 @@ fun BeneficiaryHomeView(modifier: Modifier, navController: NavController,userRol
                     onClick = item.onClick
                 )
             }
+
+            item(span = { GridItemSpan(2) }) {
+                Spacer(Modifier.height(8.dp))
+                Text(
+                    "Últimas Atividades",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+            item(span = { GridItemSpan(2) }) {
+                ActivityListSection(notifications = uiState.notifications)
+            }
         }
     }
+
+@Composable
+fun ActivityListSection(
+    notifications: List<NotificationReceiverModel>
+) {
+    Card(
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFF3F2F4)), // Light Gray
+        shape = RoundedCornerShape(16.dp),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            if (notifications.isEmpty()) {
+                Text(
+                    text = "Nenhuma atividade recente",
+                    modifier = Modifier.padding(8.dp),
+                    color = Color.Gray
+                )
+            } else {
+                notifications.forEachIndexed { index, notification ->
+                    ActivityRow(
+                        icon = getIconForType(notification.type),
+                        title = notification.tittle, // Ensure your model has 'title' corrected from 'tittle'
+                        time = notification.created_at // You may want to parse/format this date string
+                    )
+
+                    // Add Divider only if it is NOT the last item
+                    if (index < notifications.size - 1) {
+                        Divider(
+                            modifier = Modifier.padding(vertical = 12.dp),
+                            color = Color.LightGray.copy(alpha = 0.5f)
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
 
 @Preview(showBackground = true)
 @Composable

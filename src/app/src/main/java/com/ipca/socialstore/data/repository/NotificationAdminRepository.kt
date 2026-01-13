@@ -4,9 +4,9 @@ import com.ipca.socialstore.data.enums.DatabaseTables
 import com.ipca.socialstore.data.exceptions.ExceptionMapper
 import com.ipca.socialstore.data.helpers.from
 import com.ipca.socialstore.data.models.NotificationAdminModel
-import com.ipca.socialstore.data.models.NotificationBeneficiaryModel
 import com.ipca.socialstore.data.models.TableIdModel
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
+import com.ipca.socialstore.presentation.models.NotificationReceiverModel
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.postgrest.query.Columns
 import javax.inject.Inject
@@ -26,28 +26,81 @@ class NotificationAdminRepository @Inject constructor(
         }
     }
 
-    suspend fun getNotificationsUnsended(): ResultWrapper<List<NotificationAdminModel>> {
+    suspend fun getAllNotifications(): ResultWrapper<List<NotificationReceiverModel>> {
         return try {
             val result = supabase.from(DatabaseTables.NOTIFICATION_ADMIN).select {
-                filter {
-                    eq("sended", false)
-                }
-            }.decodeList<NotificationAdminModel>()
+            }.decodeList<NotificationReceiverModel>()
             ResultWrapper.Success(result)
         } catch (e: Exception) {
             ResultWrapper.Error(exceptionMapper.map(e))
         }
     }
 
-    suspend fun markNotificationAsSent(notificationId: Int): ResultWrapper<Unit> {
+    suspend fun getAllNotifications(limit: Int): ResultWrapper<List<NotificationReceiverModel>> {
+        return try {
+            val result = supabase.from(DatabaseTables.NOTIFICATION_ADMIN).select {
+                limit(limit.toLong())
+            }.decodeList<NotificationReceiverModel>()
+            ResultWrapper.Success(result)
+        } catch (e: Exception) {
+            ResultWrapper.Error(exceptionMapper.map(e))
+        }
+    }
+
+    suspend fun getNotificationsUnread(): ResultWrapper<List<NotificationReceiverModel>> {
+        return try {
+            val result = supabase.from(DatabaseTables.NOTIFICATION_ADMIN).select {
+                filter {
+                    eq("read", false)
+                }
+            }.decodeList<NotificationReceiverModel>()
+            ResultWrapper.Success(result)
+        } catch (e: Exception) {
+            ResultWrapper.Error(exceptionMapper.map(e))
+        }
+    }
+
+    suspend fun getNotificationsUnread(limit: Int): ResultWrapper<List<NotificationReceiverModel>> {
+        return try {
+            val result = supabase.from(DatabaseTables.NOTIFICATION_ADMIN).select {
+                filter {
+                    eq("read", false)
+                }
+                // Add the limit here. Note: It usually expects a Long.
+                limit(limit.toLong())
+            }.decodeList<NotificationReceiverModel>()
+            ResultWrapper.Success(result)
+        } catch (e: Exception) {
+            ResultWrapper.Error(exceptionMapper.map(e))
+        }
+    }
+
+    suspend fun markNotificationAsRead(notificationId: Int): ResultWrapper<Unit> {
         return try {
             supabase.from(DatabaseTables.NOTIFICATION_ADMIN).update(
                 {
-                    set("sended", true)
+                    set("read", true)
                 }
             ) {
                 filter {
                     eq("id", notificationId)
+                }
+            }
+            ResultWrapper.Success(Unit)
+        } catch (e: Exception) {
+            ResultWrapper.Error(exceptionMapper.map(e))
+        }
+    }
+
+    suspend fun markNotificationListAsRead(notificationIds: List<Int>): ResultWrapper<Unit> {
+        return try {
+            supabase.from(DatabaseTables.NOTIFICATION_ADMIN).update(
+                {
+                    set("read", true)
+                }
+            ) {
+                filter {
+                    isIn("id", notificationIds)
                 }
             }
             ResultWrapper.Success(Unit)

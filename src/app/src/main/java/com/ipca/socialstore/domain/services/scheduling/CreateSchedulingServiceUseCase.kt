@@ -29,7 +29,6 @@ class CreateSchedulingServiceUseCase @Inject constructor(
 
             val schedulingResult = createSchedulingUseCase(newScheduling)
 
-
             val createdScheduling = when (schedulingResult) {
                 is ResultWrapper.Success -> schedulingResult.data
                 is ResultWrapper.Error -> return ResultWrapper.Error(schedulingResult.error)

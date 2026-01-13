@@ -101,7 +101,6 @@ dependencies {
     implementation("io.github.jan-tennert.supabase:realtime-kt")
     implementation("io.github.jan-tennert.supabase:functions-kt")
 
-
     // Ktor 3.x (compatível com Supabase)
     implementation("io.ktor:ktor-client-core:3.3.2")
     implementation("io.ktor:ktor-client-android:3.3.2") // para Android

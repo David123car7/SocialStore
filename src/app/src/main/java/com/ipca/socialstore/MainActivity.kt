@@ -168,8 +168,8 @@ class MainActivity : ComponentActivity() {
                         ) {
                             ApplicationStateAdminView(modifier = Modifier.padding(innerPadding), navController = navController, userRole = mainState.userRole)
                         }
-                        composable <AdminRoutes.NotificationHistory>{
-                            NotificationHistoryView(modifier = Modifier.padding(innerPadding), navController = navController)
+                        composable <GeneralRoutes.NotificationHistory>{
+                            NotificationHistoryView(modifier = Modifier.padding(innerPadding), navController = navController, userRole = mainState.userRole)
                         }
                         composable <AdminRoutes.SchedulingMainPage>{
                             SchedulingMainPageView(modifier = Modifier.padding(innerPadding), navController = navController)

@@ -16,6 +16,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -25,8 +26,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.ipca.socialstore.data.enums.NotificationTypes
 import com.ipca.socialstore.data.enums.UserRole
+import com.ipca.socialstore.presentation.models.NotificationReceiverModel
 import com.ipca.socialstore.presentation.routes.AdminRoutes
 import com.ipca.socialstore.presentation.ui.components.DashboardCard
 import com.ipca.socialstore.presentation.utils.navigation.NavigationLogic
@@ -40,8 +44,12 @@ data class DashboardMenuItem(
 
 @Composable
 fun AdminHomeView(modifier: Modifier, navController: NavController, userRole: UserRole){
+    val viewModel: AdminHomeViewModel = hiltViewModel()
+    val uiState by viewModel.uiState
+
     AdminHomeContent(
         modifier = modifier,
+        uiState = uiState,
         navigateTo = { route ->
             NavigationLogic.navigateTo(
                 navController = navController,
@@ -52,7 +60,10 @@ fun AdminHomeView(modifier: Modifier, navController: NavController, userRole: Us
     )
 }
 @Composable
-fun AdminHomeContent(modifier: Modifier, navigateTo: (route: Any) -> Unit) {
+fun AdminHomeContent(
+    modifier: Modifier,
+    uiState: AdminHomeState,
+    navigateTo: (route: Any) -> Unit) {
 
     val menuItems = listOf(
         DashboardMenuItem(1, "Candidaturas", Icons.Outlined.Description, onClick = {navigateTo(AdminRoutes.ListApplications)}),
@@ -97,42 +108,54 @@ fun AdminHomeContent(modifier: Modifier, navigateTo: (route: Any) -> Unit) {
             )
         }
         item(span = { GridItemSpan(2) }) {
-            ActivityListSection()
+            ActivityListSection(notifications = uiState.notifications)
         }
     }
 }
 
 @Composable
-fun ActivityListSection() {
+fun ActivityListSection(
+    notifications: List<NotificationReceiverModel>
+) {
     Card(
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFF3F2F4)), // Cinzento claro
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFF3F2F4)), // Light Gray
         shape = RoundedCornerShape(16.dp),
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            // Item 1
-            ActivityRow(
-                icon = Icons.Outlined.Description,
-                title = "João Silva submeteu candidatura",
-                time = "Há 2 minutos"
-            )
-            Divider(modifier = Modifier.padding(vertical = 12.dp), color = Color.LightGray.copy(alpha=0.5f))
+            if (notifications.isEmpty()) {
+                Text(
+                    text = "Nenhuma atividade recente",
+                    modifier = Modifier.padding(8.dp),
+                    color = Color.Gray
+                )
+            } else {
+                notifications.forEachIndexed { index, notification ->
+                    ActivityRow(
+                        icon = getIconForType(notification.type),
+                        title = notification.tittle, // Ensure your model has 'title' corrected from 'tittle'
+                        time = notification.created_at // You may want to parse/format this date string
+                    )
 
-            // Item 2
-            ActivityRow(
-                icon = Icons.Outlined.Inventory2,
-                title = "Sistema: Stock de Arroz atualizado",
-                time = "Há 3 dias"
-            )
-            Divider(modifier = Modifier.padding(vertical = 12.dp), color = Color.LightGray.copy(alpha=0.5f))
-
-            // Item 3
-            ActivityRow(
-                icon = Icons.Outlined.Description, // Ícone diferente se quiseres
-                title = "Maria Costa cancelou agendamento",
-                time = "Há 5 dias"
-            )
+                    // Add Divider only if it is NOT the last item
+                    if (index < notifications.size - 1) {
+                        Divider(
+                            modifier = Modifier.padding(vertical = 12.dp),
+                            color = Color.LightGray.copy(alpha = 0.5f)
+                        )
+                    }
+                }
+            }
         }
+    }
+}
+
+fun getIconForType(type: String?): ImageVector {
+    return when (type) {
+        NotificationTypes.STOCK.type -> Icons.Outlined.Inventory2
+        NotificationTypes.SCHEDULE.type -> Icons.Outlined.Event
+        NotificationTypes.APPLICATION.type -> Icons.Outlined.Description
+        else -> Icons.Outlined.Notifications // Generic fallback
     }
 }
 
@@ -177,7 +200,5 @@ fun ActivityRow(icon: ImageVector, title: String, time: String) {
 @Preview(showBackground = true)
 @Composable
 fun AdminHomePreview() {
-    MaterialTheme {
-        AdminHomeContent(modifier = Modifier, navigateTo = {})
-    }
+
 }

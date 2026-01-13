@@ -3,8 +3,10 @@ package com.ipca.socialstore.presentation.ui
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ipca.socialstore.data.enums.UserRole
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
 import com.ipca.socialstore.domain.auth.LogoutUseCase
+import com.ipca.socialstore.domain.services.notifications.GetNotificationsByUser
 import com.ipca.socialstore.presentation.utils.errors.ErrorText
 import com.ipca.socialstore.presentation.utils.errors.asUiText
 import com.ipca.socialstore.presentation.views.home.defaultHomeView.DefaultHomeState
@@ -18,7 +20,8 @@ data class SocialStoreScaffoldState (
 )
 
 @HiltViewModel
-class SocialStoreScaffoldViewModel @Inject constructor(private val logoutUseCase: LogoutUseCase): ViewModel() {
+class SocialStoreScaffoldViewModel @Inject constructor(
+    private val logoutUseCase: LogoutUseCase): ViewModel() {
     var uiState = mutableStateOf(DefaultHomeState())
 
     fun logout(){

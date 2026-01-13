@@ -6,14 +6,18 @@ import android.content.Context
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import com.ipca.socialstore.R // Importa os teus recursos
+import com.ipca.socialstore.data.enums.NotificationTypes
 import com.ipca.socialstore.data.exceptions.AppError
 import com.ipca.socialstore.data.exceptions.ExceptionMapper
+import com.ipca.socialstore.data.models.NotificationAdminModel
 import com.ipca.socialstore.data.models.NotificationScheduledModel
 import com.ipca.socialstore.data.repository.AuthRepository
+import com.ipca.socialstore.data.repository.NotificationAdminRepository
 import com.ipca.socialstore.data.repository.NotificationRepository
 import com.ipca.socialstore.data.repository.UserRepository
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
 import com.ipca.socialstore.domain.item.GetItemNameUseCase
+import com.ipca.socialstore.domain.notificationAdmin.CreateAdminNotificationUseCase
 import com.ipca.socialstore.domain.notificationSchedule.CreateInitialNotificationUseCase
 import com.ipca.socialstore.domain.stock.GetStockById
 
@@ -27,9 +31,9 @@ class CreateStockNotificationService @Inject constructor(
     private val getItemNameUseCase: GetItemNameUseCase,
     private val createInitialNotificationUseCase: CreateInitialNotificationUseCase,
     private val notificationRepository: NotificationRepository,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val createAdminNotificationUseCase: CreateAdminNotificationUseCase,
 ) {
-
     private val CHANNEL_ID = "STOCK_ALERTS_CHANNEL"
 
     suspend operator fun invoke(stockId: List<Int>): ResultWrapper<Boolean> {
@@ -71,40 +75,17 @@ class CreateStockNotificationService @Inject constructor(
                     createInitialNotificationUseCase(notificationModel)
                 }
 
-                showSystemNotification(notificationTitle, notificationSubject)
+                createAdminNotificationUseCase(
+                    tittle = notificationTitle,
+                    description = notificationSubject,
+                    type = NotificationTypes.STOCK.type
+                )
             }
             ResultWrapper.Success(true)
 
         } catch (e: Exception) {
             ResultWrapper.Error(exceptionMapper.map(e))
         }
-    }
-
-    fun showSystemNotification(title: String, message: String) {
-        val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                CHANNEL_ID,
-                "Alertas de Stock e Validade",
-                NotificationManager.IMPORTANCE_HIGH
-            ).apply {
-                description = "Notificações urgentes sobre validade de itens no armazém"
-                enableVibration(true)
-            }
-            notificationManager.createNotificationChannel(channel)
-        }
-
-        val builder = NotificationCompat.Builder(context, CHANNEL_ID)
-            .setSmallIcon(android.R.drawable.ic_dialog_alert)
-            .setContentTitle(title)
-            .setContentText(message)
-            .setStyle(NotificationCompat.BigTextStyle().bigText(message))
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setCategory(NotificationCompat.CATEGORY_ALARM)
-            .setAutoCancel(true)
-
-        notificationManager.notify(System.currentTimeMillis().toInt(), builder.build())
     }
 
      suspend fun checkIfUserIsAdmin(): Boolean {

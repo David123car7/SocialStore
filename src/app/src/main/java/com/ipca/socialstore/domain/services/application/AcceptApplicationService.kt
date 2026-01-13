@@ -2,26 +2,31 @@ package com.ipca.socialstore.domain.services.application
 
 
 import com.ipca.socialstore.data.enums.ApplicationStates
+import com.ipca.socialstore.data.enums.NotificationTypes
 import com.ipca.socialstore.data.enums.UserRole
 import com.ipca.socialstore.data.models.ApplicationModel
 import com.ipca.socialstore.data.models.ApplicationStateModel
 import com.ipca.socialstore.data.models.BeneficiaryModel
 import com.ipca.socialstore.data.models.NotificationScheduledModel
+import com.ipca.socialstore.data.models.NotificationUserModel
 import com.ipca.socialstore.data.pdfbox.PdfGenerator
 import com.ipca.socialstore.data.repository.ApplicationStateRepository
 import com.ipca.socialstore.data.repository.AuthRepository
 import com.ipca.socialstore.data.repository.BeneficiaryRepository
+import com.ipca.socialstore.data.repository.NotificationBeneficiaryRepository
 import com.ipca.socialstore.data.repository.NotificationRepository
 import com.ipca.socialstore.data.repository.UserRepository
 import com.ipca.socialstore.data.resultwrappers.ResultWrapper
 import com.ipca.socialstore.domain.notificationSchedule.CreateInitialNotificationUseCase
+import com.ipca.socialstore.domain.notificationUser.CreateUserNotificationUseCase
 import javax.inject.Inject
 
 class AcceptApplicationService @Inject constructor(
     private val applicationStateRepository: ApplicationStateRepository,
     private val beneficiaryRepository: BeneficiaryRepository,
     private val authRepository: AuthRepository,
-    private val userRepository: UserRepository){
+    private val userRepository: UserRepository,
+    private val createUserNotificationUseCase: CreateUserNotificationUseCase){
     suspend operator fun invoke(application: ApplicationModel): ResultWrapper<Unit>{
         val uidResult = authRepository.getUserUidByApplicationId(appId = application.id!!)
         if (uidResult is ResultWrapper.Error) return ResultWrapper.Error(uidResult.error)
@@ -54,6 +59,14 @@ class AcceptApplicationService @Inject constructor(
         val userBenIdResult = userRepository.setBeneficiaryId(uid = uid, beneficiaryId = benificiaryId)
         if(userBenIdResult is ResultWrapper.Error)
             return ResultWrapper.Error(userBenIdResult.error)
+
+
+        createUserNotificationUseCase(
+            userId = uid,
+            tittle = "Candidatura",
+            description = "A sua candidatura foi aceite",
+            type = NotificationTypes.APPLICATION.type
+        )
 
         return ResultWrapper.Success(Unit)
     }
