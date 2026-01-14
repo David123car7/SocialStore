@@ -213,42 +213,18 @@ fun CreateDonationViewContent(
                     OutlinedTextField(
                         value = uiState.donorName,
                         label = { Text("Doado Por") },
-                        modifier = Modifier.weight(1f),
+                        modifier = Modifier.weight(0.8f),
                         onValueChange = { value -> onUpdateDonor(value) },
                         shape = RoundedCornerShape(12.dp)
                     )
 
-                    var showDatePicker by remember { mutableStateOf(false) }
-
                     TextFieldDateComponent(
                         modifier = Modifier.weight(1f),
-                        label = "Doado Dia",
+                        label = "Data",
                         date = uiState.donationDate,
                         onDateUpdate = { newValue -> onUpdateDate(newValue) },
-                        onDatePickerUpdate = { showDatePicker = true }
+                        onDatePickerUpdate = {  }
                     )
-
-                    if (showDatePicker) {
-                        val datePickerState = rememberDatePickerState()
-                        DatePickerDialog(
-                            onDismissRequest = { showDatePicker = false },
-                            confirmButton = {
-                                TextButton(onClick = {
-                                    val millis = datePickerState.selectedDateMillis
-                                    if (millis != null) {
-                                        val formatter = java.text.SimpleDateFormat("dd/MM/yyyy", java.util.Locale.getDefault())
-                                        onUpdateDate(formatter.format(java.util.Date(millis)))
-                                    }
-                                    showDatePicker = false
-                                }) { Text("OK") }
-                            },
-                            dismissButton = {
-                                TextButton(onClick = { showDatePicker = false }) { Text("Cancelar") }
-                            }
-                        ) {
-                            DatePicker(state = datePickerState)
-                        }
-                    }
                 }
 
                 Text(
@@ -306,18 +282,20 @@ fun CreateDonationViewContent(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        OutlinedTextField(
-                            value = date.date,
-                            label = { Text("Validade") },
+                        TextFieldDateComponent(
                             modifier = Modifier.weight(1f),
-                            onValueChange = { value -> onUpdateExpiration(index, value) },
-                            shape = RoundedCornerShape(12.dp)
+                            label = "Validade",
+                            date = date.date,
+                            onDateUpdate = { newValue -> onUpdateExpiration(index,newValue) },
+                            onDatePickerUpdate = {  }
                         )
+
+
+
                         OutlinedTextField(
                             value = date.quantity,
-                            label = { Text("Quantidade") },
-                            modifier = Modifier.weight(1f),
-                            onValueChange = { value -> onUpdateQuantity(index, value) },
+                            label = { Text("Qnt") },
+                            modifier = Modifier.weight(0.5f),                            onValueChange = { value -> onUpdateQuantity(index, value) },
                             shape = RoundedCornerShape(12.dp),
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                         )
