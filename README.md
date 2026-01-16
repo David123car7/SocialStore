@@ -1,15 +1,15 @@
-# 🤝 Social Store
+# Social Store
 
 > **Academic Context**  
 > This application was developed as part of the “Mobile Application Development && Applied Project” course in the third year of the degree in Computer Systems Engineering (Licenciatura em Engenharia de Sistemas Informáticos) at Instituto Politécnico do Cávado e do Ave.
 
-## 📋 About the Project
+## About the Project
 
 The **IPCA Social Store** is a solidarity initiative designed to support students in vulnerable socioeconomic situations by providing essential goods (food, hygiene products, etc.).
 
-This project aims to develop an **integrated digital solution** to modernize and optimize the entire management process. The system consists of a **Mobile Application** for internal use by Social Action Services (SAS) staff and a public **Website** for the academic community.
+This project aims to develop an **integrated digital solution** to modernize and optimize the entire management process. The system consists of a **Mobile Application** for internal use by Social Action Services (SAS) staff.
 
-### 🎯 Key Objectives
+### Key Objectives
 * **Centralize** beneficiary information and inventory data.
 * **Automate** stock management (entries, exits, and expiration dates).
 * **Optimize** delivery scheduling and pickup management.
@@ -17,29 +17,30 @@ This project aims to develop an **integrated digital solution** to modernize and
 
 ---
 
-## 🚀 Key Features
+## Key Features
 
-### 📱 Mobile Application
-* **Authentication:** Secure login with IPCA institutional domain.
+### Mobile Application
 * **Beneficiary Management:** Registration, eligibility validation, and support history.
 * **Inventory Control:** Stock registration (barcode scanning), expiration date monitoring, and categorization.
 * **Scheduling:** Delivery appointments, absence management, and rescheduling.
-* **Reporting:** Visual metrics on stock entries/exits and expiration alerts.
-
-### 🌐 Website (Public)
-* Promotion of donation campaigns and partnerships.
-* General information about the Social Store's operation.
-
+* **Reporting:** Visual metrics on stock entries/exits and ability to export those reports.
+* **Application Creation:** Users can submit the benificiary application with staff providing feedback.
+  
 ---
 
-## 🛠️ Tech Stack
-
-The project utilizes a hybrid architecture with the following technologies:
-
-| Layer | Technology | Description |
-| :--- | :--- | :--- |
-| **Mobile** | ![Android](https://img.shields.io/badge/Android_Studio-3DDC84?style=flat&logo=android&logoColor=white) ![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?style=flat&logo=supabase&logoColor=white) ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=flat&logo=postgresql&logoColor=white) | Native Android development integrated with Supabase (Auth & SQL Database) |
-| **Frontend Web** | ![Next.js](https://img.shields.io/badge/Next.js-000000?style=flat&logo=nextdotjs&logoColor=white) ![React](https://img.shields.io/badge/React-20232A?style=flat&logo=react&logoColor=61DAFB) | Public informational website |
-
+| Layer              | Technology                                                                 | Description                                                    |
+| :----------------- | :------------------------------------------------------------------------ | :------------------------------------------------------------- |
+| **Mobile**         | ![Android](https://img.shields.io/badge/Android_Studio-3DDC84?style=flat&logo=android&logoColor=white) | Native Android development.                                   |
+| **Backend**        | ![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?style=flat&logo=supabase&logoColor=white) | Integrated Auth & Database.                               |
+| **Firebase**  | ![Firebase](https://img.shields.io/badge/Firebase-FFCA28?style=flat&logo=firebase&logoColor=white) | Used for real-time notifications.      
 ---
+
+## Future Improvements
+
+While the project is functional, there are still areas that need enhancement:
+
+* **Event Notifications:** The project is yet to implement notifications for all events, which would greatly improve user engagement and experience.
+* **User Interface Improvements:** The current UI requires refinement to enhance usability and aesthetics.
+
+Although the project will not continue to receive updates, these suggestions could be valuable for any future development efforts.
 
