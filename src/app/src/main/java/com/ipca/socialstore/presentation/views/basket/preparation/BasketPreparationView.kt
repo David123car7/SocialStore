@@ -19,7 +19,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults.buttonColors
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -51,7 +50,6 @@ import com.ipca.socialstore.data.models.ItemModel
 import com.ipca.socialstore.data.models.SchedulingModel
 import com.ipca.socialstore.presentation.models.StockReceiverModel
 import com.ipca.socialstore.presentation.ui.components.SearchBarContent
-import com.ipca.socialstore.presentation.ui.theme.GreenIPCA
 import com.ipca.socialstore.presentation.ui.theme.SocialStoreTheme
 
 @Composable
@@ -190,7 +188,6 @@ fun BasketPreparationContent(
                     onCreate()
                 }
                       },
-            colors = buttonColors(GreenIPCA),
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(text = "Colocar Items Entrega")
